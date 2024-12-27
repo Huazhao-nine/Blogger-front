@@ -1,5 +1,4 @@
-import request from '../api/request'
-import axios from "axios"; // 引入封装好的请求模块
+import request from "@/api/request.js";
 
 /**
  * 获取每日壁纸

@@ -4,6 +4,7 @@
     <div class="header" :style="{ backgroundImage: `url(${wallpaperUrl})` }">
       <h1>花朝九日's Blogger</h1>
     </div>
+
     <!-- 瀑布流文章列表 -->
     <div
         class="article-list"
@@ -12,230 +13,262 @@
         @touchmove="onTouchMove"
         @touchend="onTouchEnd"
     >
-      <el-skeleton :rows="20" animated v-if="articlesLoading"/>
-      <div class="article-card" v-else v-for="article in articles" :key="article.id" @click="getArticlesDetail(article.id)">
+      <el-skeleton :rows="20" animated v-if="articlesLoading" />
+      <div
+          class="article-card"
+          v-else
+          v-for="article in articles"
+          :key="article.id"
+          @click="getArticlesDetail(article.id)"
+      >
         <div class="article-content">
           <h3 class="article-title">{{ article.title }}</h3>
           <p class="article-summary">{{ article.summary }}</p>
         </div>
       </div>
     </div>
+
     <!-- 底部导航栏 -->
     <div class="footer-nav">
-      <button @click="goToPage('')">主页</button>
-      <button @click="goToPage('')">文章</button>
-      <button @click="goToPage('')">关于</button>
+      <button @click="goToPage('')">Home</button>
+      <button @click="goToPage('')">Articles</button>
+      <button @click="goToPage('')">About</button>
     </div>
+
     <!-- 可拖动的悬浮球 -->
-<!--    <div-->
-<!--        class="floating-btn"-->
-<!--        ref="floatingBtn"-->
-<!--        @touchstart="onTouchStartForBall"-->
-<!--        @touchmove="onTouchMoveForBall"-->
-<!--        @touchend="onTouchEndForBall"-->
-<!--        @click="toggleMenu"-->
-<!--    >-->
-<!--      <span>+</span>-->
-<!--    </div>-->
+    <!--
+    <div
+      class="floating-btn"
+      ref="floatingBtn"
+      @touchstart="onTouchStartForBall"
+      @touchmove="onTouchMoveForBall"
+      @touchend="onTouchEndForBall"
+      @click="toggleMenu"
+    >
+      <span>+</span>
+    </div>
+    -->
+
     <!-- 菜单 -->
-<!--    <div v-if="isMenuVisible" class="floating-menu" ref="floatingMenu">-->
-<!--      <ul>-->
-<!--        <li>菜单项 1</li>-->
-<!--        <li>菜单项 2</li>-->
-<!--        <li>菜单项 3</li>-->
-<!--      </ul>-->
-<!--    </div>-->
+    <!--
+    <div v-if="isMenuVisible" class="floating-menu" ref="floatingMenu">
+      <ul>
+        <li>菜单项 1</li>
+        <li>菜单项 2</li>
+        <li>菜单项 3</li>
+      </ul>
+    </div>
+    -->
   </div>
 </template>
+
 <script setup>
 import { ref, onMounted, onBeforeUnmount } from 'vue';
-import { getWallPaper } from "@/api/getWallPaper.js";
-import {ElNotification} from "element-plus";
-import {getTheArticlesForHome} from "@/api/getTheArticlesForHome.js";
-import {HomeArticles, HomePage} from "@/api/globals.js";
-    const articlesLoading = ref(false);
-    const articles = ref([]);
-    const getArticleList = async () => {
-      articlesLoading.value = true;
-      const res = await getTheArticlesForHome(HomePage.value, HomeArticles.value)
-      articles.value = res.data.data.records;
-      articlesLoading.value = false;
-      // articlesLoading.value = false;
-    }
-    const getArticlesDetail = (articleId) => {
-      ElNotification({
-        title: '注意',
-        message: "你要看的文章ID为" + articleId + ",此功能正在赶来的路上。",
-        type: 'warning',
-      })
-    }
-    const wallpaperUrl = ref('');
-    const isMenuVisible = ref(false);
-    const isDraggingForBall = ref(false);
-    const startXForBall = ref(0);
-    const startYForBall = ref(0);
-    const offsetXForBall = ref(0);
-    const offsetYForBall = ref(0);
-    const startY = ref(0);
-    const currentY = ref(0);
-    const isDragging = ref(false);
-    const maxScroll = ref(0);
-    // 切换菜单显示状态
-    const toggleMenu = (event) => {
-      isMenuVisible.value = !isMenuVisible.value;
-      event.stopPropagation(); // 阻止事件冒泡
-    };
-    // 处理悬浮球拖动
-    const onTouchStartForBall = (event) => {
-      isDraggingForBall.value = true;
-      const touch = event.touches[0];
-      startXForBall.value = touch.clientX - offsetXForBall.value;
-      startYForBall.value = touch.clientY - offsetYForBall.value;
-      event.preventDefault();
-    };
-    const onTouchMoveForBall = (event) => {
-      if (!isDraggingForBall.value) return;
-      const touch = event.touches[0];
-      offsetXForBall.value = touch.clientX - startXForBall.value;
-      offsetYForBall.value = touch.clientY - startYForBall.value;
-      const floatingBtn = document.querySelector('.floating-btn');
-      floatingBtn.style.transform = `translate(${offsetXForBall.value}px, ${offsetYForBall.value}px)`;
-      event.preventDefault();
-    };
-    const onTouchEndForBall = () => {
-      isDraggingForBall.value = false;
-    };
-    // 点击其他地方隐藏菜单
-    const handleClickOutside = (event) => {
-      const floatingBtn = document.querySelector('.floating-btn');
-      const floatingMenu = document.querySelector('.floating-menu');
-      if (
-          floatingBtn &&
-          !floatingBtn.contains(event.target) &&
-          floatingMenu &&
-          !floatingMenu.contains(event.target)
-      ) {
-        isMenuVisible.value = false;
-      }
-    };
-    // 获取壁纸
-    const fetchWallpaper = async () => {
-      try {
-        let imageUrl = await getWallPaper();
-        const wallpaperData = imageUrl.data.msg;
-        const parsedData = JSON.parse(wallpaperData);
-        const baseUrl = "https://www.bing.com";
-        imageUrl = baseUrl + parsedData.images[0].url;
-        wallpaperUrl.value = imageUrl;
-        // 创建一个Image对象并加载壁纸
-        const image = new Image();
-        image.crossOrigin = "Anonymous";  // 处理跨域问题
-        image.src = imageUrl;
-        image.onload = () => {
-          // 创建Canvas元素
-          const canvas = document.createElement('canvas');
-          const ctx = canvas.getContext('2d');
-          // 设置canvas尺寸为图片的尺寸
-          canvas.width = image.width;
-          canvas.height = image.height;
-          // 将图片绘制到Canvas上
-          ctx.drawImage(image, 0, 0, image.width, image.height);
-          // 获取图片顶部和底部的颜色数据
-          const topColor = getAverageColor(ctx, 0, 0, image.width, image.height / 3);
-          const bottomColor = getAverageColor(ctx, 0, image.height * 2 / 3, image.width, image.height);
-          // 设置渐变色
-          const gradient = `linear-gradient(to bottom, rgb(${topColor.r}, ${topColor.g}, ${topColor.b}), rgb(${bottomColor.r}, ${bottomColor.g}, ${bottomColor.b}))`;
-          // document.body.style.background = gradient;
-        };
-      } catch (error) {
-        console.error('Error fetching wallpaper:', error);
-      }
-    };
-    // 获取指定区域的平均颜色
-    const getAverageColor = (ctx, x, y, width, height) => {
-    const imageData = ctx.getImageData(x, y, width, height);
-    const data = imageData.data;
-    let r = 0, g = 0, b = 0;
-    for (let i = 0; i < data.length; i += 4) {
-      r += data[i];     // red
-      g += data[i + 1]; // green
-      b += data[i + 2]; // blue
-    }
+import { ElNotification } from 'element-plus';
+import { HomeArticles, HomePage } from '@/api/globals.js';
+import { getWallPaper } from '@/api/WallpaperService.js';
+import { getArticleByID, getTheArticlesForHome } from '@/api/ArticleService.js';
 
-    const pixelCount = data.length / 4;
-    r = Math.floor(r / pixelCount);
-    g = Math.floor(g / pixelCount);
-    b = Math.floor(b / pixelCount);
+const articlesLoading = ref(false);
+const articles = ref([]);
 
-    return { r, g, b };
-  };
-    // 计算最大滚动范围
-    const calculateMaxScroll = () => {
-      const articleList = document.querySelector('.article-list');
-      maxScroll.value = articleList.clientHeight - articleList.scrollHeight;
+const getArticleList = async () => {
+  articlesLoading.value = true;
+  const res = await getTheArticlesForHome(HomePage.value, HomeArticles.value);
+  articles.value = res.data.data.records;
+  articlesLoading.value = false;
+};
+
+const getArticlesDetail = async (articleId) => {
+  const response = await getArticleByID(articleId);
+  const article = response.data.data;
+  ElNotification({
+    title: '注意',
+    message: "你要看的文章标题为" + article.title + ",此功能正在赶来的路上。",
+    type: 'warning',
+  });
+};
+
+const wallpaperUrl = ref('');
+const isMenuVisible = ref(false);
+const isDraggingForBall = ref(false);
+const startXForBall = ref(0);
+const startYForBall = ref(0);
+const offsetXForBall = ref(0);
+const offsetYForBall = ref(0);
+const startY = ref(0);
+const currentY = ref(0);
+const isDragging = ref(false);
+const maxScroll = ref(0);
+
+// 切换菜单显示状态
+const toggleMenu = (event) => {
+  isMenuVisible.value = !isMenuVisible.value;
+  event.stopPropagation(); // 阻止事件冒泡
+};
+
+// 处理悬浮球拖动
+const onTouchStartForBall = (event) => {
+  isDraggingForBall.value = true;
+  const touch = event.touches[0];
+  startXForBall.value = touch.clientX - offsetXForBall.value;
+  startYForBall.value = touch.clientY - offsetYForBall.value;
+  event.preventDefault();
+};
+
+const onTouchMoveForBall = (event) => {
+  if (!isDraggingForBall.value) return;
+  const touch = event.touches[0];
+  offsetXForBall.value = touch.clientX - startXForBall.value;
+  offsetYForBall.value = touch.clientY - startYForBall.value;
+  const floatingBtn = document.querySelector('.floating-btn');
+  floatingBtn.style.transform = `translate(${offsetXForBall.value}px, ${offsetYForBall.value}px)`;
+  event.preventDefault();
+};
+
+const onTouchEndForBall = () => {
+  isDraggingForBall.value = false;
+};
+
+// 点击其他地方隐藏菜单
+const handleClickOutside = (event) => {
+  const floatingBtn = document.querySelector('.floating-btn');
+  const floatingMenu = document.querySelector('.floating-menu');
+  if (
+      floatingBtn &&
+      !floatingBtn.contains(event.target) &&
+      floatingMenu &&
+      !floatingMenu.contains(event.target)
+  ) {
+    isMenuVisible.value = false;
+  }
+};
+
+// 获取壁纸
+const fetchWallpaper = async () => {
+  try {
+    let imageUrl = await getWallPaper();
+    const wallpaperData = imageUrl.data.msg;
+    const parsedData = JSON.parse(wallpaperData);
+    const baseUrl = 'https://www.bing.com';
+    imageUrl = baseUrl + parsedData.images[0].url;
+    wallpaperUrl.value = imageUrl;
+    // 创建一个Image对象并加载壁纸
+    const image = new Image();
+    image.crossOrigin = 'Anonymous'; // 处理跨域问题
+    image.src = imageUrl;
+    image.onload = () => {
+      // 创建Canvas元素
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      // 设置canvas尺寸为图片的尺寸
+      canvas.width = image.width;
+      canvas.height = image.height;
+      // 将图片绘制到Canvas上
+      ctx.drawImage(image, 0, 0, image.width, image.height);
+      // 获取图片顶部和底部的颜色数据
+      const topColor = getAverageColor(ctx, 0, 0, image.width, image.height / 3);
+      const bottomColor = getAverageColor(ctx, 0, image.height * 2 / 3, image.width, image.height);
+      // 设置渐变色
+      const gradient = `linear-gradient(to bottom, rgb(${topColor.r}, ${topColor.g}, ${topColor.b}), rgb(${bottomColor.r}, ${bottomColor.g}, ${bottomColor.b}))`;
+      // document.body.style.background = gradient;
     };
-    // 跳转页面
-    const goToPage = (page) => {
-      window.location.href = `/${page}`;
-    };
-    // 滑动事件处理
-    const onTouchStart = (event) => {
-      startY.value = event.touches[0].pageY - currentY.value;
-      isDragging.value = true;
-    };
-    const onTouchMove = (event) => {
-      if (!isDragging.value) return;
-      currentY.value = event.touches[0].pageY - startY.value;
-      if (currentY.value > 0) {
-        currentY.value /= 2;
-      } else if (currentY.value < maxScroll.value) {
-        currentY.value = maxScroll.value + (currentY.value - maxScroll.value) / 2;
-      }
-      const articleList = document.querySelector('.article-list');
-      articleList.style.transform = `translateY(${currentY.value}px)`;
-    };
-    const onTouchEnd = () => {
-      if (!isDragging.value) return;
-      isDragging.value = false;
-      if (currentY.value > 0) {
-        currentY.value = 0;
-      } else if (currentY.value < maxScroll.value) {
-        currentY.value = maxScroll.value;
-      }
-      const articleList = document.querySelector('.article-list');
-      articleList.style.transition = 'transform 0.3s ease';
-      articleList.style.transform = `translateY(${currentY.value}px)`;
-      setTimeout(() => {
-        articleList.style.transition = '';
-      }, 300);
-    };
-    // 检测设备类型
-    const checkDeviceType = () => {
-      if (window.innerWidth > 768) {
-        ElNotification({
-          title: '注意',
-          message: '当前页面暂未适配桌面端，请使用移动端设备进行浏览获得最佳效果。',
-          type: 'warning',
-        })
-      }
-    };
-    // 生命周期钩子
-    onMounted(() => {
-      fetchWallpaper();
-      calculateMaxScroll();
-      checkDeviceType(); // 初次加载时检查设备
-      window.addEventListener("resize", checkDeviceType); // 窗口大小变化时重新检查
-      window.addEventListener("resize", calculateMaxScroll);
-      document.addEventListener('touchstart', handleClickOutside);
-      getArticleList();
+  } catch (error) {
+    console.error('Error fetching wallpaper:', error);
+  }
+};
+
+// 获取指定区域的平均颜色
+const getAverageColor = (ctx, x, y, width, height) => {
+  const imageData = ctx.getImageData(x, y, width, height);
+  const data = imageData.data;
+  let r = 0, g = 0, b = 0;
+  for (let i = 0; i < data.length; i += 4) {
+    r += data[i];     // red
+    g += data[i + 1]; // green
+    b += data[i + 2]; // blue
+  }
+
+  const pixelCount = data.length / 4;
+  r = Math.floor(r / pixelCount);
+  g = Math.floor(g / pixelCount);
+  b = Math.floor(b / pixelCount);
+
+  return { r, g, b };
+};
+
+// 计算最大滚动范围
+const calculateMaxScroll = () => {
+  const articleList = document.querySelector('.article-list');
+  maxScroll.value = articleList.clientHeight - articleList.scrollHeight;
+};
+
+// 跳转页面
+const goToPage = (page) => {
+  window.location.href = `/${page}`;
+};
+
+// 滑动事件处理
+const onTouchStart = (event) => {
+  startY.value = event.touches[0].pageY - currentY.value;
+  isDragging.value = true;
+};
+
+const onTouchMove = (event) => {
+  if (!isDragging.value) return;
+  currentY.value = event.touches[0].pageY - startY.value;
+  if (currentY.value > 0) {
+    currentY.value /= 2;
+  } else if (currentY.value < maxScroll.value) {
+    currentY.value = maxScroll.value + (currentY.value - maxScroll.value) / 2;
+  }
+  const articleList = document.querySelector('.article-list');
+  articleList.style.transform = `translateY(${currentY.value}px)`;
+};
+
+const onTouchEnd = () => {
+  if (!isDragging.value) return;
+  isDragging.value = false;
+  if (currentY.value > 0) {
+    currentY.value = 0;
+  } else if (currentY.value < maxScroll.value) {
+    currentY.value = maxScroll.value;
+  }
+  const articleList = document.querySelector('.article-list');
+  articleList.style.transition = 'transform 0.3s ease';
+  articleList.style.transform = `translateY(${currentY.value}px)`;
+  setTimeout(() => {
+    articleList.style.transition = '';
+  }, 300);
+};
+
+// 检测设备类型
+const checkDeviceType = () => {
+  if (window.innerWidth > 768) {
+    ElNotification({
+      title: '页面暂未适配',
+      message: '当前页面暂未适配桌面端，请使用移动端设备进行浏览获得最佳效果。',
+      type: 'warning',
     });
-    onBeforeUnmount(() => {
-      window.removeEventListener("resize", calculateMaxScroll);
-      document.removeEventListener('touchstart', handleClickOutside);
-      window.removeEventListener("resize", checkDeviceType); // 清理事件监听
-    });
+  }
+};
+
+// 生命周期钩子
+onMounted(() => {
+  fetchWallpaper();
+  calculateMaxScroll();
+  checkDeviceType(); // 初次加载时检查设备
+  window.addEventListener('resize', checkDeviceType); // 窗口大小变化时重新检查
+  window.addEventListener('resize', calculateMaxScroll);
+  document.addEventListener('touchstart', handleClickOutside);
+  getArticleList();
+});
+
+onBeforeUnmount(() => {
+  window.removeEventListener('resize', calculateMaxScroll);
+  document.removeEventListener('touchstart', handleClickOutside);
+});
 </script>
-
 <style scoped>
 .home {
   display: flex;
@@ -296,7 +329,7 @@ import {HomeArticles, HomePage} from "@/api/globals.js";
   border-radius: 25px;
   overflow: hidden;
   margin-bottom: 25px; /* 卡片之间的间距 */
-  background-color: #ffffff; /* 白色背景 */
+  background-color: #FFFFFE; /* 白色背景 */
   box-shadow: 0 15px 20px rgba(0, 0, 0, 0.1); /* 细微阴影 */
   transition: transform 0.1s ease, box-shadow 0.1s ease; /* 动画效果 */
 }
@@ -316,6 +349,7 @@ import {HomeArticles, HomePage} from "@/api/globals.js";
 .article-summary {
   font-size: 1.0em;
   color: #555;
+  font-weight: 500;
 }
 /* 底部导航栏：亚克力透明效果 */
 .footer-nav {
