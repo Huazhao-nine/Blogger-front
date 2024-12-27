@@ -60,6 +60,7 @@ import {HomeArticles, HomePage} from "@/api/globals.js";
       const res = await getTheArticlesForHome(HomePage.value, HomeArticles.value)
       articles.value = res.data.data.records;
       articlesLoading.value = false;
+      // articlesLoading.value = false;
     }
     const getArticlesDetail = (articleId) => {
       ElNotification({
