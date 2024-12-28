@@ -1,8 +1,8 @@
 <template>
-  <div class="home">
+  <div class="home" v-if="isPhone">
     <!-- 顶部轮换壁纸 -->
     <div class="header" :style="{ backgroundImage: `url(${wallpaperUrl})` }">
-      <h1>花朝九日's Blogger</h1>
+      <h1 >关于花朝九日</h1>
     </div>
 
     <!-- 瀑布流文章列表 -->
@@ -19,7 +19,6 @@
           v-else
           v-for="article in articles"
           :key="article.id"
-          @click="getArticlesDetail(article.id)"
       >
         <div class="article-content">
           <h3 class="article-title">{{ article.title }}</h3>
@@ -29,11 +28,7 @@
     </div>
 
     <!-- 底部导航栏 -->
-    <div class="footer-nav">
-      <button @click="goToPage('')">Home</button>
-      <button @click="goToPage('')">Articles</button>
-      <button @click="goToPage('')">About</button>
-    </div>
+    <footer-nav></footer-nav>
 
     <!-- 可拖动的悬浮球 -->
     <!--
@@ -60,6 +55,9 @@
     </div>
     -->
   </div>
+  <div class="header" :style="{ backgroundImage: `url(${wallpaperUrl})` }" v-else>
+    <h1 >请使用移动端访问获得更好体验</h1>
+  </div>
 </template>
 
 <script setup>
@@ -68,6 +66,7 @@ import { ElNotification } from 'element-plus';
 import { HomeArticles, HomePage } from '@/api/globals.js';
 import { getWallPaper } from '@/api/WallpaperService.js';
 import { getArticleByID, getTheArticlesForHome } from '@/api/ArticleService.js';
+import FooterNav from "@/components/footerNav.vue";
 
 const articlesLoading = ref(false);
 const articles = ref([]);
@@ -77,16 +76,6 @@ const getArticleList = async () => {
   const res = await getTheArticlesForHome(HomePage.value, HomeArticles.value);
   articles.value = res.data.data.records;
   articlesLoading.value = false;
-};
-
-const getArticlesDetail = async (articleId) => {
-  const response = await getArticleByID(articleId);
-  const article = response.data.data;
-  ElNotification({
-    title: '注意',
-    message: "你要看的文章标题为" + article.title + ",此功能正在赶来的路上。",
-    type: 'warning',
-  });
 };
 
 const wallpaperUrl = ref('');
@@ -203,11 +192,6 @@ const calculateMaxScroll = () => {
   maxScroll.value = articleList.clientHeight - articleList.scrollHeight;
 };
 
-// 跳转页面
-const goToPage = (page) => {
-  window.location.href = `/${page}`;
-};
-
 // 滑动事件处理
 const onTouchStart = (event) => {
   startY.value = event.touches[0].pageY - currentY.value;
@@ -241,16 +225,17 @@ const onTouchEnd = () => {
     articleList.style.transition = '';
   }, 300);
 };
-
+const isPhone = ref(true)
 // 检测设备类型
 const checkDeviceType = () => {
   if (window.innerWidth > 768) {
+    isPhone.value = false
     ElNotification({
       title: '页面暂未适配',
       message: '当前页面暂未适配桌面端，请使用移动端设备进行浏览获得最佳效果。',
       type: 'warning',
     });
-  }
+  }else isPhone.value = true
 };
 
 // 生命周期钩子
@@ -351,38 +336,7 @@ onBeforeUnmount(() => {
   color: #555;
   font-weight: 500;
 }
-/* 底部导航栏：亚克力透明效果 */
-.footer-nav {
-  display: flex;
-  justify-content: space-evenly; /* 改为均匀分布 */
-  align-items: center; /* 垂直居中 */
-  position: fixed;
-  bottom: 0;
-  background: #EAEAEA;
-  backdrop-filter: blur(10px);
-  border-top: 1px solid #EAEAEA;
-  padding: 10px 0;
-  border-radius: 25px;
-  margin: 0; /* 确保没有额外的外边距 */
-  width: calc(100% - 20px); /* 如果需要控制内边距，确保宽度自适应 */
-}
-.footer-nav button {
-  flex: 1; /* 按钮等分 */
-  min-width: 80px; /* 可根据需要调整最小宽度 */
-  text-align: center;
-  background: none;
-  border: none;
-  padding: 10px;
-  font-size: 16px;
-  color: #555;
-  transition: background-color 0.3s;
-}
-.footer-nav button:hover {
-  background-color: rgba(255, 255, 255, 0.1); /* 悬浮时透明背景 */
-}
-.footer-nav button:focus {
-  outline: none;
-}
+
 .floating-btn {
   position: fixed;
   bottom: 50px; /* 距离页面底部20px */
