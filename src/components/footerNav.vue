@@ -1,7 +1,12 @@
 <script setup>
 // 跳转页面
+import router from "@/router/index.js";
+import {useRouter} from "vue-router";
+
+const router1 = useRouter()
+
 const goToPage = (page) => {
-  window.location.href = `/${page}`;
+  router1.push(`/${page}`);  // 使用 router.push 进行页面跳转
 };
 </script>
 
