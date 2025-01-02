@@ -7,8 +7,10 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    AboutMe: typeof import('./src/components/AboutMe.vue')['default']
     ElConfigProvider: typeof import('element-plus/es')['ElConfigProvider']
     ElSkeleton: typeof import('element-plus/es')['ElSkeleton']
+    ElTag: typeof import('element-plus/es')['ElTag']
     FooterNav: typeof import('./src/components/footerNav.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']

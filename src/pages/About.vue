@@ -2,136 +2,31 @@
   <div class="home" v-if="isPhone">
     <!-- 顶部轮换壁纸 -->
     <div class="header" :style="{ backgroundImage: `url(${wallpaperUrl})` }">
-      <h1 >关于花朝九日</h1>
-    </div>
-
-    <!-- 瀑布流文章列表 -->
-    <div
-        class="article-list"
-        ref="articleList"
-        @touchstart="onTouchStart"
-        @touchmove="onTouchMove"
-        @touchend="onTouchEnd"
-    >
-      <el-skeleton :rows="20" animated v-if="articlesLoading" />
-      <div
-          class="article-card"
-          v-else
-          v-for="article in articles"
-          :key="article.id"
-      >
-        <div class="article-content">
-          <h3 class="article-title">{{ article.title }}</h3>
-          <p class="article-summary">{{ article.summary }}</p>
+      <div class="header-content">
+        <!-- 左边头像 -->
+        <img class="avatar" src="/src/assets/avatar.jpg" alt="头像" />
+        <!-- 竖线 -->
+        <div class="divider"></div>
+        <!-- 右边介绍 -->
+        <div class="intro">
+          <h1>花朝九日</h1>
+          <p>就在这长夜之后，凝结一座新宇宙</p>
         </div>
       </div>
     </div>
-
-    <!-- 底部导航栏 -->
-
-    <!-- 可拖动的悬浮球 -->
-    <!--
-    <div
-      class="floating-btn"
-      ref="floatingBtn"
-      @touchstart="onTouchStartForBall"
-      @touchmove="onTouchMoveForBall"
-      @touchend="onTouchEndForBall"
-      @click="toggleMenu"
-    >
-      <span>+</span>
-    </div>
-    -->
-
-    <!-- 菜单 -->
-    <!--
-    <div v-if="isMenuVisible" class="floating-menu" ref="floatingMenu">
-      <ul>
-        <li>菜单项 1</li>
-        <li>菜单项 2</li>
-        <li>菜单项 3</li>
-      </ul>
-    </div>
-    -->
+    <!-- 瀑布流文章列表 -->
+    <about-me></about-me>
   </div>
   <div class="header" :style="{ backgroundImage: `url(${wallpaperUrl})` }" v-else>
     <h1 >请使用移动端访问获得更好体验</h1>
   </div>
 </template>
-
 <script setup>
 import { ref, onMounted, onBeforeUnmount } from 'vue';
 import { ElNotification } from 'element-plus';
-import { HomeArticles, HomePage } from '@/api/globals.js';
 import { getWallPaper } from '@/api/WallpaperService.js';
-import { getArticleByID, getTheArticlesForHome } from '@/api/ArticleService.js';
-import FooterNav from "@/components/footerNav.vue";
-
-const articlesLoading = ref(false);
-const articles = ref([]);
-
-const getArticleList = async () => {
-  articlesLoading.value = true;
-  const res = await getTheArticlesForHome(HomePage.value, HomeArticles.value);
-  articles.value = res.data.data.records;
-  articlesLoading.value = false;
-};
-
+import AboutMe from "@/components/AboutMe.vue";
 const wallpaperUrl = ref('');
-const isMenuVisible = ref(false);
-const isDraggingForBall = ref(false);
-const startXForBall = ref(0);
-const startYForBall = ref(0);
-const offsetXForBall = ref(0);
-const offsetYForBall = ref(0);
-const startY = ref(0);
-const currentY = ref(0);
-const isDragging = ref(false);
-const maxScroll = ref(0);
-
-// 切换菜单显示状态
-const toggleMenu = (event) => {
-  isMenuVisible.value = !isMenuVisible.value;
-  event.stopPropagation(); // 阻止事件冒泡
-};
-
-// 处理悬浮球拖动
-const onTouchStartForBall = (event) => {
-  isDraggingForBall.value = true;
-  const touch = event.touches[0];
-  startXForBall.value = touch.clientX - offsetXForBall.value;
-  startYForBall.value = touch.clientY - offsetYForBall.value;
-  event.preventDefault();
-};
-
-const onTouchMoveForBall = (event) => {
-  if (!isDraggingForBall.value) return;
-  const touch = event.touches[0];
-  offsetXForBall.value = touch.clientX - startXForBall.value;
-  offsetYForBall.value = touch.clientY - startYForBall.value;
-  const floatingBtn = document.querySelector('.floating-btn');
-  floatingBtn.style.transform = `translate(${offsetXForBall.value}px, ${offsetYForBall.value}px)`;
-  event.preventDefault();
-};
-
-const onTouchEndForBall = () => {
-  isDraggingForBall.value = false;
-};
-
-// 点击其他地方隐藏菜单
-const handleClickOutside = (event) => {
-  const floatingBtn = document.querySelector('.floating-btn');
-  const floatingMenu = document.querySelector('.floating-menu');
-  if (
-      floatingBtn &&
-      !floatingBtn.contains(event.target) &&
-      floatingMenu &&
-      !floatingMenu.contains(event.target)
-  ) {
-    isMenuVisible.value = false;
-  }
-};
-
 // 获取壁纸
 const fetchWallpaper = async () => {
   try {
@@ -141,89 +36,12 @@ const fetchWallpaper = async () => {
     const baseUrl = 'https://www.bing.com';
     imageUrl = baseUrl + parsedData.images[0].url;
     wallpaperUrl.value = imageUrl;
-    // 创建一个Image对象并加载壁纸
-    const image = new Image();
-    image.crossOrigin = 'Anonymous'; // 处理跨域问题
-    image.src = imageUrl;
-    image.onload = () => {
-      // 创建Canvas元素
-      const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
-      // 设置canvas尺寸为图片的尺寸
-      canvas.width = image.width;
-      canvas.height = image.height;
-      // 将图片绘制到Canvas上
-      ctx.drawImage(image, 0, 0, image.width, image.height);
-      // 获取图片顶部和底部的颜色数据
-      const topColor = getAverageColor(ctx, 0, 0, image.width, image.height / 3);
-      const bottomColor = getAverageColor(ctx, 0, image.height * 2 / 3, image.width, image.height);
-      // 设置渐变色
-      const gradient = `linear-gradient(to bottom, rgb(${topColor.r}, ${topColor.g}, ${topColor.b}), rgb(${bottomColor.r}, ${bottomColor.g}, ${bottomColor.b}))`;
-      // document.body.style.background = gradient;
-    };
   } catch (error) {
     console.error('Error fetching wallpaper:', error);
   }
 };
 
-// 获取指定区域的平均颜色
-const getAverageColor = (ctx, x, y, width, height) => {
-  const imageData = ctx.getImageData(x, y, width, height);
-  const data = imageData.data;
-  let r = 0, g = 0, b = 0;
-  for (let i = 0; i < data.length; i += 4) {
-    r += data[i];     // red
-    g += data[i + 1]; // green
-    b += data[i + 2]; // blue
-  }
 
-  const pixelCount = data.length / 4;
-  r = Math.floor(r / pixelCount);
-  g = Math.floor(g / pixelCount);
-  b = Math.floor(b / pixelCount);
-
-  return { r, g, b };
-};
-
-// 计算最大滚动范围
-const calculateMaxScroll = () => {
-  const articleList = document.querySelector('.article-list');
-  maxScroll.value = articleList.clientHeight - articleList.scrollHeight;
-};
-
-// 滑动事件处理
-const onTouchStart = (event) => {
-  startY.value = event.touches[0].pageY - currentY.value;
-  isDragging.value = true;
-};
-
-const onTouchMove = (event) => {
-  if (!isDragging.value) return;
-  currentY.value = event.touches[0].pageY - startY.value;
-  if (currentY.value > 0) {
-    currentY.value /= 2;
-  } else if (currentY.value < maxScroll.value) {
-    currentY.value = maxScroll.value + (currentY.value - maxScroll.value) / 2;
-  }
-  const articleList = document.querySelector('.article-list');
-  articleList.style.transform = `translateY(${currentY.value}px)`;
-};
-
-const onTouchEnd = () => {
-  if (!isDragging.value) return;
-  isDragging.value = false;
-  if (currentY.value > 0) {
-    currentY.value = 0;
-  } else if (currentY.value < maxScroll.value) {
-    currentY.value = maxScroll.value;
-  }
-  const articleList = document.querySelector('.article-list');
-  articleList.style.transition = 'transform 0.3s ease';
-  articleList.style.transform = `translateY(${currentY.value}px)`;
-  setTimeout(() => {
-    articleList.style.transition = '';
-  }, 300);
-};
 const isPhone = ref(true)
 // 检测设备类型
 const checkDeviceType = () => {
@@ -240,17 +58,11 @@ const checkDeviceType = () => {
 // 生命周期钩子
 onMounted(() => {
   fetchWallpaper();
-  calculateMaxScroll();
   checkDeviceType(); // 初次加载时检查设备
   window.addEventListener('resize', checkDeviceType); // 窗口大小变化时重新检查
-  window.addEventListener('resize', calculateMaxScroll);
-  document.addEventListener('touchstart', handleClickOutside);
-  getArticleList();
 });
 
 onBeforeUnmount(() => {
-  window.removeEventListener('resize', calculateMaxScroll);
-  document.removeEventListener('touchstart', handleClickOutside);
 });
 </script>
 <style scoped>
@@ -267,12 +79,53 @@ onBeforeUnmount(() => {
   height: 150px;
   position: relative;
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
   color: white;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
 }
+
+/* 内部左右布局容器 */
+.header-content {
+  display: flex;
+  align-items: center;
+  width: 90%; /* 根据需要调整宽度 */
+  max-width: 1000px; /* 限制最大宽度 */
+  margin: 0 auto;
+}
+
+/* 左侧头像样式 */
+.avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%; /* 确保头像是圆形 */
+  margin-right: 15px; /* 与竖线的间距 */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3); /* 添加头像阴影 */
+  object-fit: cover; /* 确保图片不拉伸 */
+}
+
+/* 竖线样式 */
+.divider {
+  width: 5px; /* 设置竖线宽度 */
+  height: 60%; /* 设置竖线高度，相对头像和文字的高度 */
+  background-color: rgba(255, 255, 255, 0.7); /* 设置竖线颜色和透明度 */
+  margin: 0 20px; /* 设置竖线与左右内容之间的间距 */
+}
+
+
+/* 右侧介绍样式 */
+.intro h1 {
+  margin: 0;
+  font-size: 20px; /* 标题字体大小 */
+  font-weight: bold;
+}
+
+.intro p {
+  margin: 8px 0 0; /* 段落间距 */
+  font-size: 12px; /* 描述字体大小 */
+}
+
+
 .categories a {
   display: block;
   margin: 10px 0;
@@ -283,88 +136,6 @@ onBeforeUnmount(() => {
 }
 .categories a:hover {
   color: #007bff; /* 悬浮时颜色 */
-}
-.article-list {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  padding: 10px;
-  margin-top: 25px;
-  overflow: hidden; /* 隐藏滚动条 */
-  align-items: center;
-  will-change: transform;
-  transition: transform 0.1s ease;
-}
-/*隐藏滚动条*/
-.article-list {
-  overflow-y: scroll; /* 保留滚动功能 */
-  -ms-overflow-style: none; /* 隐藏 IE 滚动条 */
-  scrollbar-width: none; /* 隐藏 Firefox 滚动条 */
-}
-.article-list::-webkit-scrollbar {
-  display: none; /* 隐藏 Chrome 和 Safari 滚动条 */
-}
-.article-card {
-  width: 100%; /* 使文章卡片宽度为 100% */
-  max-width: 1000px; /* 设置文章卡片最大宽度（调整为适合屏幕的宽度） */
-  display: flex;
-  flex-direction: column;
-  border-radius: 25px;
-  overflow: hidden;
-  margin-bottom: 25px; /* 卡片之间的间距 */
-  background-color: #FFFFFE; /* 白色背景 */
-  box-shadow: 0 15px 20px rgba(0, 0, 0, 0.1); /* 细微阴影 */
-  transition: transform 0.1s ease, box-shadow 0.1s ease; /* 动画效果 */
-}
-.article-card:hover {
-  transform: translateY(-8px); /* 悬停时微微上浮 */
-  box-shadow: 0 15px 25px rgba(0, 0, 0, 0.15); /* 增强阴影效果 */
-}
-.article-content {
-  padding: 15px;
-}
-.article-title {
-  font-size: 1.3em;
-  margin: 0 0 10px;
-  font-weight: 1000;
-  color: #333; /* 标题颜色，深灰色 */
-}
-.article-summary {
-  font-size: 1.0em;
-  color: #555;
-  font-weight: 500;
-}
-
-.floating-btn {
-  position: fixed;
-  bottom: 50px; /* 距离页面底部20px */
-  right: 50px; /* 距离页面右侧20px */
-  width: 50px;
-  height: 50px;
-  background-color: #4D81DA; /* 你可以选择任何颜色 */
-  border-radius: 50%; /* 圆形按钮 */
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-  cursor: pointer;
-  color: white;
-  font-size: 20px;
-  transition: transform 0.3s;
-}
-.floating-btn:hover {
-  transform: scale(1.1); /* 悬浮球点击时稍微放大 */
-}
-.floating-menu {
-  position: absolute;
-  bottom: 80px; /* 菜单距离悬浮球的垂直距离 */
-  right: 20px;
-  background-color: rgba(0, 0, 0, 0.8);
-  color: white;
-  border-radius: 8px;
-  padding: 15px;
-  z-index: 999; /* 确保菜单位于悬浮球之下 */
 }
 .floating-menu ul {
   list-style-type: none;
