@@ -1,6 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router';
 
-
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
     routes: [
@@ -16,7 +15,12 @@ const router = createRouter({
             path: '/Articles',
             component: () => import('@/pages/Articles.vue')
         },
+        {
+            path: '/article/:id', // 路由参数 :id 用于动态获取文章ID
+            component: () => import('@/pages/ArticleDetail.vue'),
+            props: true  // 启用路由传参到组件
+        }
     ]
 })
 
-export default router
+export default router;

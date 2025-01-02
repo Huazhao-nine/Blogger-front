@@ -257,7 +257,6 @@ onBeforeUnmount(() => {
 .home {
   display: flex;
   flex-direction: column;
-  height: 100vh;
 }
 .header {
   border-radius: 25px; /* 设置更平滑的圆角 */

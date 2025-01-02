@@ -67,6 +67,7 @@ import { HomeArticles, HomePage } from '@/api/globals.js';
 import { getWallPaper } from '@/api/WallpaperService.js';
 import { getArticleByID, getTheArticlesForHome } from '@/api/ArticleService.js';
 import FooterNav from "@/components/footerNav.vue";
+import {useRouter} from "vue-router";
 
 const articlesLoading = ref(false);
 const articles = ref([]);
@@ -78,14 +79,12 @@ const getArticleList = async () => {
   articlesLoading.value = false;
 };
 
+const router = useRouter()
+
 const getArticlesDetail = async (articleId) => {
   const response = await getArticleByID(articleId);
   const article = response.data.data;
-  ElNotification({
-    title: '注意',
-    message: "你要看的文章标题为" + article.title + ",此功能正在赶来的路上。",
-    type: 'warning',
-  });
+  await router.push(`/article/${article.id}`);
 };
 
 const wallpaperUrl = ref('');
@@ -268,7 +267,6 @@ onBeforeUnmount(() => {
 .home {
   display: flex;
   flex-direction: column;
-  height: 100vh;
 }
 .header {
   border-radius: 25px; /* 设置更平滑的圆角 */
