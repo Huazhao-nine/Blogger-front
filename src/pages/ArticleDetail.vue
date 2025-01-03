@@ -1,9 +1,13 @@
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, onUnmounted } from 'vue';
 import { useRoute } from 'vue-router';
 import {getArticleByID} from "@/api/ArticleService.js";
 import {ElNotification} from "element-plus";
-import {getWallPaper} from "@/api/WallpaperService.js";  // 引入 useRoute 来访问路由信息
+import {getWallPaper} from "@/api/WallpaperService.js";
+import {Clock, User, View} from "@element-plus/icons-vue";
+import {marked} from "marked";
+import 'highlight.js/styles/atom-one-light.css';  // 在此引入高亮样式
+import hljs from "highlight.js";  // 引入 useRoute 来访问路由信息
 const articlesLoading = ref(false)
 const route = useRoute();// 获取当前路由信息
 const article = ref({})
@@ -12,13 +16,24 @@ const getArticle = async () => {
   const id = route.params.id;// 从路由参数中提取 articleId
   const res = await getArticleByID(id);
   article.value = res.data.data
-  console.log(article.value);
+  await getMarkdownContent()
   articlesLoading.value = false
 }
+const formatDate = (dateString) => {
+  const date = new Date(dateString);
+  return date.toLocaleDateString('en-US', { year: 'numeric', month: 'numeric', day: 'numeric' });
+};
 onMounted(() => {
-  getArticle()
-  fetchWallpaper()
-})
+  getArticle();
+  fetchWallpaper();
+  checkDeviceType();  // 初始化检测设备类型
+  window.addEventListener('resize', checkDeviceType); // 添加监听器以动态检测设备类型
+});
+
+onUnmounted(() => {
+  window.removeEventListener('resize', checkDeviceType); // 清除监听器
+});
+
 
 const isPhone = ref(true)
 // 检测设备类型
@@ -47,28 +62,89 @@ const fetchWallpaper = async () => {
     console.error('Error fetching wallpaper:', error);
   }
 };
+const htmlContent = ref()
+const getMarkdownContent = async () => {
+  htmlContent.value = await marked(article.value.content);
+  console.log(htmlContent.value)
+  setTimeout(() => {
+    // 使用 highlightAll 自动高亮所有代码块
+    hljs.highlightAll();
+  }, 50);  // 等待 markdown 渲染完成后再进行高亮
+};
+
+const startY = ref(0);
+const currentY = ref(0);
+const isDragging = ref(false);
+const maxScroll = ref(0);
+
+// 滑动事件处理
+const onTouchStart = (event) => {
+  startY.value = event.touches[0].pageY - currentY.value;
+  isDragging.value = true;
+};
+
+const onTouchMove = (event) => {
+  if (!isDragging.value) return;
+  currentY.value = event.touches[0].pageY - startY.value;
+  if (currentY.value > 0) {
+    currentY.value /= 2;
+  } else if (currentY.value < maxScroll.value) {
+    currentY.value = maxScroll.value + (currentY.value - maxScroll.value) / 2;
+  }
+  const articleList = document.querySelector('.article-list');
+  articleList.style.transform = `translateY(${currentY.value}px)`;
+};
+
+const onTouchEnd = () => {
+  if (!isDragging.value) return;
+  isDragging.value = false;
+  if (currentY.value > 0) {
+    currentY.value = 0;
+  } else if (currentY.value < maxScroll.value) {
+    currentY.value = maxScroll.value;
+  }
+  const articleList = document.querySelector('.article-list');
+  articleList.style.transition = 'transform 0.3s ease';
+  articleList.style.transform = `translateY(${currentY.value}px)`;
+  setTimeout(() => {
+    articleList.style.transition = '';
+  }, 300);
+};
 </script>
 <template>
   <div class="home" v-if="isPhone">
     <!-- 顶部轮换壁纸 -->
     <div class="header" :style="{ backgroundImage: `url(${wallpaperUrl})` }">
-      <h1 >{{article.title}}</h1>
+      <h2 >{{article.title}}</h2>
+      <div class="article-meta">
+        <div class="views">
+          <el-icon><View /></el-icon>{{article.viewCount}}
+        </div>
+        <div class="author">
+          <el-icon><User /></el-icon>{{article.authorName}}
+        </div>
+        <div class="date">
+          <el-icon><Clock /></el-icon>
+          {{ formatDate(article.publishedAt) }}
+        </div>
+      </div>
+
     </div>
     <!-- 瀑布流文章列表 -->
     <div
         class="article-list"
         ref="articleList"
+        @touchstart="onTouchStart"
+        @touchmove="onTouchMove"
+        @touchend="onTouchEnd"
     >
       <el-skeleton :rows="20" animated v-if="articlesLoading" />
       <div
           class="article-card"
           v-else
       >
+        <div class="article-content" v-html="htmlContent"></div>
 
-        <div class="article-content">
-          <p>作者:花朝九日 333 2024/12/22</p>
-          <p>{{ article.content}}</p>
-        </div>
       </div>
     </div>
   </div>
@@ -149,18 +225,29 @@ const fetchWallpaper = async () => {
   box-shadow: 0 15px 25px rgba(0, 0, 0, 0.15); /* 增强阴影效果 */
 }
 .article-content {
-  padding: 15px;
-}
-.article-title {
-  font-size: 1.3em;
-  margin: 0 0 10px;
-  font-weight: 1000;
-  color: #333; /* 标题颜色，深灰色 */
-}
-.article-summary {
+  padding: 20px;
   font-size: 1.0em;
-  color: #555;
-  font-weight: 500;
 }
+
+.article-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.article-meta .views, .article-meta .author, .article-meta .date {
+  display: flex;
+  align-items: center;
+  margin: 0 10px;  /* 给每个元素添加左右间距 */
+}
+.article-meta .author {
+  text-align: center;
+}
+
+.article-meta .date {
+  text-align: right;
+}
+
+
 
 </style>
