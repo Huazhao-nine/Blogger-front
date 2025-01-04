@@ -80,11 +80,19 @@ const getArticleList = async () => {
 };
 
 const router = useRouter()
-
+const firstClick = ref(true)
 const getArticlesDetail = async (articleId) => {
-  const response = await getArticleByID(articleId);
-  const article = response.data.data;
-  await router.push(`/article/${article.id}`);
+  // const response = await getArticleByID(articleId);
+  // const article = response.data.data;
+  // if (firstClick.value){
+  //   ElNotification({
+  //     title: '正在跳转',
+  //     message: '正在前往文章的路上',
+  //     type: 'warning',
+  //   });
+  //   firstClick.value = false
+  // }
+  await router.push(`/article/${articleId}`);
 };
 
 const wallpaperUrl = ref('');
