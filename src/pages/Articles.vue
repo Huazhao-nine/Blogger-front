@@ -2,13 +2,13 @@
   <div class="home" v-if="isPhone">
     <!-- 顶部轮换壁纸 -->
     <div class="header" :style="{ backgroundImage: `url(${wallpaperUrl})` }">
-      <h1 >文章</h1>
+      <h1 >文章列表</h1>
     </div>
 
     <!-- 瀑布流文章列表 -->
     <div
         class="article-list"
-        ref="articleList"
+        ref="articleListRef"
         @touchstart="onTouchStart"
         @touchmove="onTouchMove"
         @touchend="onTouchEnd"
@@ -19,7 +19,9 @@
           v-else
           v-for="article in articles"
           :key="article.id"
+          @click="getArticlesDetail(article.id)"
       >
+        <top-button :isPinned="article.isPinned" />
         <div class="article-content">
           <h3 class="article-title">{{ article.title }}</h3>
           <p class="article-summary">{{ article.summary }}</p>
@@ -64,16 +66,19 @@ import { ref, onMounted, onBeforeUnmount } from 'vue';
 import { ElNotification } from 'element-plus';
 import { HomeArticles, HomePage } from '@/api/globals.js';
 import { getWallPaper } from '@/api/WallpaperService.js';
-import { getArticleByID, getTheArticlesForHome } from '@/api/ArticleService.js';
+import {getArticleByID, getTheArticles, getTheArticlesForHome} from '@/api/ArticleService.js';
 import FooterNav from "@/components/footerNav.vue";
+import TopButton from "@/components/TopButton.vue";
+import router from "@/router/index.js";
+import {useRouter} from "vue-router";
 
 const articlesLoading = ref(false);
 const articles = ref([]);
 
 const getArticleList = async () => {
   articlesLoading.value = true;
-  const res = await getTheArticlesForHome(HomePage.value, HomeArticles.value);
-  articles.value = res.data.data.records;
+  const res = await getTheArticles();
+  articles.value = res.data.data;
   articlesLoading.value = false;
 };
 
@@ -88,6 +93,21 @@ const startY = ref(0);
 const currentY = ref(0);
 const isDragging = ref(false);
 const maxScroll = ref(0);
+
+const router1 = useRouter()
+const getArticlesDetail = async (articleId) => {
+  // const response = await getArticleByID(articleId);
+  // const article = response.data.data;
+  // if (firstClick.value){
+  //   ElNotification({
+  //     title: '正在跳转',
+  //     message: '正在前往文章的路上',
+  //     type: 'warning',
+  //   });
+  //   firstClick.value = false
+  // }
+  await router1.push(`/article/${articleId}`);
+};
 
 // 切换菜单显示状态
 const toggleMenu = (event) => {
@@ -196,7 +216,7 @@ const onTouchStart = (event) => {
   startY.value = event.touches[0].pageY - currentY.value;
   isDragging.value = true;
 };
-
+const articleListRef = ref(null);
 const onTouchMove = (event) => {
   if (!isDragging.value) return;
   currentY.value = event.touches[0].pageY - startY.value;
@@ -205,8 +225,7 @@ const onTouchMove = (event) => {
   } else if (currentY.value < maxScroll.value) {
     currentY.value = maxScroll.value + (currentY.value - maxScroll.value) / 2;
   }
-  const articleList = document.querySelector('.article-list');
-  articleList.style.transform = `translateY(${currentY.value}px)`;
+  articleListRef.value.style.transform = `translateY(${currentY.value}px)`;
 };
 
 const onTouchEnd = () => {
@@ -305,6 +324,7 @@ onBeforeUnmount(() => {
   display: none; /* 隐藏 Chrome 和 Safari 滚动条 */
 }
 .article-card {
+  position: relative;
   width: 100%; /* 使文章卡片宽度为 100% */
   max-width: 1000px; /* 设置文章卡片最大宽度（调整为适合屏幕的宽度） */
   display: flex;
@@ -317,8 +337,9 @@ onBeforeUnmount(() => {
   transition: transform 0.1s ease, box-shadow 0.1s ease; /* 动画效果 */
 }
 .article-card:hover {
-  transform: translateY(-8px); /* 悬停时微微上浮 */
-  box-shadow: 0 15px 25px rgba(0, 0, 0, 0.15); /* 增强阴影效果 */
+  transform: scale(1.02); /* 微微放大 */
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2); /* 加强阴影 */
 }
 .article-content {
   padding: 15px;

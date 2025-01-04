@@ -95,13 +95,20 @@ onBeforeUnmount(() => {
 
 /* 左侧头像样式 */
 .avatar {
-  width: 80px;
-  height: 80px;
-  border-radius: 50%; /* 确保头像是圆形 */
-  margin-right: 15px; /* 与竖线的间距 */
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3); /* 添加头像阴影 */
-  object-fit: cover; /* 确保图片不拉伸 */
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  margin-right: 15px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+  object-fit: cover;
+  border: 3px solid rgba(255, 255, 255, 0.8); /* 添加白色边框 */
+  background: linear-gradient(135deg, #f093fb, #f5576c); /* 添加渐变背景 */
 }
+.avatar:hover {
+  transform: rotate(360deg);
+  transition: transform 0.6s ease-in-out;
+}
+
 
 /* 竖线样式 */
 .divider {
@@ -111,17 +118,29 @@ onBeforeUnmount(() => {
   margin: 0 20px; /* 设置竖线与左右内容之间的间距 */
 }
 
-
 /* 右侧介绍样式 */
 .intro h1 {
+  animation: fadeIn 0.5s ease-in-out;
   margin: 0;
   font-size: 20px; /* 标题字体大小 */
   font-weight: bold;
 }
 
 .intro p {
+  animation: fadeIn 1s ease-in-out;
   margin: 8px 0 0; /* 段落间距 */
   font-size: 12px; /* 描述字体大小 */
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 

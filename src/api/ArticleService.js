@@ -8,6 +8,9 @@ export const getTheArticlesForHome = (page, pageSize) => {
         }
     })
 }
+export const getTheArticles = () => {
+    return request.get('/getTheArticles')
+}
 
 export const getArticleByID = (id) => {
     return request.get(`/getArticleByID/${id}`)

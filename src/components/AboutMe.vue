@@ -9,6 +9,7 @@ const onTouchStart = (event) => {
   startY.value = event.touches[0].pageY - currentY.value;
   isDragging.value = true;
 };
+const articleListRef = ref(null);
 const onTouchMove = (event) => {
   if (!isDragging.value) return;
   currentY.value = event.touches[0].pageY - startY.value;
@@ -17,8 +18,7 @@ const onTouchMove = (event) => {
   } else if (currentY.value < maxScroll.value) {
     currentY.value = maxScroll.value + (currentY.value - maxScroll.value) / 2;
   }
-  const articleList = document.querySelector('.article-list');
-  articleList.style.transform = `translateY(${currentY.value}px)`;
+  articleListRef.value.style.transform = `translateY(${currentY.value}px)`;
 };
 const onTouchEnd = () => {
   if (!isDragging.value) return;
@@ -41,6 +41,7 @@ const onTouchEnd = () => {
   <!-- 瀑布流文章列表 -->
   <div
       class="article-list"
+      ref="articleListRef"
       @touchstart="onTouchStart"
       @touchmove="onTouchMove"
       @touchend="onTouchEnd"
@@ -137,16 +138,16 @@ const onTouchEnd = () => {
   transition: transform 0.1s ease, box-shadow 0.1s ease;
 }
 .article-card:hover {
-  transform: translateY(-8px); /* 悬停时微微上浮 */
-  box-shadow: 0 15px 25px rgba(0, 0, 0, 0.15); /* 增强阴影效果 */
+  transform: scale(1.02); /* 微微放大 */
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2); /* 加强阴影 */
 }
+
 /* 调整图片样式 */
 .article-image {
-  width: 100px; /* 设置图片的宽度 */
-  height: 100px; /* 设置图片的高度 */
-  object-fit: cover; /* 确保图片按比例裁剪 */
-  border-radius: 10px; /* 设置圆角 */
-  margin-left: 15px; /* 设置图片与卡片内容的间距 */
+  width: 120px;
+  height: auto; /* 保持比例 */
+  margin-left: 20px;
 }
 .article-content {
   padding: 15px;

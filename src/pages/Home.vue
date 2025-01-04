@@ -2,13 +2,14 @@
   <div class="home" v-if="isPhone">
     <!-- 顶部轮换壁纸 -->
     <div class="header" :style="{ backgroundImage: `url(${wallpaperUrl})` }">
-      <h1 >花朝九日's Blogger</h1>
+      <h1 class="typing-effect">花朝九日's Blogger</h1>
     </div>
+
 
     <!-- 瀑布流文章列表 -->
     <div
         class="article-list"
-        ref="articleList"
+        ref="articleListRef"
         @touchstart="onTouchStart"
         @touchmove="onTouchMove"
         @touchend="onTouchEnd"
@@ -21,6 +22,7 @@
           :key="article.id"
           @click="getArticlesDetail(article.id)"
       >
+        <top-button :isPinned="article.isPinned" />
         <div class="article-content">
           <h3 class="article-title">{{ article.title }}</h3>
           <p class="article-summary">{{ article.summary }}</p>
@@ -68,6 +70,7 @@ import { getWallPaper } from '@/api/WallpaperService.js';
 import { getArticleByID, getTheArticlesForHome } from '@/api/ArticleService.js';
 import FooterNav from "@/components/footerNav.vue";
 import {useRouter} from "vue-router";
+import TopButton from "@/components/TopButton.vue";
 
 const articlesLoading = ref(false);
 const articles = ref([]);
@@ -76,6 +79,7 @@ const getArticleList = async () => {
   articlesLoading.value = true;
   const res = await getTheArticlesForHome(HomePage.value, HomeArticles.value);
   articles.value = res.data.data.records;
+  console.log(articles.value);
   articlesLoading.value = false;
 };
 
@@ -215,6 +219,7 @@ const onTouchStart = (event) => {
   isDragging.value = true;
 };
 
+const articleListRef = ref(null);
 const onTouchMove = (event) => {
   if (!isDragging.value) return;
   currentY.value = event.touches[0].pageY - startY.value;
@@ -223,8 +228,7 @@ const onTouchMove = (event) => {
   } else if (currentY.value < maxScroll.value) {
     currentY.value = maxScroll.value + (currentY.value - maxScroll.value) / 2;
   }
-  const articleList = document.querySelector('.article-list');
-  articleList.style.transform = `translateY(${currentY.value}px)`;
+  articleListRef.value.style.transform = `translateY(${currentY.value}px)`;
 };
 
 const onTouchEnd = () => {
@@ -264,6 +268,9 @@ onMounted(() => {
   window.addEventListener('resize', calculateMaxScroll);
   document.addEventListener('touchstart', handleClickOutside);
   getArticleList();
+
+
+
 });
 
 onBeforeUnmount(() => {
@@ -323,20 +330,23 @@ onBeforeUnmount(() => {
   display: none; /* 隐藏 Chrome 和 Safari 滚动条 */
 }
 .article-card {
-  width: 100%; /* 使文章卡片宽度为 100% */
-  max-width: 1000px; /* 设置文章卡片最大宽度（调整为适合屏幕的宽度） */
+  position: relative;
+  width: 100%;
+  max-width: 1000px;
   display: flex;
   flex-direction: column;
   border-radius: 25px;
   overflow: hidden;
-  margin-bottom: 25px; /* 卡片之间的间距 */
-  background-color: #FFFFFE; /* 白色背景 */
-  box-shadow: 0 15px 20px rgba(0, 0, 0, 0.1); /* 细微阴影 */
-  transition: transform 0.1s ease, box-shadow 0.1s ease; /* 动画效果 */
+  margin-bottom: 25px;
+  background-color: #FFFFFE;
+  box-shadow: 0 15px 20px rgba(0, 0, 0, 0.1);
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
 }
+
 .article-card:hover {
-  transform: translateY(-8px); /* 悬停时微微上浮 */
-  box-shadow: 0 15px 25px rgba(0, 0, 0, 0.15); /* 增强阴影效果 */
+  transform: scale(1.02); /* 微微放大 */
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2); /* 加强阴影 */
 }
 .article-content {
   padding: 15px;
@@ -392,8 +402,36 @@ onBeforeUnmount(() => {
   margin: 10px 0;
   cursor: pointer;
 }
-.floating-menu ul li:hover {
-  color: #007bff; /* 悬浮时改变文字颜色 */
+.typing-effect {
+  font-size: 2em;
+  font-weight: 700;
+  color: white;
+  white-space: nowrap;
+  overflow: hidden;
+  border-right: 3px solid rgba(255, 255, 255, 0.75); /* 打字光标 */
+  display: inline-block;
+  animation: typing 4s steps(20, end) 1s forwards, blink 0.75s step-end 4s; /* 光标闪烁4秒后结束 */
 }
+
+@keyframes typing {
+  from {
+    width: 0;
+  }
+  to {
+    width: 80%;
+  }
+}
+
+@keyframes blink {
+  50% {
+    border-color: transparent;
+  }
+  100% {
+    border-color: rgba(255, 255, 255, 0.75);
+  }
+}
+
+
+
 </style>
 

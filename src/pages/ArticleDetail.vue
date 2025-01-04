@@ -7,7 +7,8 @@ import {getWallPaper} from "@/api/WallpaperService.js";
 import {Clock, User, View} from "@element-plus/icons-vue";
 import {marked} from "marked";
 import 'highlight.js/styles/atom-one-light.css';  // 在此引入高亮样式
-import hljs from "highlight.js";  // 引入 useRoute 来访问路由信息
+import hljs from "highlight.js";
+import TopButton from "@/components/TopButton.vue";  // 引入 useRoute 来访问路由信息
 const articlesLoading = ref(false)
 const route = useRoute();// 获取当前路由信息
 const article = ref({})
@@ -65,7 +66,7 @@ const fetchWallpaper = async () => {
 const htmlContent = ref()
 const getMarkdownContent = async () => {
   htmlContent.value = await marked(article.value.content);
-  console.log(htmlContent.value)
+  // console.log(htmlContent.value)
   setTimeout(() => {
     // 使用 highlightAll 自动高亮所有代码块
     hljs.highlightAll();
@@ -115,6 +116,7 @@ const onTouchEnd = () => {
   <div class="home" v-if="isPhone">
     <!-- 顶部轮换壁纸 -->
     <div class="header" :style="{ backgroundImage: `url(${wallpaperUrl})` }">
+      <top-button :isPinned="article.isPinned" />
       <h2 >{{article.title}}</h2>
       <div class="article-meta">
         <div class="views">
