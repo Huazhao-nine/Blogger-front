@@ -15,6 +15,7 @@ const article = ref({})
 const getArticle = async () => {
   articlesLoading.value = true
   const id = route.params.id;// 从路由参数中提取 articleId
+  // console.log(id)
   const res = await getArticleByID(id);
   article.value = res.data.data
   await getMarkdownContent()

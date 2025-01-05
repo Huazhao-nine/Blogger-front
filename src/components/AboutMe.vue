@@ -52,7 +52,7 @@ const onTouchEnd = () => {
         <p class="article-summary">
 
           前<el-tag type="success" size="small">Vue3</el-tag>
-          后端<el-tag type="danger" size="small">SpringBoot3</el-tag>分离的博客系统
+          后端<el-tag type="danger" size="small">SpringBoot3</el-tag>分离的原创博客
         </p>
       </div>
     </div>
@@ -67,7 +67,7 @@ const onTouchEnd = () => {
     <div class="article-card">
       <div class="article-content">
         <h3 class="article-title">关于我</h3>
-        <p class="article-summary">一个不会写歌的大学生不是一个好的程序员</p>
+        <p class="article-summary">我没有说告别，眼看他与我永不重逢</p>
         <h3>联系我</h3>
         <ul>
           <li>QQ:982086195</li>

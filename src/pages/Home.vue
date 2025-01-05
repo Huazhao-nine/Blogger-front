@@ -79,7 +79,7 @@ const getArticleList = async () => {
   articlesLoading.value = true;
   const res = await getTheArticlesForHome(HomePage.value, HomeArticles.value);
   articles.value = res.data.data.records;
-  console.log(articles.value);
+  // console.log(articles.value);
   articlesLoading.value = false;
 };
 
@@ -403,33 +403,26 @@ onBeforeUnmount(() => {
   cursor: pointer;
 }
 .typing-effect {
+  animation: fadeIn 1.5s ease-in-out;
   font-size: 2em;
   font-weight: 700;
   color: white;
   white-space: nowrap;
   overflow: hidden;
-  border-right: 3px solid rgba(255, 255, 255, 0.75); /* 打字光标 */
   display: inline-block;
-  animation: typing 4s steps(20, end) 1s forwards, blink 0.75s step-end 4s; /* 光标闪烁4秒后结束 */
 }
 
-@keyframes typing {
+@keyframes fadeIn {
   from {
-    width: 0;
+    opacity: 0;
+    transform: translateX(-50px);
   }
   to {
-    width: 80%;
+    opacity: 1;
+    transform: translateX(0);
   }
 }
 
-@keyframes blink {
-  50% {
-    border-color: transparent;
-  }
-  100% {
-    border-color: rgba(255, 255, 255, 0.75);
-  }
-}
 
 
 
