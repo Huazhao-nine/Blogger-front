@@ -17,6 +17,8 @@
     "marked": "^15.0.5",
     "node-vibrant": "^4.0.0-alpha.5",
     "unplugin-auto-import": "^0.19.0",
+    "vite-plugin-pwa": "^0.21.1",
+    "vite-pwa": "^1.0.2",
     "vue": "^3.5.13",
     "vue-router": "^4.5.0"
   },
