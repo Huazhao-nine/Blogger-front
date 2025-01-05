@@ -19,6 +19,10 @@ const router = createRouter({
             path: '/article/:id', // 路由参数 :id 用于动态获取文章ID
             component: () => import('@/pages/ArticleDetail.vue'),
             props: true  // 启用路由传参到组件
+        },
+        {
+            path: '/Edit',
+            component: () => import('@/pages/Edit.vue')
         }
     ]
 })

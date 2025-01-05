@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue';
+import { ref, onMounted, onUnmounted, nextTick } from 'vue';
 import { useRoute } from 'vue-router';
 import {getArticleByID} from "@/api/ArticleService.js";
 import {ElNotification} from "element-plus";
@@ -147,7 +147,6 @@ const onTouchEnd = () => {
           v-else
       >
         <div class="article-content" v-html="htmlContent"></div>
-
       </div>
     </div>
   </div>

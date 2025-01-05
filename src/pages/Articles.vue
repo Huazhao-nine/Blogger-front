@@ -1,7 +1,7 @@
 <template>
   <div class="home" v-if="isPhone">
     <!-- 顶部轮换壁纸 -->
-    <div class="header" :style="{ backgroundImage: `url(${wallpaperUrl})` }">
+    <div @click="router1.push('/Edit')" class="header" :style="{ backgroundImage: `url(${wallpaperUrl})` }">
       <h1 >文章列表</h1>
     </div>
 

@@ -4,8 +4,6 @@
     <div class="header" :style="{ backgroundImage: `url(${wallpaperUrl})` }">
       <h1 class="typing-effect">花朝九日's Blogger</h1>
     </div>
-
-
     <!-- 瀑布流文章列表 -->
     <div
         class="article-list"
@@ -71,6 +69,7 @@ import { getArticleByID, getTheArticlesForHome } from '@/api/ArticleService.js';
 import FooterNav from "@/components/footerNav.vue";
 import {useRouter} from "vue-router";
 import TopButton from "@/components/TopButton.vue";
+import WallpaperCard from "@/components/WallpaperCard.vue";
 
 const articlesLoading = ref(false);
 const articles = ref([]);

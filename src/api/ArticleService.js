@@ -8,6 +8,9 @@ export const getTheArticlesForHome = (page, pageSize) => {
         }
     })
 }
+export const addArticle = (articleData) => {
+    return request.post('/addArticle', articleData);
+};
 export const getTheArticles = () => {
     return request.get('/getTheArticles')
 }

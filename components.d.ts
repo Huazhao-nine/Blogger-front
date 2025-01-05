@@ -9,6 +9,7 @@ declare module 'vue' {
   export interface GlobalComponents {
     AboutMe: typeof import('./src/components/AboutMe.vue')['default']
     ElConfigProvider: typeof import('element-plus/es')['ElConfigProvider']
+    ElDialog: typeof import('element-plus/es')['ElDialog']
     ElIcon: typeof import('element-plus/es')['ElIcon']
     ElSkeleton: typeof import('element-plus/es')['ElSkeleton']
     ElTag: typeof import('element-plus/es')['ElTag']
@@ -16,5 +17,6 @@ declare module 'vue' {
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     TopButton: typeof import('./src/components/TopButton.vue')['default']
+    WallpaperCard: typeof import('./src/components/WallpaperCard.vue')['default']
   }
 }
