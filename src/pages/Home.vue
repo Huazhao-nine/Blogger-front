@@ -77,8 +77,8 @@ const articles = ref([]);
 const getArticleList = async () => {
   articlesLoading.value = true;
   const res = await getTheArticlesForHome(HomePage.value, HomeArticles.value);
-  articles.value = res.data.data.records;
-  // console.log(articles.value);
+  articles.value = res.data.data;
+  console.log(articles.value);
   articlesLoading.value = false;
 };
 
