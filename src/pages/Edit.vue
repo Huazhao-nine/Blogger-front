@@ -90,6 +90,7 @@ const articleData = ref({
   summary: '',
   tags: [],
   categoryName: '',
+  password: '',
   isPinned: false,
 });
 
@@ -161,6 +162,16 @@ const submitArticle = async () => {
     return;
   }
 
+  if (!articleData.value.password) {
+    ElNotification({
+      title: '错误',
+      message: '密码不能为空！',
+      type: 'error',
+    });
+    isSubmitting.value = false;
+    return;
+  }
+
   // 构建提交数据
   let articlePayload = {
     userId: 1,  // 假设用户ID是固定的，可以从登录状态中获取
@@ -171,29 +182,31 @@ const submitArticle = async () => {
     tags: articleData.value.tags,  // 过滤掉空字符串的标签
     categoryName: articleData.value.categoryName,
     isPinned: articleData.value.isPinned ? 1 : 0,
+    password: articleData.value.password
   };
   // console.log(articlePayload)
     const res = await addArticle(articlePayload); // 调用API提交数据
     if (res.data.code === 200) {
       ElNotification({
         title: '成功',
-        message: '文章发布成功！',
+        message: res.data.msg,
         type: 'success',
       });
       // 重置表单
-      articleData.title = '';
-      articleData.slug = '';
-      articleData.content = '';
-      articleData.summary = '';
-      articleData.tags = [];  // 重置 tags 为一个空数组
-      articleData.categoryName = '';
-      articleData.isPinned = false;
+      articleData.value.title = '';
+      articleData.value.slug = '';
+      articleData.value.content = '';
+      articleData.value.summary = '';
+      articleData.value.tags = [];  // 重置 tags 为一个空数组
+      articleData.value.categoryName = '';
+      articleData.value.isPinned = false;
+      articleData.value.password = '';
       await router.push(`/`);
     }
   else {
     ElNotification({
       title: '错误',
-      message: '文章发布失败，请稍后重试。',
+      message: res.data.msg,
       type: 'error',
     });
   }
@@ -268,6 +281,9 @@ onUnmounted(() => {
                   />
                   <el-option label="新增分类" value="newCategory" />
                 </el-select>
+              </el-form-item>
+              <el-form-item label="密码" :rules="[ { required: true, message: '请输入密码', trigger: 'blur' } ]">
+                <el-input v-model="articleData.password" placeholder="请输入密码" />
               </el-form-item>
 
               <!-- 新增分类输入框 -->
