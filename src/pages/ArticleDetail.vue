@@ -4,7 +4,7 @@ import { useRoute } from 'vue-router';
 import {getArticleByID} from "@/api/ArticleService.js";
 import {ElNotification} from "element-plus";
 import {getWallPaper} from "@/api/WallpaperService.js";
-import {Clock, User, View} from "@element-plus/icons-vue";
+import {Clock, Memo, Postcard, User, View} from "@element-plus/icons-vue";
 import {marked} from "marked";
 import 'highlight.js/styles/atom-one-light.css';  // 在此引入高亮样式
 import hljs from "highlight.js";
@@ -121,10 +121,16 @@ const onTouchEnd = () => {
       <h2 >{{article.title}}</h2>
       <div class="article-meta">
         <div class="views">
-          <el-icon><View /></el-icon>{{article.viewCount}}
+          <el-icon><Postcard /></el-icon>
+          {{article.categoryName}}
         </div>
         <div class="author">
-          <el-icon><User /></el-icon>{{article.authorName}}
+          <el-icon><View /></el-icon>
+          {{article.viewCount}}
+        </div>
+        <div class="author">
+          <el-icon><User /></el-icon>
+          {{article.authorName}}
         </div>
         <div class="date">
           <el-icon><Clock /></el-icon>
