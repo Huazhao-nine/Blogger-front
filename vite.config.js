@@ -30,14 +30,9 @@ export default defineConfig({
         icons: [
           {
             src: '/avatar.jpg',
-            sizes: '192x192',
-            type: 'image/png',
-          },
-          {
-            src: '/avatar.jpg',
-            sizes: '512x512',
-            type: 'image/png',
-          },
+            sizes: '640x640',
+            type: 'image/jpg',
+          }
         ],
       },
     }),
