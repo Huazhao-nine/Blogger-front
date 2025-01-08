@@ -1,17 +1,21 @@
 <template>
   <div v-if="isPinned" class="pinned-badge">
-    置顶中
+    {{ desc }}
   </div>
 </template>
 
 <script setup>
-import { defineProps } from 'vue';
+import {defineProps} from 'vue';
 
 defineProps({
   isPinned: {
     type: Boolean,
-    required: true,
+    default: false,
   },
+  desc: {
+    type: String,
+    required: true,
+  }
 });
 </script>
 

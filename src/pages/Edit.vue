@@ -1,11 +1,11 @@
 <script setup>
-import { ref, onMounted, onUnmounted, watch } from 'vue';
+import {onMounted, onUnmounted, ref} from 'vue';
 import {ElButton, ElForm, ElFormItem, ElInput, ElNotification, ElOption, ElSelect, ElSwitch, ElTag} from "element-plus";
-import 'highlight.js/styles/atom-one-light.css';  // 在此引入高亮样式
+import 'highlight.js/styles/atom-one-light.css'; // 在此引入高亮样式
 import WallpaperCard from "@/components/WallpaperCard.vue";
 import {addArticle} from "@/api/ArticleService.js";
 import {addCategory, getAllCategories} from "@/api/CategoryService.js";
-import {useRouter} from "vue-router";  // 引入 useRoute 来访问路由信息
+import {useRouter} from "vue-router"; // 引入 useRoute 来访问路由信息
 
 
 const startY = ref(0);
@@ -47,6 +47,7 @@ const onTouchEnd = () => {
 const categories = ref([]);
 const dialogVisible = ref(false);
 const newCategoryName = ref('');
+const newCategoryDesc = ref('');
 const Categories = ref({})
 
 // 打开新增分类对话框
@@ -60,14 +61,24 @@ const handleCategoryChange = (value) => {
 const closeDialog = () => {
   dialogVisible.value = false;
   newCategoryName.value = ''; // 清空输入框
+  newCategoryDesc.value = ''; // 清空输入框
 };
 
 // 新增分类
 const addCate = async () => {
   if (!newCategoryName.value.trim()) {
     ElMessage.error('分类名称不能为空');
+    return
   }
-  const res = await addCategory(newCategoryName.value);
+  if (!newCategoryDesc.value.trim()) {
+    ElMessage.error('分类描述不能为空');
+    return
+  }
+  let category = {
+    name: newCategoryName.value,
+    instruction: newCategoryDesc.value
+  }
+  const res = await addCategory(category);
   // console.log(res)
   if (res.data.code === 200)ElMessage.success(res.data.msg)
   else ElMessage.error(res.data.msg)
@@ -289,6 +300,7 @@ onUnmounted(() => {
               <!-- 新增分类输入框 -->
               <el-dialog style="border-radius: 25px" :modal="false" :append-to-body="true" width="80%" v-model="dialogVisible" title="新增分类" @close="closeDialog">
                 <el-input v-model="newCategoryName" placeholder="请输入分类名称" />
+                <el-input v-model="newCategoryDesc" placeholder="请输入分类描述" style="margin-top: 25px" />
                 <template #footer>
                   <el-button @click="closeDialog">取消</el-button>
                   <el-button type="primary" @click="addCate">确认</el-button>

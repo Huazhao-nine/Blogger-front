@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory } from 'vue-router';
+import {createRouter, createWebHistory} from 'vue-router';
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -12,12 +12,17 @@ const router = createRouter({
             component: () => import('@/pages/About.vue')
         },
         {
-            path: '/Articles',
-            component: () => import('@/pages/Articles.vue')
+            path: '/Category',
+            component: () => import('@/pages/Category.vue')
         },
         {
-            path: '/article/:id', // 路由参数 :id 用于动态获取文章ID
+            path: '/article/articleID=:id', // 路由参数 :id 用于动态获取文章ID
             component: () => import('@/pages/ArticleDetail.vue'),
+            props: true  // 启用路由传参到组件
+        },
+        {
+            path: '/article/categoryID=:id', // 路由参数 :id 用于动态获取文章ID
+            component: () => import('@/pages/Article.vue'),
             props: true  // 启用路由传参到组件
         },
         {

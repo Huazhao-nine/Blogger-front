@@ -18,3 +18,7 @@ export const getTheArticles = () => {
 export const getArticleByID = (id) => {
     return request.get(`/getArticleByID/${id}`)
 }
+
+export const getArticlesByCategory = (id) => {
+    return request.get(`/getArticlesByCategory/${id}`)
+}

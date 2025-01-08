@@ -21,40 +21,13 @@
           :key="article.id"
           @click="getArticlesDetail(article.id)"
       >
-        <top-button :isPinned="article.isPinned" />
+        <top-button :isPinned="article.isPinned"  desc="置顶中"/>
         <div class="article-content">
           <h3 class="article-title">{{ article.title }}</h3>
           <p class="article-summary">{{ article.summary }}</p>
         </div>
       </div>
     </div>
-
-    <!-- 底部导航栏 -->
-
-    <!-- 可拖动的悬浮球 -->
-    <!--
-    <div
-      class="floating-btn"
-      ref="floatingBtn"
-      @touchstart="onTouchStartForBall"
-      @touchmove="onTouchMoveForBall"
-      @touchend="onTouchEndForBall"
-      @click="toggleMenu"
-    >
-      <span>+</span>
-    </div>
-    -->
-
-    <!-- 菜单 -->
-    <!--
-    <div v-if="isMenuVisible" class="floating-menu" ref="floatingMenu">
-      <ul>
-        <li>菜单项 1</li>
-        <li>菜单项 2</li>
-        <li>菜单项 3</li>
-      </ul>
-    </div>
-    -->
   </div>
   <div class="header" :style="{ backgroundImage: `url(${wallpaperUrl})` }" v-else>
     <h1 >请使用移动端访问获得更好体验</h1>
@@ -62,39 +35,34 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onBeforeUnmount } from 'vue';
-import { ElNotification } from 'element-plus';
-import { HomeArticles, HomePage } from '@/api/globals.js';
-import { getWallPaper } from '@/api/WallpaperService.js';
-import {getArticleByID, getTheArticles, getTheArticlesForHome} from '@/api/ArticleService.js';
-import FooterNav from "@/components/footerNav.vue";
+import {onBeforeUnmount, onMounted, ref} from 'vue';
+import {ElNotification} from 'element-plus';
+import {getWallPaper} from '@/api/WallpaperService.js';
+import {getArticlesByCategory} from '@/api/ArticleService.js';
 import TopButton from "@/components/TopButton.vue";
-import router from "@/router/index.js";
-import {useRouter} from "vue-router";
+import {useRoute, useRouter} from "vue-router";
+
+const route = useRoute();// 获取当前路由信息
+const router1 = useRouter()
 
 const articlesLoading = ref(false);
 const articles = ref([]);
 
 const getArticleList = async () => {
   articlesLoading.value = true;
-  const res = await getTheArticles();
+  const id = route.params.id;// 从路由参数中提取 articleId
+  const res = await getArticlesByCategory(id);
   articles.value = res.data.data;
+  // console.log(articles)
   articlesLoading.value = false;
 };
 
 const wallpaperUrl = ref('');
-const isMenuVisible = ref(false);
-const isDraggingForBall = ref(false);
-const startXForBall = ref(0);
-const startYForBall = ref(0);
-const offsetXForBall = ref(0);
-const offsetYForBall = ref(0);
 const startY = ref(0);
 const currentY = ref(0);
 const isDragging = ref(false);
 const maxScroll = ref(0);
 
-const router1 = useRouter()
 const getArticlesDetail = async (articleId) => {
   // const response = await getArticleByID(articleId);
   // const article = response.data.data;
@@ -106,50 +74,7 @@ const getArticlesDetail = async (articleId) => {
   //   });
   //   firstClick.value = false
   // }
-  await router1.push(`/article/${articleId}`);
-};
-
-// 切换菜单显示状态
-const toggleMenu = (event) => {
-  isMenuVisible.value = !isMenuVisible.value;
-  event.stopPropagation(); // 阻止事件冒泡
-};
-
-// 处理悬浮球拖动
-const onTouchStartForBall = (event) => {
-  isDraggingForBall.value = true;
-  const touch = event.touches[0];
-  startXForBall.value = touch.clientX - offsetXForBall.value;
-  startYForBall.value = touch.clientY - offsetYForBall.value;
-  event.preventDefault();
-};
-
-const onTouchMoveForBall = (event) => {
-  if (!isDraggingForBall.value) return;
-  const touch = event.touches[0];
-  offsetXForBall.value = touch.clientX - startXForBall.value;
-  offsetYForBall.value = touch.clientY - startYForBall.value;
-  const floatingBtn = document.querySelector('.floating-btn');
-  floatingBtn.style.transform = `translate(${offsetXForBall.value}px, ${offsetYForBall.value}px)`;
-  event.preventDefault();
-};
-
-const onTouchEndForBall = () => {
-  isDraggingForBall.value = false;
-};
-
-// 点击其他地方隐藏菜单
-const handleClickOutside = (event) => {
-  const floatingBtn = document.querySelector('.floating-btn');
-  const floatingMenu = document.querySelector('.floating-menu');
-  if (
-      floatingBtn &&
-      !floatingBtn.contains(event.target) &&
-      floatingMenu &&
-      !floatingMenu.contains(event.target)
-  ) {
-    isMenuVisible.value = false;
-  }
+  await router1.push(`/article/articleID=${articleId}`);
 };
 
 // 获取壁纸
@@ -161,26 +86,6 @@ const fetchWallpaper = async () => {
     const baseUrl = 'https://www.bing.com';
     imageUrl = baseUrl + parsedData.images[0].url;
     wallpaperUrl.value = imageUrl;
-    // 创建一个Image对象并加载壁纸
-    const image = new Image();
-    image.crossOrigin = 'Anonymous'; // 处理跨域问题
-    image.src = imageUrl;
-    image.onload = () => {
-      // 创建Canvas元素
-      const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
-      // 设置canvas尺寸为图片的尺寸
-      canvas.width = image.width;
-      canvas.height = image.height;
-      // 将图片绘制到Canvas上
-      ctx.drawImage(image, 0, 0, image.width, image.height);
-      // 获取图片顶部和底部的颜色数据
-      const topColor = getAverageColor(ctx, 0, 0, image.width, image.height / 3);
-      const bottomColor = getAverageColor(ctx, 0, image.height * 2 / 3, image.width, image.height);
-      // 设置渐变色
-      const gradient = `linear-gradient(to bottom, rgb(${topColor.r}, ${topColor.g}, ${topColor.b}), rgb(${bottomColor.r}, ${bottomColor.g}, ${bottomColor.b}))`;
-      // document.body.style.background = gradient;
-    };
   } catch (error) {
     console.error('Error fetching wallpaper:', error);
   }
@@ -263,13 +168,11 @@ onMounted(() => {
   checkDeviceType(); // 初次加载时检查设备
   window.addEventListener('resize', checkDeviceType); // 窗口大小变化时重新检查
   window.addEventListener('resize', calculateMaxScroll);
-  document.addEventListener('touchstart', handleClickOutside);
   getArticleList();
 });
 
 onBeforeUnmount(() => {
   window.removeEventListener('resize', calculateMaxScroll);
-  document.removeEventListener('touchstart', handleClickOutside);
 });
 </script>
 <style scoped>

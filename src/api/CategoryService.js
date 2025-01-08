@@ -4,9 +4,6 @@ export const getAllCategories = () => {
     return request.get('/Category/getAll')
 }
 
-export const addCategory = (name) => {
-    let Category = {
-        name: name
-    }
+export const addCategory = (Category) => {
     return request.post('/Category/add', Category);
 };

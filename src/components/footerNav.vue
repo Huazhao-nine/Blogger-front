@@ -1,6 +1,5 @@
 <script setup>
 // 跳转页面
-import router from "@/router/index.js";
 import {useRouter} from "vue-router";
 
 const router1 = useRouter()
@@ -14,7 +13,7 @@ const goToPage = (page) => {
   <!-- 底部导航栏 -->
   <div class="footer-nav">
     <button @click="goToPage('')">Home</button>
-    <button @click="goToPage('Articles')">Articles</button>
+    <button @click="goToPage('Category')">Category</button>
     <button @click="goToPage('About')">About</button>
   </div>
 </template>
