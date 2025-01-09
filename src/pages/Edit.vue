@@ -3,10 +3,9 @@ import {onMounted, onUnmounted, ref} from 'vue';
 import {ElButton, ElForm, ElFormItem, ElInput, ElNotification, ElOption, ElSelect, ElSwitch, ElTag} from "element-plus";
 import 'highlight.js/styles/atom-one-light.css'; // 在此引入高亮样式
 import WallpaperCard from "@/components/WallpaperCard.vue";
-import {addArticle} from "@/api/ArticleService.js";
+import {addArticle, editArticle, getArticleByID} from "@/api/ArticleService.js";
 import {addCategory, getAllCategories} from "@/api/CategoryService.js";
-import {useRouter} from "vue-router"; // 引入 useRoute 来访问路由信息
-
+import {useRoute, useRouter} from "vue-router"; // 引入 useRoute 来访问路由信息
 
 const startY = ref(0);
 const currentY = ref(0);
@@ -43,6 +42,20 @@ const onTouchEnd = () => {
     articleList.style.transition = '';
   }, 300);
 };
+
+const route = useRoute();// 获取当前路由信息
+const editedArticle = ref({})
+const isAdd = ref(true)
+const getArticle = async () => {
+  const id = route.params.id;// 从路由参数中提取 articleId
+  if (id !== null){
+    const res = await getArticleByID(id);
+    console.log(res.data.data);
+    editedArticle.value = res.data.data;
+    articleData.value = res.data.data;
+    isAdd.value = false;
+  }
+}
 
 const categories = ref([]);
 const dialogVisible = ref(false);
@@ -182,21 +195,24 @@ const submitArticle = async () => {
     isSubmitting.value = false;
     return;
   }
-
+  let res
   // 构建提交数据
-  let articlePayload = {
-    userId: 1,  // 假设用户ID是固定的，可以从登录状态中获取
-    title: articleData.value.title,
-    slug: articleData.value.slug,
-    content: articleData.value.content,
-    summary: articleData.value.summary,
-    tags: articleData.value.tags,  // 过滤掉空字符串的标签
-    categoryName: articleData.value.categoryName,
-    isPinned: articleData.value.isPinned ? 1 : 0,
-    password: articleData.value.password
-  };
-  // console.log(articlePayload)
-    const res = await addArticle(articlePayload); // 调用API提交数据
+  if (isAdd.value){
+    let articlePayload = {
+      userId: 1,  // 假设用户ID是固定的，可以从登录状态中获取
+      title: articleData.value.title,
+      slug: articleData.value.slug,
+      content: articleData.value.content,
+      summary: articleData.value.summary,
+      tags: articleData.value.tags,  // 过滤掉空字符串的标签
+      categoryName: articleData.value.categoryName,
+      isPinned: articleData.value.isPinned ? 1 : 0,
+      password: articleData.value.password
+    };
+    res = await addArticle(articlePayload); // 调用API提交数据}
+  }else {
+    res = await editArticle(editedArticle.value, articleData.value.password);
+  }
     if (res.data.code === 200) {
       ElNotification({
         title: '成功',
@@ -225,6 +241,7 @@ const submitArticle = async () => {
 };
 
 onMounted(() => {
+  getArticle();
   getAll()
 });
 

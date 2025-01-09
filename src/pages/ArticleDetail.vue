@@ -1,11 +1,13 @@
 <script setup>
-import {onMounted, onUnmounted, ref} from 'vue';
-import {useRoute} from 'vue-router';
+import {nextTick, onMounted, onUnmounted, ref} from 'vue';
+import {useRoute, useRouter} from 'vue-router';
 import {getArticleByID} from "@/api/ArticleService.js";
 import {ElNotification} from "element-plus";
 import {getWallPaper} from "@/api/WallpaperService.js";
 import {Clock, Postcard, User, View} from "@element-plus/icons-vue";
 import {marked} from "marked";
+import katex from 'katex';
+import 'katex/dist/katex.min.css'; // 导入 KaTeX 的样式
 import 'highlight.js/styles/atom-one-light.css'; // 在此引入高亮样式
 import hljs from "highlight.js";
 import TopButton from "@/components/TopButton.vue"; // 引入 useRoute 来访问路由信息
@@ -65,13 +67,68 @@ const fetchWallpaper = async () => {
 };
 const htmlContent = ref()
 const getMarkdownContent = async () => {
-  htmlContent.value = await marked(article.value.content);
-  // console.log(htmlContent.value)
+  const markedOptions = {
+    gfm: true,
+    breaks: true,
+    renderer: new marked.Renderer(),
+  };
+  marked.setOptions(markedOptions);
+  // 使用 marked 渲染文章内容
+  htmlContent.value = marked(article.value.content);
+  console.log('Rendered HTML before latex replacement:', htmlContent.value);
+
+  // 调用 replaceLatexWithClass 来替换所有公式
+  replaceLatexWithClass();
+  console.log('Rendered HTML after latex replacement:', htmlContent.value);
+
+  // 确保 DOM 更新完毕后，再执行 LaTeX 渲染
+  await nextTick();  // 等待 DOM 更新
+
+  // 延迟执行 renderLatex，确保 HTML 渲染完毕
   setTimeout(() => {
-    // 使用 highlightAll 自动高亮所有代码块
+    // 渲染 LaTeX 公式
+    renderLatex();
+  }, 100);  // 增加延迟，确保 DOM 渲染完成
+
+  // 高亮代码块
+  setTimeout(() => {
     hljs.highlightAll();
   }, 50);  // 等待 markdown 渲染完成后再进行高亮
 };
+
+// 替换 htmlContent 中的 LaTeX 公式
+const replaceLatexWithClass = () => {
+  // 替换 $$ ... $$ 为 .math 类
+  htmlContent.value = htmlContent.value.replace(/\$\$([\s\S]+?)\$\$/g, (match, latex) => {
+    // 移除所有 <br> 标签和多余的空格
+    latex = latex.replace(/<br>/g, ' ').replace(/\n/g, ' ').replace(/\s+/g, ' ').trim();
+    return `<span class="math">${latex}</span>`;
+  });
+
+  // 替换 \( ... \) 为 .inline-math 类
+  htmlContent.value = htmlContent.value.replace(/\\\(([\s\S]+?)\\\)/g, (match, latex) => {
+    latex = latex.replace(/<br>/g, ' ').replace(/\n/g, ' ').replace(/\s+/g, ' ').trim();
+    return `<span class="inline-math">${latex}</span>`;
+  });
+};
+
+const renderLatex = () => {
+  // 查找所有包含 LaTeX 公式的元素（即 .math 类）
+  const mathElements = document.querySelectorAll('.math');
+  console.log('Found math elements:', mathElements); // 输出匹配的元素
+
+  // 使用 KaTeX 渲染公式
+  mathElements.forEach((element) => {
+    katex.render(element.textContent, element, {
+      throwOnError: false,  // 如果公式有错误，不抛出异常
+    });
+  });
+};
+const router = useRouter()
+const edit = async () => {
+  await router.push(`/Edit/articleID=${article.value.id}`);
+};
+
 
 const startY = ref(0);
 const currentY = ref(0);
@@ -115,7 +172,7 @@ const onTouchEnd = () => {
 <template>
   <div class="home" v-if="isPhone">
     <!-- 顶部轮换壁纸 -->
-    <div class="header" :style="{ backgroundImage: `url(${wallpaperUrl})` }">
+    <div @click="edit" class="header" :style="{ backgroundImage: `url(${wallpaperUrl})` }">
       <top-button :isPinned="article.isPinned" desc="置顶中" />
       <h2 >{{article.title}}</h2>
       <div class="article-meta">

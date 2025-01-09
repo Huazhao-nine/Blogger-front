@@ -28,7 +28,11 @@ const router = createRouter({
         {
             path: '/Edit',
             component: () => import('@/pages/Edit.vue')
-        }
+        },
+        {
+            path: '/Edit/articleID=:id',
+            component: () => import('@/pages/Edit.vue')
+        },
     ]
 })
 
