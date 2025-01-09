@@ -75,11 +75,11 @@ const getMarkdownContent = async () => {
   marked.setOptions(markedOptions);
   // 使用 marked 渲染文章内容
   htmlContent.value = marked(article.value.content);
-  console.log('Rendered HTML before latex replacement:', htmlContent.value);
+  // console.log('Rendered HTML before latex replacement:', htmlContent.value);
 
   // 调用 replaceLatexWithClass 来替换所有公式
   replaceLatexWithClass();
-  console.log('Rendered HTML after latex replacement:', htmlContent.value);
+  // console.log('Rendered HTML after latex replacement:', htmlContent.value);
 
   // 确保 DOM 更新完毕后，再执行 LaTeX 渲染
   await nextTick();  // 等待 DOM 更新
@@ -115,7 +115,7 @@ const replaceLatexWithClass = () => {
 const renderLatex = () => {
   // 查找所有包含 LaTeX 公式的元素（即 .math 类）
   const mathElements = document.querySelectorAll('.math');
-  console.log('Found math elements:', mathElements); // 输出匹配的元素
+  // console.log('Found math elements:', mathElements); // 输出匹配的元素
 
   // 使用 KaTeX 渲染公式
   mathElements.forEach((element) => {

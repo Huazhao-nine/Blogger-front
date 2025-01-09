@@ -50,7 +50,7 @@ const getArticle = async () => {
   const id = route.params.id;// 从路由参数中提取 articleId
   if (id !== null){
     const res = await getArticleByID(id);
-    console.log(res.data.data);
+    // console.log(res.data.data);
     editedArticle.value = res.data.data;
     articleData.value = res.data.data;
     isAdd.value = false;
