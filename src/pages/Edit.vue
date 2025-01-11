@@ -5,7 +5,8 @@ import 'highlight.js/styles/atom-one-light.css'; // 在此引入高亮样式
 import WallpaperCard from "@/components/WallpaperCard.vue";
 import {addArticle, editArticle, getArticleByID} from "@/api/ArticleService.js";
 import {addCategory, getAllCategories} from "@/api/CategoryService.js";
-import {useRoute, useRouter} from "vue-router"; // 引入 useRoute 来访问路由信息
+import {useRoute, useRouter} from "vue-router";
+import {useAuthStore} from "@/stores/auth.js"; // 引入 useRoute 来访问路由信息
 
 const startY = ref(0);
 const currentY = ref(0);
@@ -48,7 +49,7 @@ const editedArticle = ref({})
 const isAdd = ref(true)
 const getArticle = async () => {
   const id = route.params.id;// 从路由参数中提取 articleId
-  if (id !== null){
+  if (id !== undefined){
     const res = await getArticleByID(id);
     // console.log(res.data.data);
     editedArticle.value = res.data.data;
@@ -65,6 +66,14 @@ const Categories = ref({})
 
 // 打开新增分类对话框
 const handleCategoryChange = (value) => {
+  if (!auth.isAuthenticated){
+    ElNotification({
+      title: '未登录',
+      message: '请登录后重试',
+      type: 'error',
+    });
+    return; // 防止重复提交
+  }
   if (value === 'newCategory') {
     dialogVisible.value = true;
   }
@@ -80,11 +89,19 @@ const closeDialog = () => {
 // 新增分类
 const addCate = async () => {
   if (!newCategoryName.value.trim()) {
-    ElMessage.error('分类名称不能为空');
+    ElNotification({
+      title: '错误',
+      message: '分类名称不能为空',
+      type: 'error',
+    });
     return
   }
   if (!newCategoryDesc.value.trim()) {
-    ElMessage.error('分类描述不能为空');
+    ElNotification({
+      title: '错误',
+      message: '分类描述不能为空',
+      type: 'error',
+    });
     return
   }
   let category = {
@@ -93,8 +110,18 @@ const addCate = async () => {
   }
   const res = await addCategory(category);
   // console.log(res)
-  if (res.data.code === 200)ElMessage.success(res.data.msg)
-  else ElMessage.error(res.data.msg)
+  if (res.data.code === 200) {
+    ElNotification({
+      title: '成功',
+      message: res.data.msg,
+      type: 'success',
+    });
+  }
+  else ElNotification({
+    title: '错误',
+    message: res.data.msg,
+    type: 'error',
+  });
   await getAll()
   closeDialog()
 };
@@ -129,9 +156,18 @@ const addTag = () => {
   }
 };
 const router = useRouter()
+const auth = useAuthStore()
 // 提交文章
 const submitArticle = async () => {
   if (isSubmitting.value) return; // 防止重复提交
+  if (!auth.isAuthenticated){
+    ElNotification({
+      title: '未登录',
+      message: '请登录后重试',
+      type: 'error',
+    });
+    return; // 防止重复提交
+  }
   isSubmitting.value = true;
 
   // 验证各个字段是否为空
@@ -199,7 +235,7 @@ const submitArticle = async () => {
   // 构建提交数据
   if (isAdd.value){
     let articlePayload = {
-      userId: 1,  // 假设用户ID是固定的，可以从登录状态中获取
+      userId: auth.user.id,  // 假设用户ID是固定的，可以从登录状态中获取
       title: articleData.value.title,
       slug: articleData.value.slug,
       content: articleData.value.content,

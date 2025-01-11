@@ -1,7 +1,7 @@
 <template>
   <div class="home" v-if="isPhone">
     <!-- 顶部轮换壁纸 -->
-    <div class="header" :style="{ backgroundImage: `url(${wallpaperUrl})` }">
+    <div class="header" @click="router.push('/Login')" :style="{ backgroundImage: `url(${wallpaperUrl})` }">
       <div class="header-content">
         <!-- 左边头像 -->
         <img class="avatar" src="/src/assets/avatar.jpg" alt="头像" />
@@ -22,11 +22,14 @@
   </div>
 </template>
 <script setup>
-import { ref, onMounted, onBeforeUnmount } from 'vue';
-import { ElNotification } from 'element-plus';
-import { getWallPaper } from '@/api/WallpaperService.js';
+import {onBeforeUnmount, onMounted, ref} from 'vue';
+import {ElNotification} from 'element-plus';
+import {getWallPaper} from '@/api/WallpaperService.js';
 import AboutMe from "@/components/AboutMe.vue";
+import {useRouter} from "vue-router";
+
 const wallpaperUrl = ref('');
+const router = useRouter()
 // 获取壁纸
 const fetchWallpaper = async () => {
   try {

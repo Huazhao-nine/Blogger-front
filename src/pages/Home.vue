@@ -68,9 +68,21 @@ import {getWallPaper} from '@/api/WallpaperService.js';
 import {getTheArticlesForHome} from '@/api/ArticleService.js';
 import {useRouter} from "vue-router";
 import TopButton from "@/components/TopButton.vue";
+import {useAuthStore} from "@/stores/auth.js";
 
 const articlesLoading = ref(false);
 const articles = ref([]);
+const auth = useAuthStore()
+
+const welcome = () => {
+  if (auth.isAuthenticated){
+    ElNotification({
+      title: auth.user.name,
+      message: "欢迎回来！",
+      type: 'success',
+    });
+  }
+}
 
 const getArticleList = async () => {
   articlesLoading.value = true;
@@ -246,7 +258,7 @@ onMounted(() => {
   document.addEventListener('touchstart', handleClickOutside);
   getArticleList();
   // console.log("任何问题请联系982086195@qq.com")
-
+  welcome()
 });
 
 onBeforeUnmount(() => {

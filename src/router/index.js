@@ -33,6 +33,10 @@ const router = createRouter({
             path: '/Edit/articleID=:id',
             component: () => import('@/pages/Edit.vue')
         },
+        {
+            path: '/Login',
+            component: () => import('@/pages/Login.vue')
+        },
     ]
 })
 
