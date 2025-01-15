@@ -2,6 +2,7 @@
   <div class="home" v-if="isPhone">
     <!-- 顶部轮换壁纸 -->
     <div class="header" @click="router.push('/Login')" :style="{ backgroundImage: `url(${wallpaperUrl})` }">
+      <time-button/>
       <div class="header-content">
         <!-- 左边头像 -->
         <img class="avatar" src="/src/assets/avatar.jpg" alt="头像" />
@@ -27,6 +28,8 @@ import {ElNotification} from 'element-plus';
 import {getWallPaper} from '@/api/WallpaperService.js';
 import AboutMe from "@/components/AboutMe.vue";
 import {useRouter} from "vue-router";
+import TimeButton from "@/components/TimeButton.vue";
+
 
 const wallpaperUrl = ref('');
 const router = useRouter()

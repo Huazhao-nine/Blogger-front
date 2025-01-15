@@ -16,6 +16,7 @@ declare module 'vue' {
     FooterNav: typeof import('./src/components/footerNav.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    TimeButton: typeof import('./src/components/TimeButton.vue')['default']
     TopButton: typeof import('./src/components/TopButton.vue')['default']
     WallpaperCard: typeof import('./src/components/WallpaperCard.vue')['default']
   }

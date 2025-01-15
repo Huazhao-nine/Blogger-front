@@ -2,6 +2,7 @@
   <div class="home" v-if="isPhone">
     <!-- 顶部轮换壁纸 -->
     <div class="header" :style="{ backgroundImage: `url(${wallpaperUrl})` }">
+      <time-button/>
       <h1 class="typing-effect">花朝九日's Blogger</h1>
     </div>
     <!-- 瀑布流文章列表 -->
@@ -69,6 +70,7 @@ import {getTheArticlesForHome} from '@/api/ArticleService.js';
 import {useRouter} from "vue-router";
 import TopButton from "@/components/TopButton.vue";
 import {useAuthStore} from "@/stores/auth.js";
+import TimeButton from "@/components/TimeButton.vue";
 
 const articlesLoading = ref(false);
 const articles = ref([]);

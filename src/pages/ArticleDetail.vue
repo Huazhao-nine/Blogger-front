@@ -10,7 +10,9 @@ import katex from 'katex';
 import 'katex/dist/katex.min.css'; // 导入 KaTeX 的样式
 import 'highlight.js/styles/atom-one-light.css'; // 在此引入高亮样式
 import hljs from "highlight.js";
-import TopButton from "@/components/TopButton.vue"; // 引入 useRoute 来访问路由信息
+import TopButton from "@/components/TopButton.vue";
+import {useAuthStore} from "@/stores/auth.js";
+import {isAuthor} from "@/api/UserService.js"; // 引入 useRoute 来访问路由信息
 const articlesLoading = ref(false)
 const route = useRoute();// 获取当前路由信息
 const article = ref({})
@@ -125,8 +127,27 @@ const renderLatex = () => {
   });
 };
 const router = useRouter()
+const auth = useAuthStore()
 const edit = async () => {
-  await router.push(`/Edit/articleID=${article.value.id}`);
+  if (!auth.isAuthenticated){
+    ElNotification({
+      title: '未登录',
+      message: '请登录后重试',
+      type: 'error',
+    });
+    return; // 防止重复提交
+  }
+  const res = await isAuthor(article.value, auth.user.id)
+  if (res.data.code === 200) {
+    await router.push(`/Edit/articleID=${article.value.id}`);
+  }else {
+    ElNotification({
+      title: '错误',
+      message: res.data.msg,
+      type: 'error',
+    });
+  }
+
 };
 
 
