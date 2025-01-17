@@ -6,7 +6,7 @@ import {ElNotification} from "element-plus";
 import {getWallPaper} from "@/api/WallpaperService.js";
 import {Clock, Postcard, User, View} from "@element-plus/icons-vue";
 import {marked} from "marked";
-import katex from 'katex';
+import katex from "katex";
 import 'katex/dist/katex.min.css'; // 导入 KaTeX 的样式
 import 'highlight.js/styles/atom-one-light.css'; // 在此引入高亮样式
 import hljs from "highlight.js";
@@ -69,34 +69,64 @@ const fetchWallpaper = async () => {
 };
 const htmlContent = ref()
 const getMarkdownContent = async () => {
+  // 定义自定义渲染器
+  const renderer = new marked.Renderer();
+  // 自定义图片渲染器
+  renderer.image = ({ href, title, text }) => {
+    console.log(href)
+    // 如果图片路径是相对路径，补充上根路径
+    // if (!/^http?:\/\//.test(href)) {
+    //   href = `/images/${href}`;  // 假设图片存放在 public/images 目录下
+    // }
+    // 返回带有 src、alt、title 和内联样式的 <img> 标签
+    return `<img src="${href}" alt="${text}" title="${title}" style="max-width: 100%; height: auto; display: block; margin: 0 auto;" />`;
+  };
+
+
+  // 配置 marked 的选项
   const markedOptions = {
     gfm: true,
     breaks: true,
-    renderer: new marked.Renderer(),
+    renderer: renderer,  // 使用自定义的渲染器
   };
+
+  // 设置 marked 配置
   marked.setOptions(markedOptions);
+  // marked.use({renderer: renderer})
   // 使用 marked 渲染文章内容
-  htmlContent.value = marked(article.value.content);
-  // console.log('Rendered HTML before latex replacement:', htmlContent.value);
 
-  // 调用 replaceLatexWithClass 来替换所有公式
+  const rawContent = article.value.content;
+  // console.log("Raw Markdown Content:", rawContent);  // 输出原始 Markdown 内容
+
+  // 渲染为 HTML
+  htmlContent.value = marked(rawContent);
+  // htmlContent.value = marked.parse(rawContent);
+
+  // 调试：查看渲染后的 HTML
+  // console.log("Rendered HTML:", htmlContent.value);
+
+  // 替换其中的 LaTeX 公式（如果有）
   replaceLatexWithClass();
-  // console.log('Rendered HTML after latex replacement:', htmlContent.value);
 
-  // 确保 DOM 更新完毕后，再执行 LaTeX 渲染
-  await nextTick();  // 等待 DOM 更新
+  // 等待 DOM 更新完毕后，再执行后续操作
+  await nextTick();
 
-  // 延迟执行 renderLatex，确保 HTML 渲染完毕
+  // 延迟渲染 LaTeX 公式，确保 HTML 渲染完毕
   setTimeout(() => {
-    // 渲染 LaTeX 公式
     renderLatex();
-  }, 100);  // 增加延迟，确保 DOM 渲染完成
+  }, 100);
 
-  // 高亮代码块
+  // 延迟执行代码高亮
   setTimeout(() => {
     hljs.highlightAll();
-  }, 50);  // 等待 markdown 渲染完成后再进行高亮
+  }, 50);
 };
+
+
+
+
+
+
 
 // 替换 htmlContent 中的 LaTeX 公式
 const replaceLatexWithClass = () => {
@@ -323,7 +353,7 @@ const onTouchEnd = () => {
 .article-meta .views, .article-meta .author, .article-meta .date {
   display: flex;
   align-items: center;
-  margin: 0 10px;  /* 给每个元素添加左右间距 */
+  margin: 0 5px;  /* 给每个元素添加左右间距 */
 }
 .article-meta .author {
   text-align: center;
@@ -332,7 +362,4 @@ const onTouchEnd = () => {
 .article-meta .date {
   text-align: right;
 }
-
-
-
 </style>
