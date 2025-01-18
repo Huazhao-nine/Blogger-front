@@ -78,11 +78,12 @@ const auth = useAuthStore()
 
 const welcome = () => {
   if (auth.isAuthenticated){
-    ElNotification({
-      title: auth.user.name,
-      message: "欢迎回来！",
-      type: 'success',
-    });
+    // ElNotification({
+    //   title: auth.user.name,
+    //   message: "欢迎回来！",
+    //   type: 'success',
+    // });
+    ElMessage.success(auth.user.name + "，欢迎！")
   }
 }
 

@@ -1,7 +1,7 @@
 <script setup>
-import { computed } from 'vue'  // 确保导入 computed
-import { useRoute } from 'vue-router'
-import { zhCn } from "element-plus/es/locale/index";
+import {computed} from 'vue' // 确保导入 computed
+import {useRoute} from 'vue-router'
+import {zhCn} from "element-plus/es/locale/index";
 import FooterNav from "@/components/footerNav.vue";
 
 const route = useRoute()
@@ -27,6 +27,8 @@ const transitionName = computed(() => {
 </template>
 
 <style scoped>
+
+
 /* 定义滑动动画效果 */
 .slide-enter-active, .slide-leave-active {
   transition: transform 0.8s ease-in-out;
@@ -35,4 +37,5 @@ const transitionName = computed(() => {
 .slide-enter, .slide-leave-to {
   transform: translateY(-100%);
 }
+
 </style>
