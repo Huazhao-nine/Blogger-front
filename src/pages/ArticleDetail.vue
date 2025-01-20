@@ -97,36 +97,22 @@ const getMarkdownContent = async () => {
 
   const rawContent = article.value.content;
   // console.log("Raw Markdown Content:", rawContent);  // 输出原始 Markdown 内容
-
   // 渲染为 HTML
   htmlContent.value = marked(rawContent);
   // htmlContent.value = marked.parse(rawContent);
-
   // 调试：查看渲染后的 HTML
   // console.log("Rendered HTML:", htmlContent.value);
-
   // 替换其中的 LaTeX 公式（如果有）
   replaceLatexWithClass();
-
   // 等待 DOM 更新完毕后，再执行后续操作
   await nextTick();
-
   // 延迟渲染 LaTeX 公式，确保 HTML 渲染完毕
-  setTimeout(() => {
-    renderLatex();
-  }, 100);
-
   // 延迟执行代码高亮
   setTimeout(() => {
+    renderLatex();
     hljs.highlightAll();
   }, 50);
 };
-
-
-
-
-
-
 
 // 替换 htmlContent 中的 LaTeX 公式
 const replaceLatexWithClass = () => {
@@ -147,15 +133,15 @@ const replaceLatexWithClass = () => {
 const renderLatex = () => {
   // 查找所有包含 LaTeX 公式的元素（即 .math 类）
   const mathElements = document.querySelectorAll('.math');
-  // console.log('Found math elements:', mathElements); // 输出匹配的元素
 
-  // 使用 KaTeX 渲染公式
   mathElements.forEach((element) => {
+    // 使用 KaTeX 渲染公式
     katex.render(element.textContent, element, {
       throwOnError: false,  // 如果公式有错误，不抛出异常
     });
   });
 };
+
 const router = useRouter()
 const auth = useAuthStore()
 const edit = async () => {
@@ -274,8 +260,6 @@ const onTouchEnd = () => {
   flex-direction: column;
 }
 .header {
-  border-radius: 25px; /* 设置更平滑的圆角 */
-  overflow: hidden; /* 确保圆角生效 */
   background-size: cover; /* 背景图自动覆盖 */
   background-position: center; /* 居中背景图 */
   height: 150px;
@@ -286,7 +270,10 @@ const onTouchEnd = () => {
   justify-content: center;
   color: white;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  overflow: hidden; /* 确保圆角和背景图不超出边界 */
+  border-radius: 25px;
 }
+
 .categories a {
   display: block;
   margin: 10px 0;
@@ -362,4 +349,6 @@ const onTouchEnd = () => {
 .article-meta .date {
   text-align: right;
 }
+
+
 </style>

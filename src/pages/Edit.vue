@@ -143,6 +143,7 @@ const articleData = ref({
   categoryName: '',
   password: '',
   isPinned: false,
+  isHome: false
 });
 
 const inputTag = ref('');  // 绑定输入框的值
@@ -243,6 +244,7 @@ const submitArticle = async () => {
       tags: articleData.value.tags,  // 过滤掉空字符串的标签
       categoryName: articleData.value.categoryName,
       isPinned: articleData.value.isPinned ? 1 : 0,
+      isHome: articleData.value.isHome ? 1 : 0,
       password: articleData.value.password
     };
     res = await addArticle(articlePayload); // 调用API提交数据}
@@ -263,6 +265,7 @@ const submitArticle = async () => {
       articleData.value.tags = [];  // 重置 tags 为一个空数组
       articleData.value.categoryName = '';
       articleData.value.isPinned = false;
+      articleData.value.isHome = false;
       articleData.value.password = '';
       await router.push(`/`);
     }
@@ -362,6 +365,9 @@ onUnmounted(() => {
             </el-form>
             <el-form-item label="置顶">
               <el-switch v-model="articleData.isPinned" active-text="是" inactive-text="否" />
+            </el-form-item>
+            <el-form-item label="主页置顶">
+              <el-switch v-model="articleData.isHome" active-text="是" inactive-text="否" />
             </el-form-item>
             <el-form-item>
               <el-button :loading="isSubmitting" type="primary" @click="submitArticle" round>提交文章</el-button>

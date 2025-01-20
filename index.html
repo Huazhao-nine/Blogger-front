@@ -2,13 +2,13 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=0.8">
     <link rel="manifest" href="/manifest.json" />
     <link rel="icon" href="/avatar.jpg">
     <title>花朝九日's Blogger</title>
 </head>
 <body>
-<div id="app"></div>
+<div id="app" ></div>
 <script type="module" src="/src/main.js"></script>
 </body>
 <style>
@@ -21,6 +21,21 @@
     /* Mono font (optional) */
     pre,code {
         font-family: "LXGW WenKai Mono Lite", sans-serif;
+    }
+
+    /* 设置默认字体大小 */
+    html {
+        font-size: 1.0rem; /* 1rem = 16px，基于html的font-size */
+        line-height: 1.8;  /* 增加行间距 */
+    }
+
+    #content {
+        padding: 15px;
+    }
+
+    /* 使用 rem 单位来设置字体大小 */
+    p {
+
     }
 </style>
 

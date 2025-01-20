@@ -63,6 +63,18 @@ export default defineConfig({
           },
         },
       },
+      {
+        urlPattern: /https:\/\/www\.bing\.com\/th\?id=[^&]+/,
+        handler: 'CacheFirst',
+        options: {
+          cacheName: 'wallpaper-images',
+          expiration: {
+            maxEntries: 1,  // 只保留一个壁纸
+            maxAgeSeconds: 24 * 60 * 60,  // 缓存 1 天
+          },
+        },
+  },
+
     ],
     // 启用 Service Worker 自清理功能
     skipWaiting: true, // 强制立即激活新版本的 SW

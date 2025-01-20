@@ -175,6 +175,7 @@ const fetchWallpaper = async () => {
     const baseUrl = 'https://www.bing.com';
     imageUrl = baseUrl + parsedData.images[0].url;
     wallpaperUrl.value = imageUrl;
+    // console.log(imageUrl)
   } catch (error) {
     console.error('Error fetching wallpaper:', error);
   }
@@ -413,6 +414,8 @@ onBeforeUnmount(() => {
     transform: translateX(0);
   }
 }
+
+
 
 
 
