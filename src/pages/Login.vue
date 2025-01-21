@@ -6,43 +6,8 @@ import WallpaperCard from "@/components/WallpaperCard.vue";
 import {useRouter} from "vue-router";
 import {login, sendValidateCode} from "@/api/UserService.js";
 import {useAuthStore} from "@/stores/auth.js";
-import AboutMe from "@/components/AboutMe.vue"; // 引入 useRoute 来访问路由信息
-
-const startY = ref(0);
-const currentY = ref(0);
-const isDragging = ref(false);
-const maxScroll = ref(0);
-// 滑动事件处理
-const onTouchStart = (event) => {
-  startY.value = event.touches[0].pageY - currentY.value;
-  isDragging.value = true;
-};
-const onTouchMove = (event) => {
-  if (!isDragging.value) return;
-  currentY.value = event.touches[0].pageY - startY.value;
-  if (currentY.value > 0) {
-    currentY.value /= 2;
-  } else if (currentY.value < maxScroll.value) {
-    currentY.value = maxScroll.value + (currentY.value - maxScroll.value) / 2;
-  }
-  const articleList = document.querySelector('.article-list');
-  articleList.style.transform = `translateY(${currentY.value}px)`;
-};
-const onTouchEnd = () => {
-  if (!isDragging.value) return;
-  isDragging.value = false;
-  if (currentY.value > 0) {
-    currentY.value = 0;
-  } else if (currentY.value < maxScroll.value) {
-    currentY.value = maxScroll.value;
-  }
-  const articleList = document.querySelector('.article-list');
-  articleList.style.transition = 'transform 0.3s ease';
-  articleList.style.transform = `translateY(${currentY.value}px)`;
-  setTimeout(() => {
-    articleList.style.transition = '';
-  }, 300);
-};
+import AboutMe from "@/components/AboutMe.vue";
+import {useDraggable} from "@/api/useTouchScroll.js"; // 引入 useRoute 来访问路由信息
 
 
 const formData = ref({
@@ -192,12 +157,18 @@ const submitLogin = async () => {
   isSubmitting.value = false;
 };
 
-
+const articleListRef = ref(null);
+const { calculateMaxScroll, bindTouchEvents, unbindTouchEvents } = useDraggable(articleListRef);
 onMounted(() => {
+  calculateMaxScroll(); // 计算最大滚动范围
+  bindTouchEvents(); // 绑定触摸事件
+  window.addEventListener('resize', calculateMaxScroll);
   isLogin()
 });
 
 onUnmounted(() => {
+  unbindTouchEvents()
+  window.removeEventListener('resize', calculateMaxScroll);
 });
 
 
@@ -211,10 +182,7 @@ onUnmounted(() => {
     <div
         v-if="!loginStatus"
         class="article-list"
-        ref="articleList"
-        @touchstart="onTouchStart"
-        @touchmove="onTouchMove"
-        @touchend="onTouchEnd"
+        ref="articleListRef"
     >
       <div
           class="article-card"

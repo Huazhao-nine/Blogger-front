@@ -1,16 +1,18 @@
 <template>
   <div class="home" v-if="isPhone">
     <!-- 顶部轮换壁纸 -->
-    <div class="header" @click="router.push('/Login')" :style="{ backgroundImage: `url(${wallpaperUrl})` }">
+    <div class="header":style="{ backgroundImage: `url(${wallpaperUrl})` }">
       <time-button/>
       <div class="header-content">
         <!-- 左边头像 -->
-        <img class="avatar" src="/src/assets/avatar.jpg" alt="头像" />
+        <img class="avatar" @click="userLoginAndOut"  src="/src/assets/avatar.jpg" alt="头像" v-if="!auth.isAuthenticated"/>
+        <img class="avatar" @click="userLoginAndOut" :src="imageData" alt="QQ Avatar" v-else/>
         <!-- 竖线 -->
         <div class="divider"></div>
         <!-- 右边介绍 -->
         <div class="intro">
-          <h1>花朝九日</h1>
+          <h1 v-if="auth.isAuthenticated">{{ auth.user.name }}</h1>
+          <h1 v-else>未登录，点击头像登录</h1>
           <p>就在这长夜之后，凝结一座新宇宙</p>
         </div>
       </div>
@@ -24,29 +26,25 @@
 </template>
 <script setup>
 import {onBeforeUnmount, onMounted, ref} from 'vue';
-import {ElNotification} from 'element-plus';
-import {getWallPaper} from '@/api/WallpaperService.js';
+import {ElMessageBox, ElNotification} from 'element-plus';
+import {fetchWallpaper, getWallPaper} from '@/api/WallpaperService.js';
 import AboutMe from "@/components/AboutMe.vue";
 import {useRouter} from "vue-router";
 import TimeButton from "@/components/TimeButton.vue";
-
+import {useAuthStore} from "@/stores/auth.js";
+import {getQQAvatar} from "@/api/QQService.js";
+const auth = useAuthStore()
 
 const wallpaperUrl = ref('');
 const router = useRouter()
-// 获取壁纸
-const fetchWallpaper = async () => {
-  try {
-    let imageUrl = await getWallPaper();
-    const wallpaperData = imageUrl.data.msg;
-    const parsedData = JSON.parse(wallpaperData);
-    const baseUrl = 'https://www.bing.com';
-    imageUrl = baseUrl + parsedData.images[0].url;
-    wallpaperUrl.value = imageUrl;
-  } catch (error) {
-    console.error('Error fetching wallpaper:', error);
-  }
-};
+const imageData = ref('')
 
+const getUserImg = async () => {
+  if (auth.isAuthenticated){
+    const res = await getQQAvatar(auth.user.email)
+    imageData.value = 'data:image/jpeg;base64,' +  res.data.msg
+  }
+}
 
 const isPhone = ref(true)
 // 检测设备类型
@@ -60,11 +58,42 @@ const checkDeviceType = () => {
     });
   }else isPhone.value = true
 };
-
+const isLogin = () => {
+  if (auth.isAuthenticated){
+    ElMessage.success('点击头像可退出登录')
+  }
+}
+const userLoginAndOut = () => {
+  if (auth.isAuthenticated){
+    ElMessageBox.alert('确定要退出登录吗', '确认退出', {
+      // if you want to disable its autofocus
+      // autofocus: false,
+      confirmButtonText: 'OK',
+      customStyle: {
+        borderRadius: '25px',  // 设置圆角为 25px
+      },
+      callback: (action) => {
+        if (action === 'confirm'){
+          auth.logout()
+          ElNotification({
+            title: '成功',
+            message:'已退出登录',
+            type: 'success',
+          });
+          router.push('/')
+        }
+      },
+    })
+  }else {
+    router.push('/Login')
+  }
+}
 // 生命周期钩子
 onMounted(() => {
-  fetchWallpaper();
+  fetchWallpaper(wallpaperUrl);
   checkDeviceType(); // 初次加载时检查设备
+  getUserImg()
+  isLogin()
   window.addEventListener('resize', checkDeviceType); // 窗口大小变化时重新检查
 });
 

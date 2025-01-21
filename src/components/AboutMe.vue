@@ -1,40 +1,20 @@
 <script setup>
-import { ref } from 'vue';
-const startY = ref(0);
-const currentY = ref(0);
-const isDragging = ref(false);
-const maxScroll = ref(0);
-// 滑动事件处理
-const onTouchStart = (event) => {
-  startY.value = event.touches[0].pageY - currentY.value;
-  isDragging.value = true;
-};
+import {onBeforeUnmount, onMounted, ref} from 'vue';
+import {useDraggable} from "@/api/useTouchScroll.js";
+import {fetchWallpaper} from "@/api/WallpaperService.js";
+import router from "@/router/index.js";
 const articleListRef = ref(null);
-const onTouchMove = (event) => {
-  if (!isDragging.value) return;
-  currentY.value = event.touches[0].pageY - startY.value;
-  if (currentY.value > 0) {
-    currentY.value /= 2;
-  } else if (currentY.value < maxScroll.value) {
-    currentY.value = maxScroll.value + (currentY.value - maxScroll.value) / 2;
-  }
-  articleListRef.value.style.transform = `translateY(${currentY.value}px)`;
-};
-const onTouchEnd = () => {
-  if (!isDragging.value) return;
-  isDragging.value = false;
-  if (currentY.value > 0) {
-    currentY.value = 0;
-  } else if (currentY.value < maxScroll.value) {
-    currentY.value = maxScroll.value;
-  }
-  const articleList = document.querySelector('.article-list');
-  articleList.style.transition = 'transform 0.3s ease';
-  articleList.style.transform = `translateY(${currentY.value}px)`;
-  setTimeout(() => {
-    articleList.style.transition = '';
-  }, 300);
-};
+const { calculateMaxScroll, bindTouchEvents, unbindTouchEvents } = useDraggable(articleListRef);
+onMounted(() => {
+  calculateMaxScroll(); // 计算最大滚动范围
+  bindTouchEvents(); // 绑定触摸事件
+  window.addEventListener('resize', calculateMaxScroll);
+});
+
+onBeforeUnmount(() => {
+  unbindTouchEvents()
+  window.removeEventListener('resize', calculateMaxScroll);
+});
 </script>
 
 <template>
@@ -42,20 +22,7 @@ const onTouchEnd = () => {
   <div
       class="article-list"
       ref="articleListRef"
-      @touchstart="onTouchStart"
-      @touchmove="onTouchMove"
-      @touchend="onTouchEnd"
   >
-    <div class="article-card">
-      <div class="article-content">
-        <h3 class="article-title">花朝九日's Blogger</h3>
-        <p class="article-summary">
-
-          前<el-tag type="success" size="small">Vue3</el-tag>
-          后端<el-tag type="danger" size="small">SpringBoot3</el-tag>分离的原创博客
-        </p>
-      </div>
-    </div>
     <div class="article-card">
       <div class="article-content">
         <h3 class="article-title">MBTI</h3>
@@ -65,6 +32,7 @@ const onTouchEnd = () => {
       <img class="article-image" src="/src/assets/intj-portrait.svg" alt="INTJ 画像" />
     </div>
     <div class="article-card">
+
       <div class="article-content">
         <h3 class="article-title">关于我</h3>
         <p class="article-summary">我没有说告别，眼看他与我永不重逢</p>
@@ -76,6 +44,21 @@ const onTouchEnd = () => {
         </ul>
       </div>
     </div>
+    <div class="article-card">
+      <div class="article-content">
+        <h3 class="article-title">花朝九日's Blogger</h3>
+        <p>
+          网站备案号： <el-tag type="info" size="small" effect="plain">ICP备2025001234号</el-tag>
+        </p>
+        <p class="article-summary">
+          前<el-tag type="success" size="small" effect="plain">Vue3</el-tag>
+          后端<el-tag type="danger" size="small" effect="plain">SpringBoot3</el-tag>分离的个人博客
+        </p>
+        <p class="copyright">Copyright 2024-2025 花朝九日 All Rights Reserved.</p>
+
+      </div>
+    </div>
+
   </div>
 </template>
 

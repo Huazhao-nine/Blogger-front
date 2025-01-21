@@ -6,44 +6,10 @@ import WallpaperCard from "@/components/WallpaperCard.vue";
 import {addArticle, editArticle, getArticleByID} from "@/api/ArticleService.js";
 import {addCategory, getAllCategories} from "@/api/CategoryService.js";
 import {useRoute, useRouter} from "vue-router";
-import {useAuthStore} from "@/stores/auth.js"; // 引入 useRoute 来访问路由信息
-
-const startY = ref(0);
-const currentY = ref(0);
-const isDragging = ref(false);
-const maxScroll = ref(0);
-// 滑动事件处理
-const onTouchStart = (event) => {
-  startY.value = event.touches[0].pageY - currentY.value;
-  isDragging.value = true;
-};
-const onTouchMove = (event) => {
-  if (!isDragging.value) return;
-  currentY.value = event.touches[0].pageY - startY.value;
-  if (currentY.value > 0) {
-    currentY.value /= 2;
-  } else if (currentY.value < maxScroll.value) {
-    currentY.value = maxScroll.value + (currentY.value - maxScroll.value) / 2;
-  }
-  const articleList = document.querySelector('.article-list');
-  articleList.style.transform = `translateY(${currentY.value}px)`;
-};
-const onTouchEnd = () => {
-  if (!isDragging.value) return;
-  isDragging.value = false;
-  if (currentY.value > 0) {
-    currentY.value = 0;
-  } else if (currentY.value < maxScroll.value) {
-    currentY.value = maxScroll.value;
-  }
-  const articleList = document.querySelector('.article-list');
-  articleList.style.transition = 'transform 0.3s ease';
-  articleList.style.transform = `translateY(${currentY.value}px)`;
-  setTimeout(() => {
-    articleList.style.transition = '';
-  }, 300);
-};
-
+import {useAuthStore} from "@/stores/auth.js";
+import {useDraggable} from "@/api/useTouchScroll.js"; // 引入 useRoute 来访问路由信息
+const articleListRef = ref(null);
+const { calculateMaxScroll, bindTouchEvents, unbindTouchEvents } = useDraggable(articleListRef);
 const route = useRoute();// 获取当前路由信息
 const editedArticle = ref({})
 const isAdd = ref(true)
@@ -279,12 +245,16 @@ const submitArticle = async () => {
     isSubmitting.value = false;
 };
 
+
 onMounted(() => {
+  calculateMaxScroll(); // 计算最大滚动范围
+  bindTouchEvents(); // 绑定触摸事件
   getArticle();
   getAll()
 });
 
 onUnmounted(() => {
+  unbindTouchEvents()
 });
 
 
@@ -296,10 +266,7 @@ onUnmounted(() => {
     <!-- 瀑布流文章列表 -->
     <div
         class="article-list"
-        ref="articleList"
-        @touchstart="onTouchStart"
-        @touchmove="onTouchMove"
-        @touchend="onTouchEnd"
+        ref="articleListRef"
     >
       <div
           class="article-card"
@@ -364,10 +331,8 @@ onUnmounted(() => {
               </el-dialog>
             </el-form>
             <el-form-item label="置顶">
-              <el-switch v-model="articleData.isPinned" active-text="是" inactive-text="否" />
-            </el-form-item>
-            <el-form-item label="主页置顶">
-              <el-switch v-model="articleData.isHome" active-text="是" inactive-text="否" />
+              <el-switch v-model="articleData.isPinned" active-text="文章置顶" inactive-text="否" />
+              <el-switch v-model="articleData.isHome" style="margin-left: 25px"  active-text="主页置顶" inactive-text="否" />
             </el-form-item>
             <el-form-item>
               <el-button :loading="isSubmitting" type="primary" @click="submitArticle" round>提交文章</el-button>

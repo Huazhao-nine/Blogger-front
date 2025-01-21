@@ -9,9 +9,6 @@
     <div
         class="article-list"
         ref="articleListRef"
-        @touchstart="onTouchStart"
-        @touchmove="onTouchMove"
-        @touchend="onTouchEnd"
     >
       <el-skeleton :rows="20" animated v-if="articlesLoading" />
       <div
@@ -37,10 +34,11 @@
 <script setup>
 import {onBeforeUnmount, onMounted, ref} from 'vue';
 import {ElNotification} from 'element-plus';
-import {getWallPaper} from '@/api/WallpaperService.js';
-import {getArticlesByCategory} from '@/api/ArticleService.js';
+import {fetchWallpaper} from '@/api/WallpaperService.js';
+import {getArticlesByCategory, getArticlesDetail} from '@/api/ArticleService.js';
 import TopButton from "@/components/TopButton.vue";
 import {useRoute, useRouter} from "vue-router";
+import {useDraggable} from "@/api/useTouchScroll.js";
 
 const route = useRoute();// 获取当前路由信息
 const router1 = useRouter()
@@ -58,96 +56,6 @@ const getArticleList = async () => {
 };
 
 const wallpaperUrl = ref('');
-const startY = ref(0);
-const currentY = ref(0);
-const isDragging = ref(false);
-const maxScroll = ref(0);
-
-const getArticlesDetail = async (articleId) => {
-  // const response = await getArticleByID(articleId);
-  // const article = response.data.data;
-  // if (firstClick.value){
-  //   ElNotification({
-  //     title: '正在跳转',
-  //     message: '正在前往文章的路上',
-  //     type: 'warning',
-  //   });
-  //   firstClick.value = false
-  // }
-  await router1.push(`/article/articleID=${articleId}`);
-};
-
-// 获取壁纸
-const fetchWallpaper = async () => {
-  try {
-    let imageUrl = await getWallPaper();
-    const wallpaperData = imageUrl.data.msg;
-    const parsedData = JSON.parse(wallpaperData);
-    const baseUrl = 'https://www.bing.com';
-    imageUrl = baseUrl + parsedData.images[0].url;
-    wallpaperUrl.value = imageUrl;
-  } catch (error) {
-    console.error('Error fetching wallpaper:', error);
-  }
-};
-
-// 获取指定区域的平均颜色
-const getAverageColor = (ctx, x, y, width, height) => {
-  const imageData = ctx.getImageData(x, y, width, height);
-  const data = imageData.data;
-  let r = 0, g = 0, b = 0;
-  for (let i = 0; i < data.length; i += 4) {
-    r += data[i];     // red
-    g += data[i + 1]; // green
-    b += data[i + 2]; // blue
-  }
-
-  const pixelCount = data.length / 4;
-  r = Math.floor(r / pixelCount);
-  g = Math.floor(g / pixelCount);
-  b = Math.floor(b / pixelCount);
-
-  return { r, g, b };
-};
-
-// 计算最大滚动范围
-const calculateMaxScroll = () => {
-  const articleList = document.querySelector('.article-list');
-  maxScroll.value = articleList.clientHeight - articleList.scrollHeight;
-};
-
-// 滑动事件处理
-const onTouchStart = (event) => {
-  startY.value = event.touches[0].pageY - currentY.value;
-  isDragging.value = true;
-};
-const articleListRef = ref(null);
-const onTouchMove = (event) => {
-  if (!isDragging.value) return;
-  currentY.value = event.touches[0].pageY - startY.value;
-  if (currentY.value > 0) {
-    currentY.value /= 2;
-  } else if (currentY.value < maxScroll.value) {
-    currentY.value = maxScroll.value + (currentY.value - maxScroll.value) / 2;
-  }
-  articleListRef.value.style.transform = `translateY(${currentY.value}px)`;
-};
-
-const onTouchEnd = () => {
-  if (!isDragging.value) return;
-  isDragging.value = false;
-  if (currentY.value > 0) {
-    currentY.value = 0;
-  } else if (currentY.value < maxScroll.value) {
-    currentY.value = maxScroll.value;
-  }
-  const articleList = document.querySelector('.article-list');
-  articleList.style.transition = 'transform 0.3s ease';
-  articleList.style.transform = `translateY(${currentY.value}px)`;
-  setTimeout(() => {
-    articleList.style.transition = '';
-  }, 300);
-};
 const isPhone = ref(true)
 // 检测设备类型
 const checkDeviceType = () => {
@@ -160,11 +68,14 @@ const checkDeviceType = () => {
     });
   }else isPhone.value = true
 };
+const articleListRef = ref(null);
+const { calculateMaxScroll, bindTouchEvents, unbindTouchEvents } = useDraggable(articleListRef);
 
 // 生命周期钩子
 onMounted(() => {
-  fetchWallpaper();
-  calculateMaxScroll();
+  fetchWallpaper(wallpaperUrl);
+  calculateMaxScroll(); // 计算最大滚动范围
+  bindTouchEvents(); // 绑定触摸事件
   checkDeviceType(); // 初次加载时检查设备
   window.addEventListener('resize', checkDeviceType); // 窗口大小变化时重新检查
   window.addEventListener('resize', calculateMaxScroll);
@@ -172,6 +83,7 @@ onMounted(() => {
 });
 
 onBeforeUnmount(() => {
+  unbindTouchEvents()
   window.removeEventListener('resize', calculateMaxScroll);
 });
 </script>

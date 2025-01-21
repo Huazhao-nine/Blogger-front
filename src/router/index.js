@@ -16,12 +16,12 @@ const router = createRouter({
             component: () => import('@/pages/Category.vue')
         },
         {
-            path: '/article/articleID=:id', // 路由参数 :id 用于动态获取文章ID
+            path: '/Article/:id/:slug', // 路由参数 :id 用于动态获取文章ID
             component: () => import('@/pages/ArticleDetail.vue'),
             props: true  // 启用路由传参到组件
         },
         {
-            path: '/article/categoryID=:id', // 路由参数 :id 用于动态获取文章ID
+            path: '/Category/:id', // 路由参数 :id 用于动态获取文章ID
             component: () => import('@/pages/Article.vue'),
             props: true  // 启用路由传参到组件
         },
@@ -30,7 +30,7 @@ const router = createRouter({
             component: () => import('@/pages/Edit.vue')
         },
         {
-            path: '/Edit/articleID=:id',
+            path: '/Edit/:id',
             component: () => import('@/pages/Edit.vue')
         },
         {

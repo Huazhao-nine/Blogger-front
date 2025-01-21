@@ -9,9 +9,6 @@
     <div
         class="article-list"
         ref="articleListRef"
-        @touchstart="onTouchStart"
-        @touchmove="onTouchMove"
-        @touchend="onTouchEnd"
     >
       <el-skeleton :rows="20" animated v-if="articlesLoading" />
       <div
@@ -29,32 +26,6 @@
       </div>
     </div>
 
-    <!-- 底部导航栏 -->
-
-    <!-- 可拖动的悬浮球 -->
-    <!--
-    <div
-      class="floating-btn"
-      ref="floatingBtn"
-      @touchstart="onTouchStartForBall"
-      @touchmove="onTouchMoveForBall"
-      @touchend="onTouchEndForBall"
-      @click="toggleMenu"
-    >
-      <span>+</span>
-    </div>
-    -->
-
-    <!-- 菜单 -->
-    <!--
-    <div v-if="isMenuVisible" class="floating-menu" ref="floatingMenu">
-      <ul>
-        <li>菜单项 1</li>
-        <li>菜单项 2</li>
-        <li>菜单项 3</li>
-      </ul>
-    </div>
-    -->
   </div>
   <div class="header" :style="{ backgroundImage: `url(${wallpaperUrl})` }" v-else>
     <h1 >请使用移动端访问获得更好体验</h1>
@@ -65,17 +36,19 @@
 import {onBeforeUnmount, onMounted, ref} from 'vue';
 import {ElNotification} from 'element-plus';
 import {HomeArticles, HomePage} from '@/api/globals.js';
-import {getWallPaper} from '@/api/WallpaperService.js';
-import {getTheArticlesForHome} from '@/api/ArticleService.js';
+import {fetchWallpaper, getWallPaper} from '@/api/WallpaperService.js';
+import {getArticleByID, getArticlesDetail, getTheArticlesForHome} from '@/api/ArticleService.js';
 import {useRouter} from "vue-router";
 import TopButton from "@/components/TopButton.vue";
 import {useAuthStore} from "@/stores/auth.js";
 import TimeButton from "@/components/TimeButton.vue";
+import {useDraggable} from "@/api/useTouchScroll.js";
 
 const articlesLoading = ref(false);
 const articles = ref([]);
 const auth = useAuthStore()
-
+const articleListRef = ref(null);
+const { calculateMaxScroll, bindTouchEvents, unbindTouchEvents } = useDraggable(articleListRef);
 const welcome = () => {
   if (auth.isAuthenticated){
     // ElNotification({
@@ -95,150 +68,10 @@ const getArticleList = async () => {
   articlesLoading.value = false;
 };
 
-const router = useRouter()
-const firstClick = ref(true)
-const getArticlesDetail = async (articleId) => {
-  // const response = await getArticleByID(articleId);
-  // const article = response.data.data;
-  // if (firstClick.value){
-  //   ElNotification({
-  //     title: '正在跳转',
-  //     message: '正在前往文章的路上',
-  //     type: 'warning',
-  //   });
-  //   firstClick.value = false
-  // }
-  await router.push(`/article/articleID=${articleId}`);
-};
+
 
 const wallpaperUrl = ref('');
-const isMenuVisible = ref(false);
-const isDraggingForBall = ref(false);
-const startXForBall = ref(0);
-const startYForBall = ref(0);
-const offsetXForBall = ref(0);
-const offsetYForBall = ref(0);
-const startY = ref(0);
-const currentY = ref(0);
-const isDragging = ref(false);
-const maxScroll = ref(0);
 
-// 切换菜单显示状态
-const toggleMenu = (event) => {
-  isMenuVisible.value = !isMenuVisible.value;
-  event.stopPropagation(); // 阻止事件冒泡
-};
-
-// 处理悬浮球拖动
-const onTouchStartForBall = (event) => {
-  isDraggingForBall.value = true;
-  const touch = event.touches[0];
-  startXForBall.value = touch.clientX - offsetXForBall.value;
-  startYForBall.value = touch.clientY - offsetYForBall.value;
-  event.preventDefault();
-};
-
-const onTouchMoveForBall = (event) => {
-  if (!isDraggingForBall.value) return;
-  const touch = event.touches[0];
-  offsetXForBall.value = touch.clientX - startXForBall.value;
-  offsetYForBall.value = touch.clientY - startYForBall.value;
-  const floatingBtn = document.querySelector('.floating-btn');
-  floatingBtn.style.transform = `translate(${offsetXForBall.value}px, ${offsetYForBall.value}px)`;
-  event.preventDefault();
-};
-
-const onTouchEndForBall = () => {
-  isDraggingForBall.value = false;
-};
-
-// 点击其他地方隐藏菜单
-const handleClickOutside = (event) => {
-  const floatingBtn = document.querySelector('.floating-btn');
-  const floatingMenu = document.querySelector('.floating-menu');
-  if (
-      floatingBtn &&
-      !floatingBtn.contains(event.target) &&
-      floatingMenu &&
-      !floatingMenu.contains(event.target)
-  ) {
-    isMenuVisible.value = false;
-  }
-};
-
-// 获取壁纸
-const fetchWallpaper = async () => {
-  try {
-    let imageUrl = await getWallPaper();
-    const wallpaperData = imageUrl.data.msg;
-    const parsedData = JSON.parse(wallpaperData);
-    const baseUrl = 'https://www.bing.com';
-    imageUrl = baseUrl + parsedData.images[0].url;
-    wallpaperUrl.value = imageUrl;
-    // console.log(imageUrl)
-  } catch (error) {
-    console.error('Error fetching wallpaper:', error);
-  }
-};
-
-// 获取指定区域的平均颜色
-const getAverageColor = (ctx, x, y, width, height) => {
-  const imageData = ctx.getImageData(x, y, width, height);
-  const data = imageData.data;
-  let r = 0, g = 0, b = 0;
-  for (let i = 0; i < data.length; i += 4) {
-    r += data[i];     // red
-    g += data[i + 1]; // green
-    b += data[i + 2]; // blue
-  }
-
-  const pixelCount = data.length / 4;
-  r = Math.floor(r / pixelCount);
-  g = Math.floor(g / pixelCount);
-  b = Math.floor(b / pixelCount);
-
-  return { r, g, b };
-};
-
-// 计算最大滚动范围
-const calculateMaxScroll = () => {
-  const articleList = document.querySelector('.article-list');
-  maxScroll.value = articleList.clientHeight - articleList.scrollHeight;
-};
-
-// 滑动事件处理
-const onTouchStart = (event) => {
-  startY.value = event.touches[0].pageY - currentY.value;
-  isDragging.value = true;
-};
-
-const articleListRef = ref(null);
-const onTouchMove = (event) => {
-  if (!isDragging.value) return;
-  currentY.value = event.touches[0].pageY - startY.value;
-  if (currentY.value > 0) {
-    currentY.value /= 2;
-  } else if (currentY.value < maxScroll.value) {
-    currentY.value = maxScroll.value + (currentY.value - maxScroll.value) / 2;
-  }
-  articleListRef.value.style.transform = `translateY(${currentY.value}px)`;
-};
-
-const onTouchEnd = () => {
-  if (!isDragging.value) return;
-  isDragging.value = false;
-  if (currentY.value > 0) {
-    currentY.value = 0;
-  } else if (currentY.value < maxScroll.value) {
-    currentY.value = maxScroll.value;
-  }
-  const articleList = document.querySelector('.article-list');
-  articleList.style.transition = 'transform 0.3s ease';
-  articleList.style.transform = `translateY(${currentY.value}px)`;
-  setTimeout(() => {
-    articleList.style.transition = '';
-  }, 300);
-};
 const isPhone = ref(true)
 // 检测设备类型
 const checkDeviceType = () => {
@@ -254,20 +87,20 @@ const checkDeviceType = () => {
 
 // 生命周期钩子
 onMounted(() => {
-  fetchWallpaper();
-  calculateMaxScroll();
+  fetchWallpaper(wallpaperUrl);
+  calculateMaxScroll(); // 计算最大滚动范围
+  bindTouchEvents(); // 绑定触摸事件
   checkDeviceType(); // 初次加载时检查设备
   window.addEventListener('resize', checkDeviceType); // 窗口大小变化时重新检查
   window.addEventListener('resize', calculateMaxScroll);
-  document.addEventListener('touchstart', handleClickOutside);
   getArticleList();
   // console.log("任何问题请联系982086195@qq.com")
   welcome()
 });
 
 onBeforeUnmount(() => {
+  unbindTouchEvents(); // 组件卸载时移除事件
   window.removeEventListener('resize', calculateMaxScroll);
-  document.removeEventListener('touchstart', handleClickOutside);
 });
 </script>
 <style scoped>

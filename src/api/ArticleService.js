@@ -1,4 +1,5 @@
 import request from "@/api/request.js";
+import router from "@/router/index.js";
 
 export const getTheArticlesForHome = (page, pageSize) => {
     return request.get('/getTheArticlesForHome', {
@@ -27,3 +28,9 @@ export const getArticleByID = (id) => {
 export const getArticlesByCategory = (id) => {
     return request.get(`/getArticlesByCategory/${id}`)
 }
+
+export const getArticlesDetail = async (articleId) => {
+    const response = await getArticleByID(articleId);
+    const article = response.data.data;
+    await router.push(`/Article/${articleId}/${article.slug}`);
+};

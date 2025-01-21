@@ -3,7 +3,7 @@ import {nextTick, onMounted, onUnmounted, ref} from 'vue';
 import {useRoute, useRouter} from 'vue-router';
 import {getArticleByID} from "@/api/ArticleService.js";
 import {ElNotification} from "element-plus";
-import {getWallPaper} from "@/api/WallpaperService.js";
+import {fetchWallpaper} from "@/api/WallpaperService.js";
 import {Clock, Postcard, User, View} from "@element-plus/icons-vue";
 import {marked} from "marked";
 import katex from "katex";
@@ -12,7 +12,8 @@ import 'highlight.js/styles/atom-one-light.css'; // 在此引入高亮样式
 import hljs from "highlight.js";
 import TopButton from "@/components/TopButton.vue";
 import {useAuthStore} from "@/stores/auth.js";
-import {isAuthor} from "@/api/UserService.js"; // 引入 useRoute 来访问路由信息
+import {isAuthor} from "@/api/UserService.js";
+import {useDraggable} from "@/api/useTouchScroll.js"; // 引入 useRoute 来访问路由信息
 const articlesLoading = ref(false)
 const route = useRoute();// 获取当前路由信息
 const article = ref({})
@@ -28,14 +29,22 @@ const formatDate = (dateString) => {
   const date = new Date(dateString);
   return date.toLocaleDateString('en-US', { year: 'numeric', month: 'numeric', day: 'numeric' });
 };
+
+const articleListRef = ref(null);
+const { calculateMaxScroll, bindTouchEvents, unbindTouchEvents } = useDraggable(articleListRef);
+
 onMounted(() => {
   getArticle();
-  fetchWallpaper();
+  fetchWallpaper(wallpaperUrl);
   checkDeviceType();  // 初始化检测设备类型
+  calculateMaxScroll(); // 计算最大滚动范围
+  bindTouchEvents(); // 绑定触摸事件
+  window.addEventListener('resize', calculateMaxScroll);
   window.addEventListener('resize', checkDeviceType); // 添加监听器以动态检测设备类型
 });
 
 onUnmounted(() => {
+  unbindTouchEvents()
   window.removeEventListener('resize', checkDeviceType); // 清除监听器
 });
 
@@ -54,19 +63,6 @@ const checkDeviceType = () => {
 };
 
 const wallpaperUrl = ref('');
-// 获取壁纸
-const fetchWallpaper = async () => {
-  try {
-    let imageUrl = await getWallPaper();
-    const wallpaperData = imageUrl.data.msg;
-    const parsedData = JSON.parse(wallpaperData);
-    const baseUrl = 'https://www.bing.com';
-    imageUrl = baseUrl + parsedData.images[0].url;
-    wallpaperUrl.value = imageUrl;
-  } catch (error) {
-    console.error('Error fetching wallpaper:', error);
-  }
-};
 const htmlContent = ref()
 const getMarkdownContent = async () => {
   // 定义自定义渲染器
@@ -155,7 +151,7 @@ const edit = async () => {
   }
   const res = await isAuthor(article.value, auth.user.id)
   if (res.data.code === 200) {
-    await router.push(`/Edit/articleID=${article.value.id}`);
+    await router.push(`/Edit/${article.value.id}`);
   }else {
     ElNotification({
       title: '错误',
@@ -166,45 +162,6 @@ const edit = async () => {
 
 };
 
-
-const startY = ref(0);
-const currentY = ref(0);
-const isDragging = ref(false);
-const maxScroll = ref(0);
-
-// 滑动事件处理
-const onTouchStart = (event) => {
-  startY.value = event.touches[0].pageY - currentY.value;
-  isDragging.value = true;
-};
-
-const onTouchMove = (event) => {
-  if (!isDragging.value) return;
-  currentY.value = event.touches[0].pageY - startY.value;
-  if (currentY.value > 0) {
-    currentY.value /= 2;
-  } else if (currentY.value < maxScroll.value) {
-    currentY.value = maxScroll.value + (currentY.value - maxScroll.value) / 2;
-  }
-  const articleList = document.querySelector('.article-list');
-  articleList.style.transform = `translateY(${currentY.value}px)`;
-};
-
-const onTouchEnd = () => {
-  if (!isDragging.value) return;
-  isDragging.value = false;
-  if (currentY.value > 0) {
-    currentY.value = 0;
-  } else if (currentY.value < maxScroll.value) {
-    currentY.value = maxScroll.value;
-  }
-  const articleList = document.querySelector('.article-list');
-  articleList.style.transition = 'transform 0.3s ease';
-  articleList.style.transform = `translateY(${currentY.value}px)`;
-  setTimeout(() => {
-    articleList.style.transition = '';
-  }, 300);
-};
 </script>
 <template>
   <div class="home" v-if="isPhone">
@@ -235,10 +192,8 @@ const onTouchEnd = () => {
     <!-- 瀑布流文章列表 -->
     <div
         class="article-list"
-        ref="articleList"
-        @touchstart="onTouchStart"
-        @touchmove="onTouchMove"
-        @touchend="onTouchEnd"
+        ref="articleListRef"
+
     >
       <el-skeleton :rows="20" animated v-if="articlesLoading" />
       <div
