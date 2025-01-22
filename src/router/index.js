@@ -39,7 +39,11 @@ const router = createRouter({
         },
         {
             path: '/Share',
-            component: () => import('@/pages/Share.vue')
+            component: () => import('@/pages/Bookmark.vue')
+        },
+        {
+            path: '/Card',
+            component: () => import('@/pages/Card.vue')
         },
     ]
 })
