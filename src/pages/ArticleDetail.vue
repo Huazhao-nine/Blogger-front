@@ -14,7 +14,8 @@ import TopButton from "@/components/TopButton.vue";
 import {useAuthStore} from "@/stores/auth.js";
 import {isAuthor} from "@/api/UserService.js";
 import {useDraggable} from "@/api/useTouchScroll.js";
-import {formatDate} from "../api/globals.js"; // 引入 useRoute 来访问路由信息
+import {formatDate} from "../api/globals.js";
+import Bookmark from "@/components/Bookmark.vue"; // 引入 useRoute 来访问路由信息
 const articlesLoading = ref(false)
 const route = useRoute();// 获取当前路由信息
 const article = ref({})
@@ -27,9 +28,20 @@ const getArticle = async () => {
   articlesLoading.value = false
 }
 
+const bookmarkStatus = ref(false)
+const selection = ref('')
+// 监听用户复制事件
+const onCopy = async () => {
+  selection.value = await navigator.clipboard.readText();
+  bookmarkStatus.value = true
+};
+
+
 
 const articleListRef = ref(null);
 const { calculateMaxScroll, bindTouchEvents, unbindTouchEvents } = useDraggable(articleListRef);
+
+
 
 onMounted(() => {
   getArticle();
@@ -37,12 +49,15 @@ onMounted(() => {
   checkDeviceType();  // 初始化检测设备类型
   calculateMaxScroll(); // 计算最大滚动范围
   bindTouchEvents(); // 绑定触摸事件
+  document.addEventListener("copy", onCopy);
+
   window.addEventListener('resize', calculateMaxScroll);
   window.addEventListener('resize', checkDeviceType); // 添加监听器以动态检测设备类型
 });
 
 onUnmounted(() => {
   unbindTouchEvents()
+  document.removeEventListener("copy", onCopy);
   window.removeEventListener('resize', checkDeviceType); // 清除监听器
 });
 
@@ -135,7 +150,10 @@ const renderLatex = () => {
     });
   });
 };
-
+const reFresh = () => {
+  bookmarkStatus.value = false
+  getMarkdownContent()
+}
 const router = useRouter()
 const auth = useAuthStore()
 const edit = async () => {
@@ -162,6 +180,11 @@ const edit = async () => {
 
 </script>
 <template>
+  <div v-if="bookmarkStatus">
+    <h3 class="preview-container" @click = "reFresh">书签预览(点我关闭)</h3>
+    <bookmark :article="article" :selection="selection"></bookmark>
+  </div>
+  <div v-else>
   <div class="home" v-if="isPhone">
     <!-- 顶部轮换壁纸 -->
     <div @click="edit" class="header" :style="{ backgroundImage: `url(${wallpaperUrl})` }">
@@ -205,6 +228,8 @@ const edit = async () => {
   <div class="header" :style="{ backgroundImage: `url(${wallpaperUrl})` }" v-else>
     <h1 >请使用移动端访问获得更好体验</h1>
   </div>
+  </div>
+
 </template>
 
 <style scoped>
@@ -303,5 +328,8 @@ const edit = async () => {
   text-align: right;
 }
 
-
+.preview-container {
+  margin-top: 20px;
+  text-align: center;
+}
 </style>
