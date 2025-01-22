@@ -48,7 +48,7 @@ onBeforeUnmount(() => {
       <div class="article-content">
         <h3 class="article-title">花朝九日's Blogger</h3>
         <p>
-          网站备案号： <el-tag type="info" size="small" effect="plain">ICP备2025001234号</el-tag>
+          网站备案号： <el-tag type="info" size="small" effect="plain">鄂ICP备2025092180号</el-tag>
         </p>
         <p class="article-summary">
           前<el-tag type="success" size="small" effect="plain">Vue3</el-tag>

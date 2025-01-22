@@ -37,6 +37,10 @@ const router = createRouter({
             path: '/Login',
             component: () => import('@/pages/Login.vue')
         },
+        {
+            path: '/Share',
+            component: () => import('@/pages/Share.vue')
+        },
     ]
 })
 

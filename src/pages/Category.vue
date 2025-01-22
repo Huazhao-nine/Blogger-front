@@ -16,7 +16,7 @@
           :key="category.id"
           @click="getCategoryDetail(category.id)"
       >
-        <top-button :isPinned="true" desc="╰(✿´⌣`✿)╯♡" />
+        <top-button :isPinned="true" :desc=formatDate(category.createdAt) />
         <div class="article-content">
           <h3 class="article-title">{{ category.name }}</h3>
           <p class="article-summary">{{ category.instruction }}</p>
@@ -38,6 +38,7 @@ import {useRouter} from "vue-router";
 import WallpaperCard from "@/components/WallpaperCard.vue";
 import {getAllCategories, getCategoryDetail} from "@/api/CategoryService.js";
 import {useDraggable} from "@/api/useTouchScroll.js";
+import {formatDate} from "@/api/globals.js";
 
 const articlesLoading = ref(false);
 const categories = ref([]);

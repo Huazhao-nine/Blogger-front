@@ -13,7 +13,8 @@ import hljs from "highlight.js";
 import TopButton from "@/components/TopButton.vue";
 import {useAuthStore} from "@/stores/auth.js";
 import {isAuthor} from "@/api/UserService.js";
-import {useDraggable} from "@/api/useTouchScroll.js"; // 引入 useRoute 来访问路由信息
+import {useDraggable} from "@/api/useTouchScroll.js";
+import {formatDate} from "../api/globals.js"; // 引入 useRoute 来访问路由信息
 const articlesLoading = ref(false)
 const route = useRoute();// 获取当前路由信息
 const article = ref({})
@@ -25,10 +26,7 @@ const getArticle = async () => {
   await getMarkdownContent()
   articlesLoading.value = false
 }
-const formatDate = (dateString) => {
-  const date = new Date(dateString);
-  return date.toLocaleDateString('en-US', { year: 'numeric', month: 'numeric', day: 'numeric' });
-};
+
 
 const articleListRef = ref(null);
 const { calculateMaxScroll, bindTouchEvents, unbindTouchEvents } = useDraggable(articleListRef);
