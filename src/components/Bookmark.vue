@@ -81,7 +81,7 @@ const generateBookmark = async () => {
   ctx.fillStyle = "#000"; // 黑色背景
   ctx.fillRect(0, 0, cssWidth, cssHeight);
   ctx.font = '25px "LXGW WenKai TC Medium", sans-serif'; // 字体大小
-  ctx.fillStyle = "#fff"; // 白色文字
+  ctx.fillStyle = "#FFFFFE"; // 白色文字
   ctx.textAlign = "start"; // 从左到右显示
   ctx.textBaseline = "top"; // 从顶部开始绘制
   // 绘制 "摘录于" 和日期

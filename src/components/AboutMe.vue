@@ -4,6 +4,9 @@ import {useDraggable} from "@/api/useTouchScroll.js";
 import {fetchWallpaper} from "@/api/WallpaperService.js";
 import router from "@/router/index.js";
 const articleListRef = ref(null);
+const goToBeian = () => {
+  window.open('https://beian.miit.gov.cn/', '_blank'); // 新窗口打开网址
+}
 const { calculateMaxScroll, bindTouchEvents, unbindTouchEvents } = useDraggable(articleListRef);
 onMounted(() => {
   calculateMaxScroll(); // 计算最大滚动范围
@@ -48,7 +51,16 @@ onBeforeUnmount(() => {
       <div class="article-content">
         <h3 class="article-title">花朝九日's Blogger</h3>
         <p>
-          网站备案号： <el-tag type="info" size="small" effect="plain">鄂ICP备2025092180号</el-tag>
+          网站备案号：
+          <el-tag
+              type="info"
+              size="small"
+              effect="plain"
+              @click="goToBeian"
+              style="cursor: pointer;"
+          >
+            鄂ICP备2025092180号-1
+          </el-tag>
         </p>
         <p class="article-summary">
           前<el-tag type="success" size="small" effect="plain">Vue3</el-tag>
