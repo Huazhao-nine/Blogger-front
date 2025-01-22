@@ -89,7 +89,7 @@ const generateBookmark = async () => {
   currentY += lineHeight / 2; // 空一点距离
   ctx.fillText(`摘录于 ${currentDate}`, padding, currentY);
   // 生成二维码
-  const url = "https://hzjr.top/" + route.path;
+  const url = "https://hzjr.top" + route.path;
   const qrCodeCanvas = document.createElement("canvas");
   await QRCode.toCanvas(qrCodeCanvas, url, {width: 80, margin: 0});
   // 将二维码绘制到右上角
