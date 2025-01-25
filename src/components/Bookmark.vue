@@ -27,7 +27,7 @@ const getCurrentDate = () => {
   const now = new Date();
   return `${now.getFullYear()}/${now.getMonth() + 1}/${now.getDate()}`;
 };
-const getCssHeight = (text, context, maxWidth, lineHeight, additionalHeight) => {
+const getCssHeight = (text, context, maxWidth, lineHeight) => {
   const words = text.split(""); // 按字分割，适应中文
   let line = "";
   let totalHeight = 0; // 初始高度
@@ -48,7 +48,7 @@ const getCssHeight = (text, context, maxWidth, lineHeight, additionalHeight) => 
   totalHeight += lineHeight;
 
   // 加上固定内容的高度
-  return totalHeight + additionalHeight;
+  return totalHeight;
 };
 // 生成书签功能
 const generateBookmark = async () => {
@@ -68,8 +68,12 @@ const generateBookmark = async () => {
   const padding = 20; // 左侧和顶部的边距
   const maxWidth = cssWidth - 2 * padding; // 最大行宽
   let currentY = padding;
-  const additionalHeight = 330; // 固定内容高度 (摘录于、分割线、标题等)
-  const cssHeight = getCssHeight(selection, ctx, maxWidth, lineHeight, additionalHeight);
+  const title = "- " + props.article.title;
+  const author = "- 花朝九日's blogger";
+  const url = "https://hzjr.top" + route.path;
+  const additionalHeight = getCssHeight(title + author + url, ctx, maxWidth, lineHeight) + 250; // 固定内容高度 (摘录于、分割线、标题等)
+  console.log(additionalHeight)
+  const cssHeight = getCssHeight(selection, ctx, maxWidth, lineHeight) + additionalHeight;
   const devicePixelRatio = window.devicePixelRatio || 1;
   canvas.width = cssWidth * devicePixelRatio;
   canvas.height = cssHeight * devicePixelRatio;
@@ -89,12 +93,11 @@ const generateBookmark = async () => {
   currentY += lineHeight / 2; // 空一点距离
   ctx.fillText(`摘录于 ${currentDate}`, padding, currentY);
   // 生成二维码
-  const url = "https://hzjr.top" + route.path;
   const qrCodeCanvas = document.createElement("canvas");
-  await QRCode.toCanvas(qrCodeCanvas, url, {width: 80, margin: 0});
+  await QRCode.toCanvas(qrCodeCanvas, url, {width: 200, margin: 0});
   // 将二维码绘制到右上角
-  ctx.drawImage(qrCodeCanvas, cssWidth - 100, padding, 80, 80);
-  currentY += lineHeight * 2; // 空一行
+  ctx.drawImage(qrCodeCanvas, cssWidth - 120, padding, 90, 90);
+  currentY += lineHeight * 2.5; // 空一行
   // 自动换行函数
   const wrapText = (context, text, x, y, maxWidth, lineHeight) => {
     const words = text.split(""); // 按字分割，适应中文
@@ -129,8 +132,6 @@ const generateBookmark = async () => {
   ctx.setLineDash([]); // 清除虚线样式
   currentY += lineHeight; // 分割线下面留空间
   // 绘制标题、作者和网址
-  const title = "- " + props.article.title;
-  const author = "- 花朝九日's blogger";
   ctx.fillText(title, padding, currentY);
   currentY += lineHeight;
   ctx.fillText(author, padding, currentY);
