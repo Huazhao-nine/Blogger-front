@@ -13,17 +13,18 @@ const transitionName = computed(() => {
 </script>
 
 <template>
+  <router-view v-slot="{ Component }">
+
   <el-config-provider :locale="zhCn">
     <div>
       <!-- 使用 router-view 的 v-slot 来包裹过渡动画 -->
-      <router-view v-slot="{ Component }">
         <transition :name="transitionName" mode="out-in">
           <component :is="Component" />
         </transition>
-      </router-view>
       <footer-nav></footer-nav>
     </div>
   </el-config-provider>
+  </router-view>
 </template>
 
 <style scoped>

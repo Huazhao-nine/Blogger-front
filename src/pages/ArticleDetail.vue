@@ -185,7 +185,7 @@ const edit = async () => {
     <bookmark :article="article" :selection="selection"></bookmark>
   </div>
   <div v-else>
-  <div class="home" v-if="isPhone">
+  <div class="home">
     <!-- 顶部轮换壁纸 -->
     <div @click="edit" class="header" :style="{ backgroundImage: `url(${wallpaperUrl})` }">
       <top-button :isPinned="article.isPinned" desc="置顶中" />
@@ -225,9 +225,7 @@ const edit = async () => {
       </div>
     </div>
   </div>
-  <div class="header" :style="{ backgroundImage: `url(${wallpaperUrl})` }" v-else>
-    <h1 >请使用移动端访问获得更好体验</h1>
-  </div>
+
   </div>
 
 </template>

@@ -1,5 +1,5 @@
 <template>
-  <div class="home" v-if="isPhone">
+  <div class="home">
     <!-- 顶部轮换壁纸 -->
     <wallpaper-card title="分类"  @click="router1.push('/Edit')" />
 
@@ -23,9 +23,6 @@
         </div>
       </div>
     </div>
-  </div>
-  <div class="header" :style="{ backgroundImage: `url(${wallpaperUrl})` }" v-else>
-    <h1 >请使用移动端访问获得更好体验</h1>
   </div>
 </template>
 
