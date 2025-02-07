@@ -1,7 +1,7 @@
 <template>
   <div class="home">
     <!-- 顶部轮换壁纸 -->
-    <div class="header":style="{ backgroundImage: `url(${wallpaperUrl})` }">
+    <div class="header" :style="{ backgroundImage: `url(${wallpaperUrl})` }">
       <time-button/>
       <div class="header-content">
         <!-- 左边头像 -->
@@ -77,7 +77,7 @@ const userLoginAndOut = () => {
             message:'已退出登录',
             type: 'success',
           });
-          router.push('/')
+          router.back()
         }
       },
     })

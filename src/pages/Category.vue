@@ -1,7 +1,7 @@
 <template>
   <div class="home">
     <!-- 顶部轮换壁纸 -->
-    <wallpaper-card title="分类"  @click="router1.push('/Edit')" />
+    <wallpaper-card title="分类"  @click="goToEdit" />
 
     <!-- 瀑布流文章列表 -->
     <div
@@ -36,6 +36,8 @@ import WallpaperCard from "@/components/WallpaperCard.vue";
 import {getAllCategories, getCategoryDetail} from "@/api/CategoryService.js";
 import {useDraggable} from "@/api/useTouchScroll.js";
 import {formatDate} from "@/api/globals.js";
+import {canEdit, goToEdit} from "@/api/RoleService.js";
+import {useAuthStore} from "@/stores/auth.js";
 
 const articlesLoading = ref(false);
 const categories = ref([]);
@@ -50,7 +52,7 @@ const getArticleList = async () => {
 
 const wallpaperUrl = ref('');
 
-const router1 = useRouter()
+
 
 const isPhone = ref(true)
 // 检测设备类型

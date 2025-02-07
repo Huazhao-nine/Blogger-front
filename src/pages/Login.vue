@@ -44,7 +44,7 @@ const userLogout = () => {
     message:'已退出登录',
     type: 'success',
   });
-  router.push('/')
+  router.back()
 }
 // 发送验证码
 const sendValidate = async () => {
@@ -145,7 +145,7 @@ const submitLogin = async () => {
     auth.setToken(res.data.data.token);  // 存储 token
     auth.setUser(res.data.data);    // 存储用户信息
     // 重定向到首页或其他页面
-    await router.push('/')
+    await router.back()
   }
   else {
     ElNotification({

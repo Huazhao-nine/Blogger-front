@@ -1,8 +1,8 @@
 <script setup>
 import {nextTick, onMounted, onUnmounted, ref} from 'vue';
 import {useRoute, useRouter} from 'vue-router';
-import {getArticleByID} from "@/api/ArticleService.js";
-import {ElNotification} from "element-plus";
+import {getArticleByID, getArticleByPwd, getArticlesDetail} from "@/api/ArticleService.js";
+import {ElMessageBox, ElNotification} from "element-plus";
 import {fetchWallpaper} from "@/api/WallpaperService.js";
 import {Clock, Postcard, User, View} from "@element-plus/icons-vue";
 import {marked} from "marked";
@@ -15,17 +15,42 @@ import {useAuthStore} from "@/stores/auth.js";
 import {isAuthor} from "@/api/UserService.js";
 import {useDraggable} from "@/api/useTouchScroll.js";
 import {formatDate} from "../api/globals.js";
-import Bookmark from "@/components/Bookmark.vue"; // 引入 useRoute 来访问路由信息
+import Bookmark from "@/components/Bookmark.vue";
 const articlesLoading = ref(false)
 const route = useRoute();// 获取当前路由信息
 const article = ref({})
+const dialogVisible = ref(false)
+const pwd = ref()
 const getArticle = async () => {
   articlesLoading.value = true
   const id = route.params.id;// 从路由参数中提取 articleId
-  const res = await getArticleByID(id);
-  article.value = res.data.data
-  await getMarkdownContent()
-  articlesLoading.value = false
+  let res = await getArticleByID(id, auth.token);
+  if (res.data.code !== 200){
+    //token校验失败，使用密码
+    dialogVisible.value = true
+  }
+  else {
+    article.value = res.data.data
+    await getMarkdownContent()
+    articlesLoading.value = false
+  }
+}
+
+const submitPwd = async () => {
+  const id = route.params.id;// 从路由参数中提取 articleId
+  let res = await getArticleByPwd(id, pwd.value);
+  if (res.data.code === 200){
+    article.value = res.data.data
+    await getMarkdownContent()
+    articlesLoading.value = false
+    dialogVisible.value = false
+  }else {
+    ElNotification({
+      title: '错误',
+      message: res.data.msg,
+      type: 'error',
+    });
+  }
 }
 
 const bookmarkStatus = ref(false)
@@ -157,6 +182,7 @@ const reFresh = () => {
 const router = useRouter()
 const auth = useAuthStore()
 const edit = async () => {
+  if (dialogVisible.value) return
   if (!auth.isAuthenticated){
     ElNotification({
       title: '未登录',
@@ -188,9 +214,9 @@ const edit = async () => {
   <div class="home">
     <!-- 顶部轮换壁纸 -->
     <div @click="edit" class="header" :style="{ backgroundImage: `url(${wallpaperUrl})` }">
-      <top-button :isPinned="article.isPinned" desc="置顶中" />
+<!--      <top-button :isPinned="article.isPinned" :locked="article.isPinned" desc="置顶中" />-->
       <h2 >{{article.title}}</h2>
-      <div class="article-meta">
+      <div v-if="!dialogVisible" class="article-meta">
         <div class="views">
           <el-icon><Postcard /></el-icon>
           {{article.categoryName}}
@@ -207,6 +233,23 @@ const edit = async () => {
           <el-icon><Clock /></el-icon>
           {{ formatDate(article.publishedAt) }}
         </div>
+      </div>
+      <div v-else class="dialog">
+        <el-dialog v-model="dialogVisible" title="文章被上锁" width="300" :show-close="false" :modal="false"
+                   :close-on-click-modal="false"
+                   :close-on-press-escape="false">
+            <el-form-item label="阅读密码">
+              <el-input v-model="pwd"/>
+            </el-form-item>
+          <template #footer>
+            <div class="dialog-footer">
+              <el-button @click="router.back()">取消</el-button>
+              <el-button type="primary" @click="submitPwd">
+                确认
+              </el-button>
+            </div>
+          </template>
+        </el-dialog>
       </div>
 
     </div>

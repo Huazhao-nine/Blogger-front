@@ -16,11 +16,19 @@ const isAdd = ref(true)
 const getArticle = async () => {
   const id = route.params.id;// 从路由参数中提取 articleId
   if (id !== undefined){
-    const res = await getArticleByID(id);
-    // console.log(res.data.data);
-    editedArticle.value = res.data.data;
-    articleData.value = res.data.data;
-    isAdd.value = false;
+    const res = await getArticleByID(id, auth.token);
+    if (res.data.code === 200) {
+      editedArticle.value = res.data.data;
+      articleData.value = res.data.data;
+      isAdd.value = false;
+    }else {
+      ElNotification({
+        title: '错误',
+        message: '权限不足',
+        type: 'error',
+      });
+      await router.back()
+    }
   }
 }
 
@@ -107,7 +115,7 @@ const articleData = ref({
   summary: '',
   tags: [],
   categoryName: '',
-  password: '',
+  pwd: '',
   isPinned: false,
   isHome: false
 });
@@ -189,15 +197,15 @@ const submitArticle = async () => {
     return;
   }
 
-  if (!articleData.value.password) {
-    ElNotification({
-      title: '错误',
-      message: '密码不能为空！',
-      type: 'error',
-    });
-    isSubmitting.value = false;
-    return;
-  }
+  // if (!articleData.value.pwd) {
+  //   ElNotification({
+  //     title: '错误',
+  //     message: '密码不能为空！',
+  //     type: 'error',
+  //   });
+  //   isSubmitting.value = false;
+  //   return;
+  // }
   let res
   // 构建提交数据
   if (isAdd.value){
@@ -211,11 +219,12 @@ const submitArticle = async () => {
       categoryName: articleData.value.categoryName,
       isPinned: articleData.value.isPinned ? 1 : 0,
       isHome: articleData.value.isHome ? 1 : 0,
-      password: articleData.value.password
+      password: articleData.value.pwd === '' ? '-1' : articleData.value.pwd
     };
     res = await addArticle(articlePayload); // 调用API提交数据}
   }else {
-    res = await editArticle(editedArticle.value, articleData.value.password);
+    let pwd = articleData.value.pwd === '' ? '-1' : articleData.value.pwd
+    res = await editArticle(editedArticle.value, pwd);
   }
     if (res.data.code === 200) {
       ElNotification({
@@ -232,8 +241,8 @@ const submitArticle = async () => {
       articleData.value.categoryName = '';
       articleData.value.isPinned = false;
       articleData.value.isHome = false;
-      articleData.value.password = '';
-      await router.push(`/`);
+      articleData.value.pwd = '';
+      await router.back();
     }
   else {
     ElNotification({
@@ -316,8 +325,8 @@ onUnmounted(() => {
                   <el-option label="新增分类" value="newCategory" />
                 </el-select>
               </el-form-item>
-              <el-form-item label="密码" :rules="[ { required: true, message: '请输入密码', trigger: 'blur' } ]">
-                <el-input v-model="articleData.password" placeholder="请输入密码" />
+              <el-form-item label="密码">
+                <el-input v-model="articleData.pwd" placeholder="密码为空表示发布公开文章" />
               </el-form-item>
 
               <!-- 新增分类输入框 -->

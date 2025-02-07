@@ -1,7 +1,7 @@
 <template>
   <div class="home">
     <!-- 顶部轮换壁纸 -->
-    <div @click="router1.push('/Edit')" class="header" :style="{ backgroundImage: `url(${wallpaperUrl})` }">
+    <div @click="goToEdit" class="header" :style="{ backgroundImage: `url(${wallpaperUrl})` }">
       <h1 >文章列表</h1>
     </div>
 
@@ -16,9 +16,9 @@
           v-else
           v-for="article in articles"
           :key="article.id"
-          @click="getArticlesDetail(article.id)"
+          @click="getArticlesDetail(article.id, auth.token)"
       >
-        <top-button :isPinned="article.isPinned"  desc="置顶中"/>
+        <top-button :isPinned="article.isPinned" :locked="article.locked" desc="置顶中"/>
         <div class="article-content">
           <h3 class="article-title">{{ article.title }}</h3>
           <p class="article-summary">{{ article.summary }}</p>
@@ -36,10 +36,12 @@ import {getArticlesByCategory, getArticlesDetail} from '@/api/ArticleService.js'
 import TopButton from "@/components/TopButton.vue";
 import {useRoute, useRouter} from "vue-router";
 import {useDraggable} from "@/api/useTouchScroll.js";
+import {goToEdit} from "@/api/RoleService.js";
+import {useAuthStore} from "@/stores/auth.js";
 
 const route = useRoute();// 获取当前路由信息
 const router1 = useRouter()
-
+const auth = useAuthStore()
 const articlesLoading = ref(false);
 const articles = ref([]);
 

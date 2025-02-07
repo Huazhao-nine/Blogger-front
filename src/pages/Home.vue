@@ -16,9 +16,9 @@
           v-else
           v-for="article in articles"
           :key="article.id"
-          @click="getArticlesDetail(article.id)"
+          @click="getArticlesDetail(article.id, auth.token)"
       >
-        <top-button :isPinned="article.isPinned" desc="置顶中"/>
+        <top-button :isPinned="article.isPinned" :locked="article.locked" desc="置顶中"/>
         <div class="article-content">
           <h3 class="article-title">{{ article.title }}</h3>
           <p class="article-summary">{{ article.summary }}</p>
@@ -52,6 +52,7 @@ const welcome = () => {
     //   message: "欢迎回来！",
     //   type: 'success',
     // });
+    // console.log(auth.token)
     ElMessage.success(auth.user.name + "，欢迎！")
   }
 }
