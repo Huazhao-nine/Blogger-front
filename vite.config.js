@@ -87,7 +87,7 @@ export default defineConfig({
     hot: true,
     proxy: {
       '/api': {
-        target: 'http://localhost:80/', //跨域地址
+        target: 'http://localhost:8182/', //跨域地址
         changeOrigin: true, //支持跨域
         rewrite: (path) => path.replace(/^\/api/, '') //重写路径,替换/api
       }
