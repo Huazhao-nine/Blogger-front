@@ -70,7 +70,9 @@ const generateBookmark = async () => {
   let currentY = padding;
   const title = "- " + props.article.title;
   const author = "- 花朝九日's blogger";
-  const url = "https://hzjr.top" + route.path;
+  // console.log('router',route);
+  const url = "https://hzjr.top/#" + route.path;
+  // const url = router.currentRoute.value.fullpath;
   const additionalHeight = getCssHeight(title + author + url, ctx, maxWidth, lineHeight) + 250; // 固定内容高度 (摘录于、分割线、标题等)
   console.log(additionalHeight)
   const cssHeight = getCssHeight(selection, ctx, maxWidth, lineHeight) + additionalHeight;
