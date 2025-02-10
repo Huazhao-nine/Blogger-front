@@ -26,6 +26,11 @@ const getArticle = async () => {
   const id = route.params.id;// 从路由参数中提取 articleId
   let res = await getArticleByID(id, auth.token);
   if (res.data.code !== 200){
+    ElNotification({
+      title: '错误',
+      message: res.data.msg,
+      type: 'error',
+    });
     //token校验失败，使用密码
     dialogVisible.value = true
   }
