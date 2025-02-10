@@ -162,18 +162,26 @@ const replaceLatexWithClass = () => {
     return `<span class="math">${latex}</span>`;
   });
 
-  // 替换 \( ... \) 为 .inline-math 类
-  htmlContent.value = htmlContent.value.replace(/\\\(([\s\S]+?)\\\)/g, (match, latex) => {
+  // 替换 $Latex$ 为 .inline-math 类
+  htmlContent.value = htmlContent.value.replace(/\$([\s\S]+?)\$/g, (match, latex) => {
     latex = latex.replace(/<br>/g, ' ').replace(/\n/g, ' ').replace(/\s+/g, ' ').trim();
     return `<span class="inline-math">${latex}</span>`;
   });
+
 };
 
 const renderLatex = () => {
   // 查找所有包含 LaTeX 公式的元素（即 .math 类）
   const mathElements = document.querySelectorAll('.math');
+  const mathInlineElements = document.querySelectorAll('.inline-math');
 
   mathElements.forEach((element) => {
+    // 使用 KaTeX 渲染公式
+    katex.render(element.textContent, element, {
+      throwOnError: false,  // 如果公式有错误，不抛出异常
+    });
+  });
+  mathInlineElements.forEach((element) => {
     // 使用 KaTeX 渲染公式
     katex.render(element.textContent, element, {
       throwOnError: false,  // 如果公式有错误，不抛出异常
