@@ -9,6 +9,7 @@
 import { ref, onMounted, onUnmounted } from "vue";
 import QRCode from "qrcode";
 import {useRoute, useRouter} from "vue-router";
+import {WEB_URL} from "@/api/globals.js";
 const props = defineProps({
   article: {
     type: Object,
@@ -71,7 +72,7 @@ const generateBookmark = async () => {
   const title = "- " + props.article.title;
   const author = "- 花朝九日's blogger";
   // console.log('router',route);
-  const url = "https://hzjr.top/#" + route.path;
+  const url = WEB_URL + route.path;
   // const url = router.currentRoute.value.fullpath;
   const additionalHeight = getCssHeight(title + author + url, ctx, maxWidth, lineHeight) + 250; // 固定内容高度 (摘录于、分割线、标题等)
   console.log(additionalHeight)
