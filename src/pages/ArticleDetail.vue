@@ -82,13 +82,13 @@ onMounted(() => {
   document.addEventListener("copy", onCopy);
 
   window.addEventListener('resize', calculateMaxScroll);
-  window.addEventListener('resize', checkDeviceType); // 添加监听器以动态检测设备类型
+  // window.addEventListener('resize', checkDeviceType); // 添加监听器以动态检测设备类型
 });
 
 onUnmounted(() => {
   unbindTouchEvents()
   document.removeEventListener("copy", onCopy);
-  window.removeEventListener('resize', checkDeviceType); // 清除监听器
+  // window.removeEventListener('resize', checkDeviceType); // 清除监听器
 });
 
 

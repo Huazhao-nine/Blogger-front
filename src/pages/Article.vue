@@ -76,7 +76,7 @@ onMounted(() => {
   calculateMaxScroll(); // 计算最大滚动范围
   bindTouchEvents(); // 绑定触摸事件
   checkDeviceType(); // 初次加载时检查设备
-  window.addEventListener('resize', checkDeviceType); // 窗口大小变化时重新检查
+  // window.addEventListener('resize', checkDeviceType); // 窗口大小变化时重新检查
   window.addEventListener('resize', calculateMaxScroll);
   getArticleList();
 });

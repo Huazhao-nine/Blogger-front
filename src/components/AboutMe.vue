@@ -37,21 +37,27 @@ onBeforeUnmount(() => {
     <div class="article-card">
 
       <div class="article-content">
-        <h3 class="article-title">关于我</h3>
-        <p class="article-summary">我没有说告别，眼看他与我永不重逢</p>
+        <h3 class="article-title">小镇里的花</h3>
+        <ul>
+          <li>
+            <p class="article-summary">我悲喜都 只换来这场 无声的野火</p>
+          </li>
+          <li>
+            <p class="article-summary">那场火 烧出不坏的 那尊是我</p>
+          </li>
+        </ul>
         <h3>联系我</h3>
         <ul>
           <li>QQ:982086195</li>
           <li>WeChat:FlowerInFire</li>
-          <li>NetEaseMusic:LeibnizFormula</li>
+<!--          <li>NetEaseMusic:LeibnizFormula</li>-->
         </ul>
       </div>
     </div>
     <div class="article-card">
       <div class="article-content">
-        <h3 class="article-title">花朝九日's Blogger</h3>
-        <p>
-          网站备案号：
+        <h3 class="article-title">
+          花朝九日's Blogger
           <el-tag
               type="info"
               size="small"
@@ -59,8 +65,12 @@ onBeforeUnmount(() => {
               @click="goToBeian"
               style="cursor: pointer;"
           >
-            鄂ICP备2025092180号-1
+            备案号：
+            鄂ICP备2025092180号-2
           </el-tag>
+        </h3>
+        <p>
+
         </p>
         <p class="article-summary">
           前<el-tag type="success" size="small" effect="plain">Vue3</el-tag>

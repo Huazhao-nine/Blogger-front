@@ -91,7 +91,7 @@ onMounted(() => {
   checkDeviceType(); // 初次加载时检查设备
   getUserImg()
   isLogin()
-  window.addEventListener('resize', checkDeviceType); // 窗口大小变化时重新检查
+  // window.addEventListener('resize', checkDeviceType); // 窗口大小变化时重新检查
 });
 
 onBeforeUnmount(() => {
