@@ -4,7 +4,7 @@ import {useRoute, useRouter} from 'vue-router';
 import {getArticleByID, getArticleByPwd, getArticlesDetail} from "@/api/ArticleService.js";
 import {ElMessageBox, ElNotification} from "element-plus";
 import {fetchWallpaper} from "@/api/WallpaperService.js";
-import {Clock, Postcard, User, View} from "@element-plus/icons-vue";
+import {Clock, EditPen, Postcard, User, View} from "@element-plus/icons-vue";
 import {marked} from "marked";
 import katex from "katex";
 import 'katex/dist/katex.min.css'; // 导入 KaTeX 的样式
@@ -243,6 +243,10 @@ const edit = async () => {
           {{article.authorName}}
         </div>
         <div class="date">
+          <el-icon><EditPen /></el-icon>
+          {{ formatDate(article.createdAt) }}
+        </div>
+        <div class="date">
           <el-icon><Clock /></el-icon>
           {{ formatDate(article.publishedAt) }}
         </div>
@@ -372,7 +376,7 @@ const edit = async () => {
 .article-meta .views, .article-meta .author, .article-meta .date {
   display: flex;
   align-items: center;
-  margin: 0 5px;  /* 给每个元素添加左右间距 */
+  margin: 0 4px;  /* 给每个元素添加左右间距 */
 }
 .article-meta .author {
   text-align: center;
