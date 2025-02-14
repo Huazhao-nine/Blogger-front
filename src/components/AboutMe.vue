@@ -37,15 +37,8 @@ onBeforeUnmount(() => {
     <div class="article-card">
 
       <div class="article-content">
-        <h3 class="article-title">小镇里的花</h3>
-        <ul>
-          <li>
-            <p class="article-summary">我悲喜都 只换来这场 无声的野火</p>
-          </li>
-          <li>
-            <p class="article-summary">那场火 烧出不坏的 那尊是我</p>
-          </li>
-        </ul>
+        <h3 class="article-title">关于</h3>
+        <p class="article-summary">我悲喜都 只换来这场 无声的野火</p>
         <h3>联系我</h3>
         <ul>
           <li>QQ:982086195</li>
@@ -58,6 +51,8 @@ onBeforeUnmount(() => {
       <div class="article-content">
         <h3 class="article-title">
           花朝九日's Blogger
+        </h3>
+        网站备案号：
           <el-tag
               type="info"
               size="small"
@@ -65,18 +60,13 @@ onBeforeUnmount(() => {
               @click="goToBeian"
               style="cursor: pointer;"
           >
-            备案号：
-            鄂ICP备2025092180号-2
+            鄂ICP备2025092180号
           </el-tag>
-        </h3>
-        <p>
-
-        </p>
         <p class="article-summary">
           前<el-tag type="success" size="small" effect="plain">Vue3</el-tag>
-          后端<el-tag type="danger" size="small" effect="plain">SpringBoot3</el-tag>分离的个人博客
+          后端<el-tag type="danger" size="small" effect="plain">SpringBoot3</el-tag>分离的手搓个人博客
         </p>
-        <p class="copyright">Copyright 2024-2025 花朝九日 All Rights Reserved.</p>
+        <p class="copyright">Copyright 2024-2025 花朝九日 All Rights Reserved</p>
 
       </div>
     </div>
