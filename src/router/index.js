@@ -53,6 +53,11 @@ const router = createRouter({
             name: 'NotFound',
             component: () => import('@/pages/Home.vue')
 
+        },
+        {
+            path: '/Sbox',
+            component: () => import('@/pages/Sbox.vue')
+
         }
     ],
 
