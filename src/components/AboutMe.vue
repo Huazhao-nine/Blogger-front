@@ -3,12 +3,26 @@ import {onBeforeUnmount, onMounted, ref} from 'vue';
 import {useDraggable} from "@/api/useTouchScroll.js";
 import {fetchWallpaper} from "@/api/WallpaperService.js";
 import router from "@/router/index.js";
+import {getCpuInfo, getGpuInfo, getMemoryInfo} from "@/api/systemMonitorService.js";
 const articleListRef = ref(null);
+const cpuInfo = ref('CPU info is reading now');
+const gpuInfo = ref('GPU info is reading now');
+const memoryInfo = ref('Memory info is reading now');
+const getInfo = async () => {
+  const res1 = await getCpuInfo()
+  const res2 = await getGpuInfo()
+  const res3 = await getMemoryInfo()
+  cpuInfo.value = res1.data.msg
+  gpuInfo.value = res2.data.msg
+  memoryInfo.value = res3.data.msg
+  console.log(cpuInfo.value)
+}
 const goToBeian = () => {
   window.open('https://beian.miit.gov.cn/', '_blank'); // 新窗口打开网址
 }
 const { calculateMaxScroll, bindTouchEvents, unbindTouchEvents } = useDraggable(articleListRef);
 onMounted(() => {
+  getInfo()
   calculateMaxScroll(); // 计算最大滚动范围
   bindTouchEvents(); // 绑定触摸事件
   window.addEventListener('resize', calculateMaxScroll);
@@ -37,9 +51,9 @@ onBeforeUnmount(() => {
     <div class="article-card">
 
       <div class="article-content">
-        <h3 class="article-title">关于</h3>
+        <h3 class="article-title">About</h3>
         <p class="article-summary">我悲喜都 只换来这场 无声的野火</p>
-        <h3>联系我</h3>
+        <h3>Contact</h3>
         <ul>
           <li>QQ:982086195</li>
           <li>WeChat:FlowerInFire</li>
@@ -65,6 +79,18 @@ onBeforeUnmount(() => {
         <p class="article-summary">
           前<el-tag type="success" size="small" effect="plain">Vue3</el-tag>
           后端<el-tag type="danger" size="small" effect="plain">SpringBoot3</el-tag>分离的手搓个人博客
+        </p>
+        <h3 class="article-title">
+          Blogger state
+        </h3>
+        <p class="article-summary">
+          {{cpuInfo}}
+        </p>
+        <p class="article-summary">
+          {{gpuInfo}}
+        </p>
+        <p class="article-summary">
+          {{memoryInfo}}
         </p>
         <p class="copyright">Copyright 2024-2025 花朝九日 All Rights Reserved</p>
 

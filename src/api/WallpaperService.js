@@ -31,7 +31,7 @@ export const fetchWallpaper = async (wallpaperUrl) => {
         console.error(error);
         ElNotification({
             title: '错误',
-            message: '壁纸初始化失败，请检查网络连接',
+            message: '服务器已离线，请稍后再试。',
             type: 'error',
         });
     }
