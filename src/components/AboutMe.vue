@@ -122,10 +122,10 @@ onBeforeUnmount(() => {
 
 .categories a {
   display: block;
-  margin: 10px 0;
+  margin: 8px 0;
   color: #333;
   text-decoration: none;
-  font-size: 18px;
+  font-size: 14px;
   font-weight: 500;
 }
 .categories a:hover {
@@ -135,9 +135,9 @@ onBeforeUnmount(() => {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  padding: 10px;
-  margin-top: 25px;
+  gap: 8px;
+  padding: 8px;
+  margin-top: 24px;
   overflow: hidden; /* 隐藏滚动条 */
   align-items: center;
   will-change: transform;
@@ -159,7 +159,7 @@ onBeforeUnmount(() => {
   flex-direction: row; /* 横向布局，使内容和图片并排显示 */
   border-radius: 25px;
   overflow: hidden;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
   background-color: #FFFFFE; /* 白色背景 */
   box-shadow: 0 15px 20px rgba(0, 0, 0, 0.1); /* 细微阴影 */
   transition: transform 0.1s ease, box-shadow 0.1s ease;
@@ -177,7 +177,7 @@ onBeforeUnmount(() => {
   margin-left: 20px;
 }
 .article-content {
-  padding: 15px;
+  padding: 10px;
   flex: 1; /* 使内容区域占满剩余空间 */
 }
 
@@ -191,9 +191,9 @@ onBeforeUnmount(() => {
 
 .article-summary {
   font-size: 1em;
-  color: #555;
+  color: #666;
   font-weight: 500;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
 }
 
 .floating-menu ul {
@@ -202,7 +202,7 @@ onBeforeUnmount(() => {
   padding: 0;
 }
 .floating-menu ul li {
-  margin: 10px 0;
+  margin: 8px 0;
   cursor: pointer;
 }
 .floating-menu ul li:hover {

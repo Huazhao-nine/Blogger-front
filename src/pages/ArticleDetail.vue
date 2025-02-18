@@ -312,7 +312,7 @@ const edit = async () => {
 
 .categories a {
   display: block;
-  margin: 10px 0;
+  margin: 8px 0;
   color: #333;
   text-decoration: none;
   font-size: 18px;
@@ -325,9 +325,9 @@ const edit = async () => {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  padding: 10px;
-  margin-top: 25px;
+  gap: 8px;
+  padding: 8px;
+  margin-top: 24px;
   overflow: hidden; /* 隐藏滚动条 */
   align-items: center;
   will-change: transform;
@@ -337,9 +337,9 @@ const edit = async () => {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  padding: 10px;
-  margin-top: 25px;
+  gap: 8px;
+  padding: 8px;
+  margin-top: 24px;
   align-items: center;
   will-change: transform;
   transition: transform 0.1s ease;

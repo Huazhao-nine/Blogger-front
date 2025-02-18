@@ -82,6 +82,7 @@ export default defineConfig({
   },
   server: {
     port: 8181,
+    // port: 8189,
     host: true,
     open: true,
     hot: true,

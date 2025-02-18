@@ -130,7 +130,7 @@ onBeforeUnmount(() => {
   width: 70px;
   height: 70px;
   border-radius: 50%;
-  margin-right: 15px;
+  margin-right: 8px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
   object-fit: cover;
   border: 3px solid rgba(255, 255, 255, 0.8); /* 添加白色边框 */
@@ -193,7 +193,7 @@ onBeforeUnmount(() => {
   padding: 0;
 }
 .floating-menu ul li {
-  margin: 10px 0;
+  margin: 8px 0;
   cursor: pointer;
 }
 .floating-menu ul li:hover {

@@ -105,7 +105,7 @@ onBeforeUnmount(() => {
 }
 .categories a {
   display: block;
-  margin: 10px 0;
+  margin: 8px 0;
   color: #333;
   text-decoration: none;
   font-size: 18px;
@@ -118,9 +118,9 @@ onBeforeUnmount(() => {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  padding: 10px;
-  margin-top: 25px;
+  gap: 8px;
+  padding: 8px;
+  margin-top: 24px;
   overflow: hidden;
   align-items: center;
   will-change: transform;
@@ -135,7 +135,7 @@ onBeforeUnmount(() => {
   flex-direction: column;
   border-radius: 25px;
   overflow: hidden;
-  margin-bottom: 25px;
+  margin-bottom: 24px;
   background-color: #FFFFFE;
   box-shadow: 0 15px 20px rgba(0, 0, 0, 0.1);
   transition: transform 0.1s ease, box-shadow 0.1s ease;
@@ -151,17 +151,17 @@ onBeforeUnmount(() => {
 }
 
 .article-content {
-  padding: 15px;
+  padding: 10px;
 }
 .article-title {
   font-size: 1.3em;
-  margin: 0 0 10px;
+  margin: 0 0 8px;
   font-weight: 1000;
   color: #333; /* 标题颜色，深灰色 */
 }
 .article-summary {
   font-size: 1.0em;
-  color: #555;
+  color: #666;
   font-weight: 500;
 }
 
