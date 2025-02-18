@@ -81,7 +81,7 @@ export default defineConfig({
     clientsClaim: true, // 确保新 SW 能立即控制页面
   },
   server: {
-    port: 8189,
+    port: 8181,
     host: true,
     open: true,
     hot: true,
