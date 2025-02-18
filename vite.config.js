@@ -92,11 +92,6 @@ export default defineConfig({
         changeOrigin: true, //支持跨域
         rewrite: (path) => path.replace(/^\/api/, '') //重写路径,替换/api
       },
-      '/systemInfo': {
-        target: 'http://localhost:8184/', //跨域地址
-        changeOrigin: true, //支持跨域
-        rewrite: (path) => path.replace(/^\/systemInfo/, '') //重写路径,替换/api
-      },
     }
   },
   resolve: {

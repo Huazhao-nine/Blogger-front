@@ -19,7 +19,7 @@ const getInfo = async () => {
 }
 // 解析出 CPU 温度
 const getCpuTemperatures = (data) => {
-  return  data.Children[0].Children[1].Children[1].Children[0].Value
+  return JSON.parse(data.msg).Children[0].Children[1].Children[1].Children[0].Value
 }
 
 const goToBeian = () => {

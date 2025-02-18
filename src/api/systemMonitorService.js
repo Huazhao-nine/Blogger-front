@@ -1,5 +1,4 @@
 import request from "@/api/request.js";
-import axios from "axios";
 
 export const getCpuInfo = () => {
     return request.get('/getCpuInfo')
@@ -14,5 +13,5 @@ export const getMemoryInfo = () => {
 }
 
 export const getCpuTemp = () => {
-    return axios.get('/systemInfo/data.json')
+    return request.get('/getCpuTemp')
 }
