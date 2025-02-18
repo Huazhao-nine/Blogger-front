@@ -8,6 +8,7 @@ const articleListRef = ref(null);
 const cpuInfo = ref('CPU info is reading now');
 const gpuInfo = ref('GPU info is reading now');
 const memoryInfo = ref('Memory info is reading now');
+let interval
 const getInfo = async () => {
   let res1 = await getCpuInfo()
   let res2 = await getGpuInfo()
@@ -31,11 +32,12 @@ onMounted(() => {
   calculateMaxScroll(); // 计算最大滚动范围
   bindTouchEvents(); // 绑定触摸事件
   window.addEventListener('resize', calculateMaxScroll);
-  setInterval(getInfo, 1000);
+  interval = setInterval(getInfo, 1000);
 });
 
 onBeforeUnmount(() => {
   unbindTouchEvents()
+  clearInterval(interval)
   window.removeEventListener('resize', calculateMaxScroll);
 });
 </script>
