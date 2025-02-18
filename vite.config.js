@@ -81,16 +81,22 @@ export default defineConfig({
     clientsClaim: true, // 确保新 SW 能立即控制页面
   },
   server: {
-    port: 8181,
+    port: 8189,
     host: true,
     open: true,
     hot: true,
     proxy: {
       '/api': {
         target: 'http://localhost:8182/', //跨域地址
+        // target: 'http://localhost:8088/', //跨域地址
         changeOrigin: true, //支持跨域
         rewrite: (path) => path.replace(/^\/api/, '') //重写路径,替换/api
-      }
+      },
+      '/systemInfo': {
+        target: 'http://localhost:8184/', //跨域地址
+        changeOrigin: true, //支持跨域
+        rewrite: (path) => path.replace(/^\/systemInfo/, '') //重写路径,替换/api
+      },
     }
   },
   resolve: {

@@ -3,20 +3,25 @@ import {onBeforeUnmount, onMounted, ref} from 'vue';
 import {useDraggable} from "@/api/useTouchScroll.js";
 import {fetchWallpaper} from "@/api/WallpaperService.js";
 import router from "@/router/index.js";
-import {getCpuInfo, getGpuInfo, getMemoryInfo} from "@/api/systemMonitorService.js";
+import {getCpuInfo, getCpuTemp, getGpuInfo, getMemoryInfo} from "@/api/systemMonitorService.js";
 const articleListRef = ref(null);
 const cpuInfo = ref('CPU info is reading now');
 const gpuInfo = ref('GPU info is reading now');
 const memoryInfo = ref('Memory info is reading now');
 const getInfo = async () => {
-  const res1 = await getCpuInfo()
-  const res2 = await getGpuInfo()
-  const res3 = await getMemoryInfo()
-  cpuInfo.value = res1.data.msg
+  let res1 = await getCpuInfo()
+  let res2 = await getGpuInfo()
+  let res3 = await getMemoryInfo()
+  let res4 = await getCpuTemp()
+  cpuInfo.value = res1.data.msg + " Temp: " + getCpuTemperatures(res4.data)
   gpuInfo.value = res2.data.msg
   memoryInfo.value = res3.data.msg
-  console.log(cpuInfo.value)
 }
+// 解析出 CPU 温度
+const getCpuTemperatures = (data) => {
+  return  data.Children[0].Children[1].Children[1].Children[0].Value
+}
+
 const goToBeian = () => {
   window.open('https://beian.miit.gov.cn/', '_blank'); // 新窗口打开网址
 }
