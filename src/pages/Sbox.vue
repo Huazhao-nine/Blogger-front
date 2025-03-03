@@ -73,8 +73,8 @@
               最佳线性逼近优势
             </label>
             <label>
-              <input type="checkbox" v-model="selectedIndicators" value="getDiffUniformity" />
-              差分均匀性
+              <input type="checkbox" v-model="selectedIndicators" value="getSelfInverseProperty" />
+              自对合性
             </label>
           </div>
         </div>
@@ -109,25 +109,21 @@ import {ref} from 'vue';
 import axios from "axios";
 import request from "@/api/request.js";
 
-const inputSize = ref(7);
-const outputSize = ref(7);
-const sboxContent = ref('54,50,62,56,22,34,94,96,38,6,63,93,2,18,123,33,\n' +
-    '\n' +
-    '55,113,39,114,21,67,65,12,47,73,46,27,25,111,124,81,\n' +
-    '\n' +
-    '53,9,121,79,52,60,58,48,101,127,40,120,104,70,71,43,\n' +
-    '\n' +
-    '20,122,72,61,23,109,13,100,77,1,16,7,82,10,105,98,\n' +
-    '\n' +
-    '117,116,76,11,89,106,0,125,118,99,86,69,30,57,126,87,\n' +
-    '\n' +
-    '112,51,17,5,95,14,90,84,91,8,35,103,32,97,28,66,\n' +
-    '\n' +
-    '102,31,26,45,75,4,85,92,37,74,80,49,68,29,115,44,\n' +
-    '\n' +
-    '64,107,108,24,110,83,36,78,42,19,15,41,88,119,59,3');
+const inputSize = ref(8);
+const outputSize = ref(8);
+const sboxContent = ref('38, 36, 199, 220, 222, 248, 55, 63, 30, 34, 198, 54, 211, 48, 247, 26, 92, 83, 93, 124, 27, 223, 217, 130, 95, 137, 214, 136, 10, 60, 28, 210, 175, 35, 24, 89, 249, 131, 47, 235, 173, 90, 127, 91, 129, 138, 8, 242, 106, 71, 192, 141, 159, 46, 116, 171, 240, 230, 225, 56, 19, 105, 197, 9, 111, 88, 45, 65, 50, 49, 121, 21, 69, 195, 134, 11, 115, 70, 232, 4, 100, 224, 62, 208, 153, 101, 133, 167, 23, 229, 74, 252, 13, 174, 152, 179, 189, 213, 6, 226, 185, 246, 227, 253, 188, 238, 250, 1, 190, 178, 98, 239, 234, 59, 166, 75, 39, 177, 53, 180, 144, 161, 172, 140, 68, 243, 164, 81, 112, 0, 40, 135, 107, 145, 231, 94, 80, 147, 128, 168, 122, 110, 196, 143, 126, 254, 52, 150, 186, 170, 77, 33, 117, 79, 157, 255, 73, 31, 207, 20, 233, 42, 216, 37, 176, 5, 67, 221, 64, 191, 86, 204, 82, 169, 205, 154, 183, 58, 165, 206, 156, 14, 237, 193, 57, 251, 51, 244, 7, 66, 17, 114, 139, 201, 142, 119, 84, 18, 108, 125, 182, 163, 245, 78, 219, 2, 158, 162, 151, 109, 215, 212, 97, 87, 149, 120, 32, 123, 22, 3, 241, 99, 43, 160, 202, 61, 155, 96, 113, 85, 25, 12, 194, 41, 103, 29, 148, 236, 200, 209, 104, 76, 16, 15, 146, 132, 181, 44, 102, 187, 118, 184, 228, 72, 218, 203');
 // 选中的评估指标
-const selectedIndicators = ref([]);
+const selectedIndicators = ref([
+  "getNonlinearity",
+  "getDiffUniformity",
+  "getDSAC",
+  "getAlgebraicDegree",
+  "getNumberOfTerms",
+  "getHammingDistance",
+  "getFixedPoints",
+  "getBestLinearApproximationAdvantage",
+  "getSelfInverseProperty"
+]);
 const evaluationResults = ref([]);
 
 // 请求发送的基本配置
@@ -151,7 +147,6 @@ const sendRequest = async (indicator) => {
 
 const startEvaluation = async () => {
   evaluationResults.value = [];
-
   // 循环遍历用户选中的评估指标
   for (let indicator of selectedIndicators.value) {
     const res = await sendRequest(indicator);
@@ -167,6 +162,7 @@ const startEvaluation = async () => {
     if (indicator === 'getFixedPoints') displayIndicator = '不动点';
     if (indicator === 'getHammingDistance') displayIndicator = '扩散特性（汉明距离）(平均，最小，最大)';
     if (indicator === 'getDSAC') displayIndicator = '雪崩特性';
+    if (indicator === 'getSelfInverseProperty') displayIndicator = '自对合性';
     let resultText = `${displayIndicator} : `
     // 处理ANF数组（代数正规形）
     if (indicator === 'getANF' && Array.isArray(res.data.data)) {
@@ -195,6 +191,7 @@ const startEvaluation = async () => {
       resultText += `<table><thead><tr>${new Array(res.data.data[0].length).fill('<th></th>').join('')}</tr></thead><tbody>${matrix}</tbody></table>`;
     } else {
       // 默认处理为JSON格式输出
+      console.log(res.data)
       resultText += JSON.stringify(res.data.data) || "无有效结果";
     }
 
