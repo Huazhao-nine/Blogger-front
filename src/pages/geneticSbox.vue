@@ -13,7 +13,6 @@
                 type="number"
                 v-model="N"
                 min="1"
-                disabled
             />
           </div>
           <div>
@@ -225,19 +224,19 @@ import { ref, reactive, onUnmounted, watch} from 'vue'
 import request from '@/api/request.js' // 根据实际路径调整
 
 // 1. 定义表单绑定的参数
-const N = ref(16)
+const N = ref(256)
 const populationSize = ref(1000)
-const mutationRate = ref(0.3)
-const elitismRate = ref(0.1)
+const mutationRate = ref(0.5)
+const elitismRate = ref(0.2)
 const maxGenerations = ref(1000)
 
-const targetNonlinearity = ref(4.0)
+const targetNonlinearity = ref(112.0)
 const targetDiffUniformity = ref(4)
-const targetLinearApprox = ref(0.25)
-const targetAlgebraicDegree = ref(3)
-const targetTermsNumber = ref(9)
+const targetLinearApprox = ref(0.0625)
+const targetAlgebraicDegree = ref(7)
+const targetTermsNumber = ref(110)
 const targetFixedPoints = ref(0)
-const targetDSAC = ref(0.5)
+const targetDSAC = ref(0.7)
 
 const desiredSBoxCount = ref(5)
 const logInterval = ref(1)
