@@ -26,6 +26,9 @@ const getCpuTemperatures = (data) => {
 const goToBeian = () => {
   window.open('https://beian.miit.gov.cn/', '_blank'); // 新窗口打开网址
 }
+const goToBeian2 = () => {
+  window.open('https://beian.mps.gov.cn/#/query/webSearch?code=42122102000232', '_blank'); // 新窗口打开网址
+}
 const { calculateMaxScroll, bindTouchEvents, unbindTouchEvents } = useDraggable(articleListRef);
 onMounted(() => {
   getInfo()
@@ -74,7 +77,6 @@ onBeforeUnmount(() => {
         <h3 class="article-title">
           花朝九日's Blogger
         </h3>
-        网站备案号：
           <el-tag
               type="info"
               size="small"
@@ -84,6 +86,16 @@ onBeforeUnmount(() => {
           >
             鄂ICP备2025092180号
           </el-tag>
+        <el-tag
+            type="info"
+            size="small"
+            effect="plain"
+            @click="goToBeian2"
+            style="cursor: pointer; margin-left: 38px"
+        >
+          <img src="/src/assets/备案图标.png" style="height: 10px;" alt="备案图标"></img>
+          鄂公网安备42122102000232号
+        </el-tag>
         <p class="article-summary">
           前<el-tag type="success" size="small" effect="plain">Vue3</el-tag>
           后端<el-tag type="danger" size="small" effect="plain">SpringBoot3</el-tag>分离的手搓个人博客
