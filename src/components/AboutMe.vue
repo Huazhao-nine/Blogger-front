@@ -77,6 +77,8 @@ onBeforeUnmount(() => {
         <h3 class="article-title">
           花朝九日's Blogger
         </h3>
+        <p>
+          ICP备案号：
           <el-tag
               type="info"
               size="small"
@@ -86,16 +88,20 @@ onBeforeUnmount(() => {
           >
             鄂ICP备2025092180号
           </el-tag>
-        <el-tag
-            type="info"
-            size="small"
-            effect="plain"
-            @click="goToBeian2"
-            style="cursor: pointer; margin-left: 38px"
-        >
-          <img src="/src/assets/备案图标.png" style="height: 10px;" alt="备案图标"></img>
-          鄂公网安备42122102000232号
-        </el-tag>
+        </p>
+        <p>
+          公安备案号：
+          <el-tag
+              type="info"
+              size="small"
+              effect="plain"
+              @click="goToBeian2"
+              style="cursor: pointer;"
+          >
+            <img src="/src/assets/备案图标.png" style="height: 10px;" alt="备案图标"></img>
+            鄂公网安备42122102000232号
+          </el-tag>
+        </p>
         <p class="article-summary">
           前<el-tag type="success" size="small" effect="plain">Vue3</el-tag>
           后端<el-tag type="danger" size="small" effect="plain">SpringBoot3</el-tag>分离的手搓个人博客

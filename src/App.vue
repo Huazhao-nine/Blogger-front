@@ -1,14 +1,24 @@
 <script setup>
-import {computed} from 'vue' // 确保导入 computed
+import {computed, ref, onMounted} from 'vue' // 确保导入 computed
 import {useRoute} from 'vue-router'
 import {zhCn} from "element-plus/es/locale/index";
 import FooterNav from "@/components/footerNav.vue";
+import {ElNotification} from "element-plus";
 
 const route = useRoute()
+const pcModel = ref(true);
+const checkPcModel = () => {
+  if (window.innerWidth > 768) {
+    pcModel.value = false
+  }else pcModel.value = true
+}
 
 // 使用滑动动画
 const transitionName = computed(() => {
   return 'slide';
+})
+onMounted(() => {
+  checkPcModel()
 })
 </script>
 
@@ -21,7 +31,7 @@ const transitionName = computed(() => {
         <transition :name="transitionName" mode="out-in">
           <component :is="Component" />
         </transition>
-      <footer-nav></footer-nav>
+      <footer-nav v-if="pcModel"></footer-nav>
     </div>
   </el-config-provider>
   </router-view>

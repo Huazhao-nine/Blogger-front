@@ -63,6 +63,11 @@ const router = createRouter({
             path: '/geneticSbox',
             component: () => import('@/pages/geneticSbox.vue')
 
+        },
+        {
+            path: '/start',
+            component: () => import('@/pages/start.vue')
+
         }
     ],
 

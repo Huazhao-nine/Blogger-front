@@ -348,7 +348,6 @@ const edit = async () => {
 
 .article-card {
   width: 100%; /* 使文章卡片宽度为 100% */
-  max-width: 1000px; /* 设置文章卡片最大宽度（调整为适合屏幕的宽度） */
   display: flex;
   flex-direction: column;
   border-radius: 25px;
@@ -357,6 +356,13 @@ const edit = async () => {
   background-color: #FFFFFE; /* 白色背景 */
   box-shadow: 0 15px 20px rgba(0, 0, 0, 0.1); /* 细微阴影 */
   transition: transform 0.1s ease, box-shadow 0.1s ease; /* 动画效果 */
+}
+/* 为电脑屏幕设置宽度为75% */
+@media (min-width: 768px) { /* 768px 是一个常见的平板/电脑分界点 */
+  .article-card {
+    max-width: 75%;
+    margin: 0 auto; /* 居中显示 */
+  }
 }
 .article-card:hover {
   transform: translateY(-8px); /* 悬停时微微上浮 */
