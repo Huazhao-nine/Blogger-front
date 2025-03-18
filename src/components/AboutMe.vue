@@ -35,7 +35,7 @@ onMounted(() => {
   calculateMaxScroll(); // 计算最大滚动范围
   bindTouchEvents(); // 绑定触摸事件
   window.addEventListener('resize', calculateMaxScroll);
-  interval = setInterval(getInfo, 1000);
+  // interval = setInterval(getInfo, 1000);
 });
 
 onBeforeUnmount(() => {

@@ -13,7 +13,7 @@
         <div class="intro">
           <h1 v-if="auth.isAuthenticated">{{ auth.user.name }}</h1>
           <h1 v-else>未登录，点击头像登录</h1>
-          <p>就在这长夜之后，凝结一座新宇宙</p>
+          <p>悟已往之不谏，知来者之可追。</p>
         </div>
       </div>
     </div>
@@ -23,15 +23,18 @@
 </template>
 <script setup>
 import {onBeforeUnmount, onMounted, ref} from 'vue';
-import {ElMessageBox, ElNotification} from 'element-plus';
+import {ElFormItem, ElInput, ElMessageBox, ElNotification} from 'element-plus';
 import {fetchWallpaper, getWallPaper} from '@/api/WallpaperService.js';
 import AboutMe from "@/components/AboutMe.vue";
-import {useRouter} from "vue-router";
+import {useRoute, useRouter} from "vue-router";
 import TimeButton from "@/components/TimeButton.vue";
 import {useAuthStore} from "@/stores/auth.js";
 import {getQQAvatar} from "@/api/QQService.js";
+import axios from "axios";
+import request from "@/api/request.js";
+import {getUserByopenid, QQLogin} from "@/api/UserService.js";
 const auth = useAuthStore()
-
+const email = ref('')
 const wallpaperUrl = ref('');
 const router = useRouter()
 const imageData = ref('')
@@ -85,8 +88,84 @@ const userLoginAndOut = () => {
     router.push('/Login')
   }
 }
+const route = useRoute();// 获取当前路由信息
+const checkLoginStatus = async () => {
+  let code = route.query.code;
+  if (code !== undefined){
+  const redirectUri = encodeURIComponent('https://flowerinfire.com/#/About');
+
+  const url = `/qqLogin/token?grant_type=authorization_code&` +
+      `client_id=102693273&` +
+      `client_secret=ypZN6f5IKF1gDamq&` +
+      `code=${code}&` +
+      `redirect_uri=${redirectUri}&` +
+      `fmt=json&` +
+      `need_openid=1`;
+
+  const res = await axios.get(url);
+  // console.log(res.data.openid);
+  const openidRes = await getUserByopenid(res.data.openid);
+    console.log(openidRes);
+     if (openidRes.data.code !== 200) {
+    ElMessageBox.prompt('请输入你想要接受消息的邮箱', 'QQ绑定', {
+      confirmButtonText: '确认',
+      cancelButtonText: '取消',
+      inputPattern:
+          /[\w!#$%&'*+/=?^_`{|}~-]+(?:\.[\w!#$%&'*+/=?^_`{|}~-]+)*@(?:[\w](?:[\w-]*[\w])?\.)+[\w](?:[\w-]*[\w])?/,
+      inputErrorMessage: '邮箱不合理',
+    })
+        .then(async ({value}) => {
+          const QQLoginPak = {
+            oauth_consumer_key: 102693273,
+            access_token: res.data.access_token,
+            openid: res.data.openid,
+            format: "json",
+            email: value,
+          }
+          ElNotification({
+            title: '邮箱绑定成功',
+            message: `你的初始账号密码均为:${value}`,
+            type: 'success',
+          });
+          const QQRes = await QQLogin(QQLoginPak);
+          console.log(QQRes);
+          if (QQRes.data.code === 200) {
+            ElNotification({
+              title: '成功',
+              message: QQRes.data.msg,
+              type: 'success',
+            });
+            auth.setToken(QQRes.data.data.token);
+            auth.setUser(QQRes.data.data);
+            await router.push('/About');
+            router.go(0);
+          } else {
+            ElNotification({
+              title: '错误',
+              message: res.data.msg,
+              type: 'error',
+            });
+          }
+        })
+  }else {
+       auth.setToken(openidRes.data.data.token);
+       auth.setUser(openidRes.data.data);
+       ElNotification({
+         title: '成功',
+         message: '登录成功',
+         type: 'success',
+       });
+       await router.push('/About');
+       router.go(0);
+     }
+
+  }
+
+};
+
 // 生命周期钩子
 onMounted(() => {
+  checkLoginStatus();
   fetchWallpaper(wallpaperUrl);
   checkDeviceType(); // 初次加载时检查设备
   getUserImg()

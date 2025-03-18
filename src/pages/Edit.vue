@@ -335,7 +335,7 @@ onUnmounted(() => {
                 <el-input v-model="newCategoryDesc" placeholder="请输入分类描述" style="margin-top: 25px" />
                 <template #footer>
                   <el-button @click="closeDialog">取消</el-button>
-                  <el-button type="primary" @click="addCate">确认</el-button>
+                  <el-button  @click="addCate">确认</el-button>
                 </template>
               </el-dialog>
             </el-form>
@@ -344,7 +344,7 @@ onUnmounted(() => {
               <el-switch v-model="articleData.isHome" style="margin-left: 25px"  active-text="主页置顶" inactive-text="否" />
             </el-form-item>
             <el-form-item>
-              <el-button :loading="isSubmitting" type="primary" @click="submitArticle" round>提交文章</el-button>
+              <el-button :loading="isSubmitting"  @click="submitArticle" round style="width: 100%">提交文章</el-button>
             </el-form-item>
           </el-form>
         </div>

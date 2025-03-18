@@ -18,7 +18,7 @@ const transitionName = computed(() => {
   return 'slide';
 })
 onMounted(() => {
-  checkPcModel()
+  // checkPcModel()
 })
 </script>
 

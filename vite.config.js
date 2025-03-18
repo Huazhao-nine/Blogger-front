@@ -39,6 +39,7 @@ export default defineConfig({
   ],
   // 自定义 Service Worker 配置
   workbox: {
+    cachePrefix: 'HuaZhao-pwa-cache-' + new Date().getTime(), // 每次部署时更新缓存前缀
     // 选择适合的缓存策略
     runtimeCaching: [
       {
@@ -48,7 +49,7 @@ export default defineConfig({
           cacheName: 'assets-cache',
           expiration: {
             maxEntries: 50,
-            maxAgeSeconds: 30 * 24 * 60 * 60, // 缓存有效期为 30 天
+            maxAgeSeconds: 24 * 60 * 60, // 缓存有效期为 1 天
           },
         },
       },
@@ -79,6 +80,8 @@ export default defineConfig({
     // 启用 Service Worker 自清理功能
     skipWaiting: true, // 强制立即激活新版本的 SW
     clientsClaim: true, // 确保新 SW 能立即控制页面
+    // 启用清理旧缓存的功能
+    cleanOutdatedCaches: true,
   },
   server: {
     port: 8181,
@@ -92,6 +95,11 @@ export default defineConfig({
         // target: 'http://localhost:8088/', //跨域地址
         changeOrigin: true, //支持跨域
         rewrite: (path) => path.replace(/^\/api/, '') //重写路径,替换/api
+      },
+      '/qqLogin': {
+        target: 'https://graph.qq.com/oauth2.0/', //跨域地址
+        changeOrigin: true, //支持跨域
+        rewrite: (path) => path.replace(/^\/qqLogin/, '') //重写路径,替换/api
       },
     }
   },
