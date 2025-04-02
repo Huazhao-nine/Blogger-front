@@ -148,11 +148,11 @@ const checkLoginStatus = async () => {
           }
         })
   }else {
-       // ElNotification({
-       //   title: '成功',
-       //   message: '登录成功',
-       //   type: 'success',
-       // });
+       ElNotification({
+         title: '成功',
+         message: '登录成功',
+         type: 'success',
+       });
        auth.setToken(openidRes.data.data.token);
        auth.setUser(openidRes.data.data);
        await router.push('/About');
