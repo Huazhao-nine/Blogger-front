@@ -30,8 +30,8 @@ export const fetchWallpaper = async (wallpaperUrl) => {
         // 捕获异常并弹出错误提示
         console.error(error);
         ElNotification({
-            title: '错误',
-            message: '服务器已离线，请稍后再试。',
+            title: '服务器离线，请稍后再试。',
+            message: '花朝九日带着服务器跑路了！！！',
             type: 'error',
         });
     }
