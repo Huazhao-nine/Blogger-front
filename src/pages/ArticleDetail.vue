@@ -527,7 +527,7 @@ onUnmounted(() => {
 }
 
 .toc-item:hover, .toc-item.active {
-  color: #409eff;
+  color: #fbcf4b;
 }
 
 .toc-item.active {
