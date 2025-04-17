@@ -18,7 +18,7 @@ body,
 .outline-content *,
 .CodeMirror,
 .CodeMirror * {
-  font-family: "LXGWWenKaiTC-Medium", sans-serif !important;
+  font-family: "LXGWWenKaiTC-Medium", sans-serif ;
 }
 
 /* 设置等宽字体区域 */
@@ -31,7 +31,7 @@ body,
 .md-fences,
 .md-fences *,
 kbd {
-  font-family: "LXGWWenKaiMonoTC-Medium", monospace !important;
+  font-family: "LXGWWenKaiMonoTC-Medium", sans-serif;
 }
 
 
