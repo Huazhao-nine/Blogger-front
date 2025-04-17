@@ -11,31 +11,6 @@
   src: url("public/fonts/LXGWWenKaiMonoTC-Medium.ttf");
 }
 
-html,
-body,
-#write,
-#write *,
-.typora-export,
-.typora-export-content,
-.typora-export-content *,
-.outline-content *,
-.CodeMirror,
-.CodeMirror * {
-  font-family: "LXGWWenKaiTC-Medium", sans-serif !important;
-}
-
-/* 等宽字体区域使用 Mono 字体 */
-#write code,
-#write pre,
-.CodeMirror,
-.CodeMirror *,
-.cm-s-inner.CodeMirror,
-.cm-s-inner.CodeMirror *,
-.md-fences,
-.md-fences *,
-kbd {
-  font-family: "LXGWWenKaiMonoTC-Medium", monospace !important;
-}
 
 html {
   font-size: 16px;
