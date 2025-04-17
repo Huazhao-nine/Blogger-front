@@ -2,12 +2,12 @@
   font-family: "LXGWWenKaiTC-Medium";
   font-weight: normal;
   font-style: normal;
-  src: url("./front/LXGWWenKaiTC-Medium.ttf");
+  src: url("./front/LXGWWenKaiLite-Medium.ttf");
 }
 
 @font-face {
   font-family: "LXGWWenKaiMonoTC-Medium";
-  src: url("./front/LXGWWenKaiMonoTC-Medium.ttf");
+  src: url("./front/LXGWWenKaiMonoLite-Medium.ttf");
 }
 
 /*!* 设置全局字体 *!*/

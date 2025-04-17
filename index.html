@@ -12,13 +12,23 @@
 <script type="module" src="/src/main.js"></script>
 </body>
 <style>
-    @import 'lxgw-wenkai-tc-web/style.css';
+    @font-face {
+        font-family: "LXGWWenKaiTC-Medium";
+        font-weight: normal;
+        font-style: normal;
+        src: url("./src/assets/front/LXGWWenKaiLite-Medium.ttf");
+    }
+
+    @font-face {
+        font-family: "LXGWWenKaiMonoTC-Medium";
+        src: url("./src/assets/front/LXGWWenKaiMonoLite-Medium.ttf");
+    }
     body {
-        font-family: "LXGW WenKai TC Medium", sans-serif;
+        font-family: "LXGWWenKaiTC-Medium", sans-serif;
     }
     /* Mono font (optional) */
     pre,code {
-        font-family: "LXGW WenKai Mono TC Medium", sans-serif;
+        font-family: "LXGWWenKaiMonoTC-Medium", sans-serif;
     }
     /* 设置默认字体大小 */
     html {
