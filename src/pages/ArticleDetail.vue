@@ -16,6 +16,8 @@ import {useDraggable} from "@/api/useTouchScroll.js";
 import {formatDate} from "../api/globals.js";
 import Bookmark from "@/components/Bookmark.vue";
 import {throttle} from 'lodash-es';
+import '@/assets/phycat-orange.css';
+
 
 // 响应式数据
 const articlesLoading = ref(false);
@@ -93,7 +95,7 @@ const getMarkdownContent = async () => {
     renderer,
   });
 
-  htmlContent.value = marked(article.value.content);
+  htmlContent.value = marked.parse(article.value.content);
   replaceLatexWithClass();
   await nextTick();
   setTimeout(() => {
@@ -350,7 +352,7 @@ onUnmounted(() => {
       <div class="article-list" ref="articleListRef">
         <el-skeleton :rows="20" animated v-if="articlesLoading" />
         <div class="article-card" v-else>
-          <div class="article-content" v-html="htmlContent" />
+          <div id="write" class="article-content" v-html="htmlContent" />
         </div>
       </div>
     </div>
@@ -358,6 +360,7 @@ onUnmounted(() => {
 </template>
 
 <style scoped>
+
 /* 基础布局 */
 .home {
   display: flex;
@@ -411,6 +414,12 @@ onUnmounted(() => {
   background-color: #FFFFFE; /* 白色背景 */
   box-shadow: 0 15px 20px rgba(0, 0, 0, 0.1); /* 细微阴影 */
   transition: transform 0.1s ease, box-shadow 0.1s ease; /* 动画效果 */
+  /* 修改点 */
+  background-image:
+      linear-gradient(to right, rgba(200, 200, 200, 0.2) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(200, 200, 200, 0.2) 1px, transparent 1px);
+  background-size: 24px 24px;
+  background-position: top left;
 }
 /* 为电脑屏幕设置宽度为75% */
 @media (min-width: 768px) { /* 768px 是一个常见的平板/电脑分界点 */
