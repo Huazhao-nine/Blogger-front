@@ -1,4 +1,3 @@
-/* 引入字体 */
 @font-face {
   font-family: "LXGWWenKaiTC-Medium";
   font-weight: normal;
@@ -9,6 +8,30 @@
 @font-face {
   font-family: "LXGWWenKaiMonoTC-Medium";
   src: url("public/fonts/LXGWWenKaiMonoTC-Medium.ttf");
+}
+
+/* 设置全局字体 */
+html,
+body,
+#write,
+#write *,
+.outline-content *,
+.CodeMirror,
+.CodeMirror * {
+  font-family: "LXGWWenKaiTC-Medium", sans-serif !important;
+}
+
+/* 设置等宽字体区域 */
+#write code,
+#write pre,
+.CodeMirror,
+.CodeMirror *,
+.cm-s-inner.CodeMirror,
+.cm-s-inner.CodeMirror *,
+.md-fences,
+.md-fences *,
+kbd {
+  font-family: "LXGWWenKaiMonoTC-Medium", monospace !important;
 }
 
 
