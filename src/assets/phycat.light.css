@@ -2,7 +2,7 @@
   font-family: "LXGWWenKaiTC-Medium";
   font-weight: normal;
   font-style: normal;
-  src: url("./front/LXGWWenKaiMonoTC-Medium.ttf");
+  src: url("./front/LXGWWenKaiTC-Medium.ttf");
 }
 
 @font-face {
@@ -10,29 +10,29 @@
   src: url("./front/LXGWWenKaiMonoTC-Medium.ttf");
 }
 
-/* 设置全局字体 */
-html,
-body,
-#write,
-#write *,
-.outline-content *,
-.CodeMirror,
-.CodeMirror * {
-  font-family: "LXGWWenKaiTC-Medium", sans-serif ;
-}
+/*!* 设置全局字体 *!*/
+/*html,*/
+/*body,*/
+/*#write,*/
+/*#write *,*/
+/*.outline-content *,*/
+/*.CodeMirror,*/
+/*.CodeMirror * {*/
+/*  font-family: "LXGWWenKaiTC-Medium", sans-serif ;*/
+/*}*/
 
-/* 设置等宽字体区域 */
-#write code,
-#write pre,
-.CodeMirror,
-.CodeMirror *,
-.cm-s-inner.CodeMirror,
-.cm-s-inner.CodeMirror *,
-.md-fences,
-.md-fences *,
-kbd {
-  font-family: "LXGWWenKaiMonoTC-Medium", sans-serif;
-}
+/*!* 设置等宽字体区域 *!*/
+/*#write code,*/
+/*#write pre,*/
+/*.CodeMirror,*/
+/*.CodeMirror *,*/
+/*.cm-s-inner.CodeMirror,*/
+/*.cm-s-inner.CodeMirror *,*/
+/*.md-fences,*/
+/*.md-fences *,*/
+/*kbd {*/
+/*  font-family: "LXGWWenKaiMonoTC-Medium", sans-serif;*/
+/*}*/
 
 
 html {
