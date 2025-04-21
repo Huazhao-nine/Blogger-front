@@ -864,6 +864,62 @@ kbd:hover {
   background: var(--element-color-so-shallow);
 }
 
+
+#write table {
+  border-collapse: collapse;
+  margin: 1em auto; /* 表格自动居中 */
+  display: table;
+  width: 100%;      /* 可根据内容宽度自动调整，或者你也可以设置为100% */
+  font-size: 14px;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.05);
+}
+
+/* 表头样式 */
+#write table thead {
+  background-color: #f2f2f2;
+}
+
+#write table thead th {
+  padding: 12px 16px;
+  font-weight: bold;
+  text-align: center;
+  color: #333;
+  border-bottom: 2px solid #ccc;
+}
+
+/* 表体单元格样式 */
+#write table td {
+  padding: 10px 14px;
+  border-bottom: 1px solid #e2e2e2;
+  text-align: center;
+  color: #444;
+  background-color: #fff;
+}
+
+/* 斑马条纹 */
+#write table tbody tr:nth-child(odd) td {
+  background-color: #f9f9f9;
+}
+
+/* 鼠标悬停行高亮 */
+#write table tbody tr:hover td {
+  background-color: #f1f8ff;
+}
+
+/* 表格边框优化（可选） */
+#write table th, #write table td {
+  border-right: 1px solid #ddd;
+}
+
+#write table tr td:last-child,
+#write table tr th:last-child {
+  border-right: none;
+}
+
 /** 表格内的单元格*/
 #write table tr th,
 #write table tr td {
