@@ -81,51 +81,97 @@ const checkDeviceType = () => {
 };
 
 const getMarkdownContent = async () => {
+  const rawContent = article.value.content;
+
+  const latexMap = new Map();
+  let index = 0;
+
+  // 提取 LaTeX 并生成占位
+  const latexProtected = rawContent
+      .replace(/\$\$([\s\S]+?)\$\$/g, (_, latex) => {
+        const key = `{{LATEX_BLOCK_${index++}}}`;
+        latexMap.set(key, { latex, display: true });
+        return key;
+      })
+      .replace(/\$([^\$]+?)\$/g, (_, latex) => {
+        const key = `{{LATEX_INLINE_${index++}}}`;
+        latexMap.set(key, { latex, display: false });
+        return key;
+      });
+
+  // 配置 marked
   const renderer = new marked.Renderer();
   renderer.image = ({ href, title, text }) => {
     return `<img src="${href}" alt="${text}" title="${title}" style="max-width: 100%; height: auto; display: block; margin: 0 auto;" />`;
   };
 
+  marked.use({
+    extensions: [{
+      name: 'highlight',
+      level: 'inline',
+      start(src) { return src.indexOf('=='); },
+      tokenizer(src) {
+        const match = /^==([\s\S]+?)==/.exec(src);
+        if (match) return { type: 'highlight', raw: match[0], text: match[1] };
+      },
+      renderer(token) {
+        return `<mark>${token.text}</mark>`;
+      }
+    }]
+  });
+
   marked.setOptions({
     async: false,
     breaks: true,
     gfm: true,
-    pedantic: false,
-    silent: false,
-    renderer,
+    renderer
   });
 
-  htmlContent.value = marked.parse(article.value.content);
-  replaceLatexWithClass();
+  // 渲染 Markdown
+  let html = marked.parse(latexProtected);
+
+  // 恢复 LaTeX 占位
+  for (const [key, { latex, display }] of latexMap.entries()) {
+    const span = `<span class="${display ? 'math' : 'inline-math'}">${latex}</span>`;
+    html = html.split(key).join(span); // 用 split+join 更可靠
+  }
+
+  htmlContent.value = html;
   await nextTick();
-  setTimeout(() => {
+
+  requestAnimationFrame(() => {
     renderLatex();
     hljs.highlightAll();
     generateTOC();
-  }, 50);
+  });
+
 };
 
-const replaceLatexWithClass = () => {
-  const processLatex = (match, latex) => {
-    latex = latex.replace(/<br>/g, ' ').replace(/\n/g, ' ').replace(/\s+/g, ' ').trim();
-    return `<span class="${match.startsWith('$$') ? 'math' : 'inline-math'}">${latex}</span>`;
-  };
 
-  htmlContent.value = htmlContent.value
-      .replace(/\$\$([\s\S]+?)\$\$/g, processLatex)
-      .replace(/\$([\s\S]+?)\$/g, processLatex);
-};
+
 
 const renderLatex = () => {
   const render = (elements, displayMode = false) => {
     elements.forEach(element => {
-      katex.render(element.textContent, element, { throwOnError: false, displayMode });
+      const latex = element.innerText; // 保留换行、空格
+      try {
+        katex.render(latex, element, {
+          throwOnError: false,
+          displayMode,
+          trust: true,
+        });
+      } catch (e) {
+        element.innerHTML = `<span style="color: red;">KaTeX Error: ${e.message}</span>`;
+      }
     });
   };
 
   render(document.querySelectorAll('.math'), true);
   render(document.querySelectorAll('.inline-math'));
 };
+
+
+
 
 const reFresh = () => {
   bookmarkStatus.value = false;
@@ -148,19 +194,35 @@ const edit = async () => {
   }
 };
 
-// 目录功能
 const generateTOC = () => {
-  tocItems.value = Array.from(document.querySelectorAll('h2, h3, h4, h5, h6'))
-      .map((heading, index) => {
-        const id = `heading-${index}`;
-        heading.id = id;
-        return {
-          id,
-          text: heading.textContent,
-          level: parseInt(heading.tagName.substring(1))
-        };
-      });
+  const headings = Array.from(document.querySelectorAll('h2, h3, h4, h5, h6'));
+  const toc = [];
+  let currentH2 = null;
+
+  headings.forEach((heading, index) => {
+    const id = `heading-${index}`;
+    heading.id = id;
+
+    const level = parseInt(heading.tagName.substring(1));
+    const item = {
+      id,
+      text: heading.textContent,
+      level,
+      children: [],
+      open: false,
+    };
+
+    if (level === 2) {
+      currentH2 = item;
+      toc.push(currentH2);
+    } else if (currentH2) {
+      currentH2.children.push(item);
+    }
+  });
+
+  tocItems.value = toc;
 };
+
 
 const scrollToHeading = (id) => {
   const element = document.getElementById(id);
@@ -180,7 +242,7 @@ const calculateProgress = () => {
 const handleScroll = throttle(() => {
   calculateProgress();
 
-  const current = Array.from(document.querySelectorAll('h1, h2, h3, h4, h5, h6'))
+  const current = Array.from(document.querySelector('.article-content')?.querySelectorAll('h2, h3, h4, h5, h6') || [])
       .findLast(heading => heading.getBoundingClientRect().top <= 100);
 
   activeHeading.value = current?.id || '';
@@ -335,13 +397,29 @@ onUnmounted(() => {
             <div class="toc-header">
               目录
             </div>
-            <div class="toc-content">  <!-- 新增滚动容器 -->
-              <div v-for="item in tocItems" :key="item.id" class="toc-item"
-                   :style="{ paddingLeft: `${(item.level - 1) * 12}px` }"
-                   :class="{ active: item.id === activeHeading }"
-                   @click="scrollToHeading(item.id); tocVisible = false"
-                   @touch="scrollToHeading(item.id); tocVisible = false">
-                {{ item.text }}
+            <div class="toc-content">
+              <div v-for="item in tocItems" :key="item.id">
+                <!-- 一级标题 -->
+                <div class="toc-item toc-h2"
+                     :class="{ active: item.id === activeHeading }"
+                     @click="() => { scrollToHeading(item.id); item.expanded = !item.expanded }">
+                  <el-icon style="margin-right: 4px;">
+                    <span v-if="item.children.length">{{ item.expanded ? '▼' : '▶' }}</span>
+                  </el-icon>
+                  {{ item.text }}
+                </div>
+
+                <!-- 二级及以下子标题 -->
+                <transition-group name="fade" tag="div">
+                  <div v-for="child in item.children" :key="child.id"
+                       v-show="item.expanded"
+                       class="toc-item"
+                       :style="{ paddingLeft: `${(child.level - 1) * 12}px` }"
+                       :class="{ active: child.id === activeHeading }"
+                       @click="scrollToHeading(child.id)">
+                    {{ child.text }}
+                  </div>
+                </transition-group>
               </div>
             </div>
           </div>
@@ -491,6 +569,9 @@ onUnmounted(() => {
   display: flex;
   flex-direction: column;
   z-index: 1001;
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 /* 目录内容区域（可滚动） */
@@ -546,6 +627,8 @@ onUnmounted(() => {
 
 .toc-content::-webkit-scrollbar-track {
   background: transparent;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+
 }
 .toc-float {
   touch-action: none; /* 保持拖动能力 */
@@ -560,4 +643,66 @@ onUnmounted(() => {
   margin-top: 20px;
   text-align: center;
 }
+/* 一级标题（h2）目录项 */
+.toc-h2 {
+  font-weight: bold;
+  font-size: 15px;
+  color: #333;
+  margin-top: 6px;
+  padding: 6px 0;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.2s;
+}
+
+/* 展开图标 */
+.toc-h2 el-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+}
+
+/* 子标题项（h3 ~ h6） */
+.toc-item:not(.toc-h2) {
+  font-size: 13px;
+  color: #666;
+  padding: 4px 0 4px 28px;
+  line-height: 1.6;
+  cursor: pointer;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+/* Hover 效果 */
+.toc-item:hover {
+  background-color: #f5f5f5;
+  color: #fbcf4b;
+}
+
+.toc-item.active {
+  font-weight: bold;
+  color: #fbcf4b;
+}
+
+/* 过渡动画 */
+.fade-enter-active, .fade-leave-active {
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+.fade-enter-from, .fade-leave-to {
+  opacity: 0;
+  max-height: 0;
+}
+.math, .inline-math {
+  animation: fadeIn 0.3s ease-out;
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+
 </style>
