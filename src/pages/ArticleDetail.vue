@@ -44,8 +44,21 @@ const { calculateMaxScroll, bindTouchEvents, unbindTouchEvents } = useDraggable(
 
 const articleCache = new Map();
 
+let cachedHeadings = [];
+let cachedArticleContent = null;
+
+function batchRender(elements, renderFn, batchSize = 5) {
+  const queue = [...elements];
+  const loop = () => {
+    const batch = queue.splice(0, batchSize);
+    batch.forEach(el => renderFn(el));
+    if (queue.length) requestIdleCallback(loop);
+  };
+  loop();
+}
+
 const chunkedParseMarkdown = async (markdown) => {
-  const chunkSize = 5000;
+  const chunkSize = isPhone.value ? 3000 : 5000;
   let html = '';
   for (let i = 0; i < markdown.length; i += chunkSize) {
     const chunk = markdown.slice(i, i + chunkSize);
@@ -58,12 +71,13 @@ const chunkedParseMarkdown = async (markdown) => {
 const getMarkdownContent = async () => {
   if (articleCache.has(article.value.id)) {
     htmlContent.value = articleCache.get(article.value.id);
-    await nextTick();
-    requestAnimationFrame(() => {
+    const renderEnhancers = throttle(() => {
       observeLatexElements();
-      hljs.highlightAll();
+      const codeBlocks = document.querySelectorAll('pre code');
+      batchRender(codeBlocks, el => hljs.highlightElement(el));
       generateTOC();
-    });
+    }, 300);
+    renderEnhancers();
     return;
   }
 
@@ -112,14 +126,15 @@ const getMarkdownContent = async () => {
   await nextTick();
   requestAnimationFrame(() => {
     observeLatexElements();
-    hljs.highlightAll();
+    const codeBlocks = document.querySelectorAll('pre code');
+    batchRender(codeBlocks, el => hljs.highlightElement(el));
     generateTOC();
   });
 };
 
 const observeLatexElements = () => {
   const elements = document.querySelectorAll('.math, .inline-math');
-  elements.forEach(el => {
+  batchRender(elements, (el) => {
     useIntersectionObserver(
         el,
         ([{ isIntersecting }]) => {
@@ -131,7 +146,7 @@ const observeLatexElements = () => {
                 displayMode: el.classList.contains('math'),
                 trust: true,
               });
-              el.dataset.rendered = true;
+              el.dataset.rendered = 'true';
             } catch (e) {
               el.innerHTML = `<span style="color: red;">KaTeX Error: ${e.message}</span>`;
             }
@@ -200,11 +215,13 @@ const edit = async () => {
 };
 
 const generateTOC = () => {
-  const headings = Array.from(document.querySelectorAll('h2, h3, h4, h5, h6'));
+  cachedArticleContent = document.querySelector('.article-content');
+  cachedHeadings = Array.from(cachedArticleContent.querySelectorAll('h2, h3, h4, h5, h6'));
+
   const toc = [];
   let currentH2 = null;
 
-  headings.forEach((heading, index) => {
+  cachedHeadings.forEach((heading, index) => {
     const id = `heading-${index}`;
     heading.id = id;
     const level = parseInt(heading.tagName.substring(1));
@@ -224,18 +241,13 @@ const scrollToHeading = (id) => {
   const element = document.getElementById(id);
   if (element) {
     const top = element.getBoundingClientRect().top + window.scrollY - 80;
-    window.scrollTo({
-      top,
-      behavior: 'smooth'
-    });
+    window.scrollTo({ top, behavior: 'smooth' });
   }
 };
 
 const expandTocForHeading = (headingId) => {
   tocItems.value.forEach(item => {
-    if (item.id === headingId) {
-      item.expanded = true;
-    } else if (item.children.some(child => child.id === headingId)) {
+    if (item.id === headingId || item.children.some(child => child.id === headingId)) {
       item.expanded = true;
     } else {
       item.expanded = false;
@@ -246,8 +258,7 @@ const expandTocForHeading = (headingId) => {
 const calculateProgress = () => {
   const articleContent = document.querySelector('.article-content');
   if (!articleContent) return;
-  const { height } = articleContent.getBoundingClientRect();
-  const maxScroll = height - window.innerHeight;
+  const maxScroll = articleContent.scrollHeight - window.innerHeight;
   scrollProgress.value = Math.min(100, (window.scrollY / maxScroll) * 100);
 };
 
@@ -256,24 +267,19 @@ const handleScroll = () => {
   if (!ticking) {
     window.requestAnimationFrame(() => {
       calculateProgress();
-
-      const headings = Array.from(document.querySelector('.article-content')?.querySelectorAll('h2, h3, h4, h5, h6') || []);
       let nearest = null;
       let minDistance = Infinity;
-
-      headings.forEach(heading => {
+      cachedHeadings.forEach(heading => {
         const distance = Math.abs(heading.getBoundingClientRect().top - 80);
         if (distance < minDistance) {
           minDistance = distance;
           nearest = heading;
         }
       });
-
       if (nearest) {
         activeHeading.value = nearest.id;
         expandTocForHeading(nearest.id);
       }
-
       ticking = false;
     });
     ticking = true;
@@ -323,7 +329,6 @@ onMounted(() => {
   checkDeviceType();
   calculateMaxScroll();
   bindTouchEvents();
-
   document.addEventListener('copy', onCopy);
   window.addEventListener('resize', calculateMaxScroll);
   window.addEventListener('resize', checkDeviceType);
@@ -345,7 +350,6 @@ onUnmounted(() => {
   window.removeEventListener('touchend', endDrag);
 });
 </script>
-
 
 <template>
   <div v-if="bookmarkStatus">
@@ -401,6 +405,8 @@ onUnmounted(() => {
       <div class="progress-container" v-if="!dialogVisible">
         <div class="progress-bar" :style="{ width: `${scrollProgress}%` }" />
       </div>
+      <el-backtop :visibility-height="200" :right="20" :bottom="80" />
+
 
       <!-- 悬浮目录按钮+面板 -->
       <div class="toc-float"
@@ -448,6 +454,10 @@ onUnmounted(() => {
         <el-skeleton :rows="3" animated v-if="articlesLoading" />
         <div class="article-card" v-else>
           <div id="write" class="article-content" v-html="htmlContent" />
+          <!-- 版权声明 -->
+          <div class="copyright-tip">
+            © Copyright by 花朝九日
+          </div>
         </div>
       </div>
 
@@ -625,7 +635,7 @@ onUnmounted(() => {
   height: 50vh;
   background: rgba(255, 255, 255, 0.85);
   border-radius: 20px;
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(3px);
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
   overflow: hidden;
   display: flex;
@@ -657,9 +667,12 @@ onUnmounted(() => {
   color: #666;
   cursor: pointer;
   transition: color 0.3s, background 0.3s;
+  border-radius: 25px;
+
 }
 
 .toc-item:hover, .toc-item.active {
+  border-radius: 25px;
   color: #fbcf4b;
   background: rgba(251, 207, 75, 0.1);
 }
@@ -676,7 +689,7 @@ onUnmounted(() => {
 
 /* 滚动条优化 */
 .toc-content::-webkit-scrollbar {
-  width: 0px;
+  width: 0;
 }
 
 /* 数学公式渐显 */
@@ -688,5 +701,12 @@ onUnmounted(() => {
   from { opacity: 0; transform: scale(0.95); }
   to { opacity: 1; transform: scale(1); }
 }
+.copyright-tip {
+  margin-top: 2rem;
+  padding: 1rem;
+  font-size: 13px;
+  text-align: center;
+}
+
 </style>
 
