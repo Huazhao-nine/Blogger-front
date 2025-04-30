@@ -68,6 +68,11 @@ const router = createRouter({
             path: '/start',
             component: () => import('@/pages/start.vue')
 
+        },
+        {
+            path: '/face',
+            component: () => import('@/pages/Face.vue')
+
         }
     ],
 
