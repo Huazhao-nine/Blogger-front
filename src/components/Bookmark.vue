@@ -59,7 +59,7 @@ const generateBookmark = async () => {
   const ctx = canvas.getContext("2d");
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.resetTransform();
-  ctx.font = '25px "LXGW WenKai TC Medium", sans-serif';
+  ctx.font = '25px "LXGWWenKaiTC-Medium", sans-serif';
   ctx.textAlign = "start";
   ctx.textBaseline = "top";
   // 设置 CSS 和高分辨率
@@ -74,7 +74,7 @@ const generateBookmark = async () => {
   // console.log('router',route);
   const url = WEB_URL + route.path;
   // const url = router.currentRoute.value.fullpath;
-  const additionalHeight = getCssHeight(title + author + url, ctx, maxWidth, lineHeight) + 250; // 固定内容高度 (摘录于、分割线、标题等)
+  const additionalHeight = getCssHeight(title + author + url, ctx, maxWidth, lineHeight) + 240; // 固定内容高度 (摘录于、分割线、标题等)
   console.log(additionalHeight)
   const cssHeight = getCssHeight(selection, ctx, maxWidth, lineHeight) + additionalHeight;
   const devicePixelRatio = window.devicePixelRatio || 1;
@@ -87,7 +87,7 @@ const generateBookmark = async () => {
   // 绘制背景
   ctx.fillStyle = "#000"; // 黑色背景
   ctx.fillRect(0, 0, cssWidth, cssHeight);
-  ctx.font = '25px "LXGW WenKai TC Medium", sans-serif'; // 字体大小
+  ctx.font = '25px "LXGWWenKaiTC-Medium", sans-serif'; // 字体大小
   ctx.fillStyle = "#FFFFFE"; // 白色文字
   ctx.textAlign = "start"; // 从左到右显示
   ctx.textBaseline = "top"; // 从顶部开始绘制
@@ -99,8 +99,8 @@ const generateBookmark = async () => {
   const qrCodeCanvas = document.createElement("canvas");
   await QRCode.toCanvas(qrCodeCanvas, url, {width: 200, margin: 0});
   // 将二维码绘制到右上角
-  ctx.drawImage(qrCodeCanvas, cssWidth - 120, padding, 90, 90);
-  currentY += lineHeight * 2.5; // 空一行
+  ctx.drawImage(qrCodeCanvas, cssWidth - 120, padding, 100, 100);
+  currentY += lineHeight * 2.4; // 空一行
   // 自动换行函数
   const wrapText = (context, text, x, y, maxWidth, lineHeight) => {
     const words = text.split(""); // 按字分割，适应中文
@@ -125,15 +125,15 @@ const generateBookmark = async () => {
   // 绘制选中文字
   currentY = wrapText(ctx, selection, padding, currentY, maxWidth, lineHeight);
   // 绘制虚线分割线
-  currentY += lineHeight / 2; // 空一点距离
+  currentY += lineHeight / 4; // 空一点距离
   ctx.strokeStyle = "#fff";
-  ctx.setLineDash([10, 10]); // 虚线样式
+  ctx.setLineDash([10, 5]); // 虚线样式
   ctx.beginPath();
   ctx.moveTo(padding, currentY);
   ctx.lineTo(cssWidth - padding, currentY);
   ctx.stroke();
   ctx.setLineDash([]); // 清除虚线样式
-  currentY += lineHeight; // 分割线下面留空间
+  currentY += padding; // 分割线下面留空间
   // 绘制标题、作者和网址
   ctx.fillText(title, padding, currentY);
   currentY += lineHeight;
@@ -158,11 +158,8 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
-/* 引入本地或 CDN 字体 */
-@import '../../node_modules/lxgw-wenkai-tc-web/style.css';
-
 body {
-  font-family: "LXGW WenKai TC Medium", sans-serif;
+  font-family: "LXGWWenKaiTC-Medium", sans-serif;
 }
 
 .preview-container {

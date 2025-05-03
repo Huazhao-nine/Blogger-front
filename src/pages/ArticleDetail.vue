@@ -708,5 +708,13 @@ onUnmounted(() => {
   text-align: center;
 }
 
+.preview-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  margin-top: 20px;
+  text-align: center;
+}
 </style>
 
