@@ -864,55 +864,69 @@ kbd:hover {
   background: var(--element-color-so-shallow);
 }
 
+/* 表格容器加滚动包裹层 */
+#write .table-container {
+  overflow-x: auto;
+  width: 100%;
+  margin: 1em auto;
+}
 
+/* 表格整体样式 */
 #write table {
   border-collapse: collapse;
-  margin: 1em auto; /* 表格自动居中 */
-  display: table;
-  width: 100%;      /* 可根据内容宽度自动调整，或者你也可以设置为100% */
+  width: 100%;
+  min-width: 600px; /* 最小宽度，避免列太挤 */
   font-size: 14px;
   background-color: #fff;
-  border: 1px solid #ccc;
-  border-radius: 6px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
   overflow: hidden;
-  box-shadow: 0 0 4px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  transition: box-shadow 0.3s ease;
+  table-layout: auto; /* 自动调整列宽 */
 }
 
 /* 表头样式 */
 #write table thead {
-  background-color: #f2f2f2;
+  background-color: #f5f7fa;
 }
 
 #write table thead th {
-  padding: 12px 16px;
-  font-weight: bold;
+  padding: 14px 18px;
+  font-weight: 600;
+  font-size: 15px;
   text-align: center;
-  color: #333;
-  border-bottom: 2px solid #ccc;
+  color: #222;
+  border-bottom: 2px solid #e0e0e0;
+  white-space: nowrap; /* 防止文字换行成竖排 */
 }
 
-/* 表体单元格样式 */
-#write table td {
-  padding: 10px 14px;
-  border-bottom: 1px solid #e2e2e2;
+/* 表体样式 */
+#write table tbody td {
+  padding: 12px 16px;
   text-align: center;
-  color: #444;
+  color: #333;
   background-color: #fff;
+  border-bottom: 1px solid #eaeaea;
+  white-space: nowrap; /* 防止文字换行成竖排 */
+  min-width: 80px;      /* 保证一定的列宽度 */
+  transition: background-color 0.2s ease;
 }
 
 /* 斑马条纹 */
 #write table tbody tr:nth-child(odd) td {
-  background-color: #f9f9f9;
+  background-color: #fcfcfc;
 }
 
-/* 鼠标悬停行高亮 */
+/* 悬停效果 */
 #write table tbody tr:hover td {
-  background-color: #f1f8ff;
+  background-color: #eaf4ff;
 }
 
-/* 表格边框优化（可选） */
-#write table th, #write table td {
-  border-right: 1px solid #ddd;
+/* 边框优化 */
+#write table th,
+#write table td {
+  border-right: 1px solid #eaeaea;
 }
 
 #write table tr td:last-child,
@@ -920,32 +934,14 @@ kbd:hover {
   border-right: none;
 }
 
-/** 表格内的单元格*/
-#write table tr th,
-#write table tr td {
-  font-size: 14px;
-  color: #000;
+/* 移动端自适应横向滚动 */
+@media (max-width: 768px) {
+  #write table {
+    display: table;
+    white-space: nowrap;
+  }
 }
 
-#write .footnotes {
-  padding: 10px;
-  font-size: 14px;
-  border-radius: 6px;
-  border: 0.8px solid var(--element-color-deep);
-}
-
-#write table.md-table {
-  overflow: hidden;
-}
-
-#write table thead {
-  border-top: 1px solid #dedddd;
-  border-bottom: 1px solid #dedddd;
-}
-
-#write table tbody {
-  border-bottom: 1px solid #dedddd;
-}
 
 /* 脚注文字 */
 #write .footnote-word {
