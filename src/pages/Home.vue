@@ -232,6 +232,7 @@ onBeforeUnmount(() => {
   white-space: nowrap;
   overflow: hidden;
   display: inline-block;
+  line-height: 2.0em;
 }
 
 @keyframes fadeIn {
