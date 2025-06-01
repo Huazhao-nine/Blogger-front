@@ -113,7 +113,7 @@ onBeforeUnmount(() => {
           {{cpuInfo}}
         </p>
         <p class="article-summary">
-          {{gpuInfo}}
+<!--          {{gpuInfo}}-->
         </p>
         <p class="article-summary">
           {{memoryInfo}}
