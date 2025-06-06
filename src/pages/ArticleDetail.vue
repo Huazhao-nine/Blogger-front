@@ -16,7 +16,7 @@ import { useDraggable } from '@/api/useTouchScroll.js';
 import { formatDate } from '../api/globals.js';
 import Bookmark from '@/components/Bookmark.vue';
 import { throttle } from 'lodash-es';
-import '@/assets/phycat-orange.css';
+import '@/assets/phycat-plusblue.css';
 import { useIntersectionObserver } from '@vueuse/core';
 
 const articlesLoading = ref(false);

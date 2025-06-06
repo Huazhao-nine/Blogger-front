@@ -61,11 +61,11 @@ html {
   }
 
   body {
-    width: 21cm;
+    /*width: 21cm;*/
     /* 设置页面宽度为A4宽度 */
-    height: 29.7cm;
+    /*height: 29.7cm;*/
     /* 设置页面高度为A4高度 */
-    margin: 1cm;
+    /*margin: 1cm;*/
     /* 设置页面边距 */
   }
 
