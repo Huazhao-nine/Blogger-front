@@ -73,6 +73,11 @@ const router = createRouter({
             path: '/face',
             component: () => import('@/pages/Face.vue')
 
+        },
+        {
+            path: '/program',
+            component: () => import('@/pages/Program.vue')
+
         }
     ],
 
