@@ -17,6 +17,9 @@ export default defineConfig({
       resolvers: [ElementPlusResolver()]
     }),
     VitePWA({
+      workbox: {
+        maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
+      },
       registerType: 'autoUpdate', // 自动更新 Service Worker
       injectRegister: 'auto',
       manifest: {
@@ -39,7 +42,7 @@ export default defineConfig({
   ],
   // 自定义 Service Worker 配置
   workbox: {
-    maximumFileSizeToCacheInBytes: 10 * 1024 * 1024,
+    maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
     cachePrefix: 'HuaZhao-pwa-cache-' + new Date().getTime(), // 每次部署时更新缓存前缀
     // 选择适合的缓存策略
     runtimeCaching: [
