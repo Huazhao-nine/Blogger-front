@@ -14,7 +14,7 @@
           v-else
           v-for="category in categories"
           :key="category.id"
-          @click="getCategoryDetail(category.id)"
+          @click="handleCategoryClick(category.id)"
       >
         <top-button :isPinned="true" :desc=formatDate(category.createdAt) />
         <div class="article-content">
@@ -28,24 +28,26 @@
 
 <script setup>
 import {onBeforeUnmount, onMounted, ref} from 'vue';
-import {ElNotification} from 'element-plus';
 import {fetchWallpaper} from '@/api/WallpaperService.js';
 import TopButton from "@/components/TopButton.vue";
-import {useRouter} from "vue-router";
 import WallpaperCard from "@/components/WallpaperCard.vue";
-import {getAllCategories, getCategoryDetail} from "@/api/CategoryService.js";
+import {getAllCategories} from "@/api/CategoryService.js";
 import {useDraggable} from "@/api/useTouchScroll.js";
 import {formatDate} from "@/api/globals.js";
 import {canEdit, goToEdit} from "@/api/RoleService.js";
 import {useAuthStore} from "@/stores/auth.js";
-
+import { useRouter } from 'vue-router'
+const router = useRouter()
+const handleCategoryClick = (id) => {
+  router.push(`/Category/${id}`)
+}
 const articlesLoading = ref(false);
 const categories = ref([]);
 
 const getArticleList = async () => {
   articlesLoading.value = true;
   const res = await getAllCategories();
-  categories.value = res.data.data;
+  categories.value = res.data;
   // console.log(categories.value)
   articlesLoading.value = false;
 };

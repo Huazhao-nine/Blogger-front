@@ -23,7 +23,6 @@
 </template>
 <script setup>
 import {onBeforeUnmount, onMounted, ref} from 'vue';
-import {ElFormItem, ElInput, ElMessageBox, ElNotification} from 'element-plus';
 import {fetchWallpaper, getWallPaper} from '@/api/WallpaperService.js';
 import AboutMe from "@/components/AboutMe.vue";
 import {useRoute, useRouter} from "vue-router";
@@ -42,7 +41,7 @@ const imageData = ref('')
 const getUserImg = async () => {
   if (auth.isAuthenticated){
     const res = await getQQAvatar(auth.user.email)
-    imageData.value = 'data:image/jpeg;base64,' +  res.data.msg
+    imageData.value = 'data:image/jpeg;base64,' +  res.msg
   }
 }
 
@@ -104,9 +103,9 @@ const checkLoginStatus = async () => {
 
   const res = await axios.get(url);
   // console.log(res.data.openid);
-  const openidRes = await getUserByopenid(res.data.openid);
+  const openidRes = await getUserByopenid(res.openid);
     console.log(openidRes);
-     if (openidRes.data.code !== 200) {
+     if (openidres.code !== 200) {
     ElMessageBox.prompt('请输入你想要接受消息的邮箱', 'QQ绑定', {
       confirmButtonText: '确认',
       cancelButtonText: '取消',
@@ -129,20 +128,20 @@ const checkLoginStatus = async () => {
           });
           const QQRes = await QQLogin(QQLoginPak);
           console.log(QQRes);
-          if (QQRes.data.code === 200) {
+          if (QQres.code === 200) {
             ElNotification({
               title: '成功',
-              message: QQRes.data.msg,
+              message: QQres.msg,
               type: 'success',
             });
-            auth.setToken(QQRes.data.data.token);
-            auth.setUser(QQRes.data.data);
+            auth.setToken(QQres.data.token);
+            auth.setUser(QQres.data);
             await router.push('/About');
             router.go(0);
           } else {
             ElNotification({
               title: '错误',
-              message: res.data.msg,
+              message: res.msg,
               type: 'error',
             });
           }
@@ -153,8 +152,8 @@ const checkLoginStatus = async () => {
          message: '登录成功',
          type: 'success',
        });
-       auth.setToken(openidRes.data.data.token);
-       auth.setUser(openidRes.data.data);
+       auth.setToken(openidres.data.token);
+       auth.setUser(openidres.data);
        await router.push('/About');
        router.go(0);
      }

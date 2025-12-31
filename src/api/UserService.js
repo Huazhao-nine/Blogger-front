@@ -1,5 +1,4 @@
 import request from "@/api/request.js";
-import axios from "axios";
 
 export const sendValidateCode = (email) => {
     return request.get('/sendValidateCode', {

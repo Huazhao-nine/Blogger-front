@@ -1,9 +1,6 @@
 import request from "@/api/request.js";
 import router from "@/router/index.js";
-import {ElNotification} from "element-plus";
-import {useAuthStore} from "@/stores/auth.js";
 
-const auth = useAuthStore()
 export const getTheArticlesForHome = (page, pageSize) => {
     return request.get('/getTheArticlesForHome', {
         params: {
@@ -46,14 +43,14 @@ export const getArticlesByCategory = (id) => {
 
 export const getArticlesDetail = async (articleId, token) => {
     const response = await getSlugById(articleId);
-    if (response.data.code === 200) {
+    if (response.code === 200) {
         // console.log("slug获取成功")
-        const slug = response.data.msg;
+        const slug = response.msg;
         await router.push(`/Article/${articleId}/${slug}`);
     }else {
         ElNotification({
             title: '错误',
-            message: response.data.msg,
+            message: response.msg,
             type: 'error',
         });
     }

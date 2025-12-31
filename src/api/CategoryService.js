@@ -1,5 +1,4 @@
 import request from "@/api/request.js";
-import router from "@/router/index.js";
 
 export const getAllCategories = () => {
     return request.get('/Category/getAll')
@@ -9,7 +8,7 @@ export const addCategory = (Category) => {
     return request.post('/Category/add', Category);
 };
 
-export const getCategoryDetail = async (categoryId) => {
+// export const getCategoryDetail = async (categoryId) => {
     // const response = await getArticleByID(articleId);
     // const article = response.data.data;
     // if (firstClick.value){
@@ -20,5 +19,5 @@ export const getCategoryDetail = async (categoryId) => {
     //   });
     //   firstClick.value = false
     // }
-    await router.push(`/Category/${categoryId}`);
-};
+    // await router.push(`/Category/${categoryId}`);
+// };

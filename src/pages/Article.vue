@@ -30,7 +30,6 @@
 
 <script setup>
 import {onBeforeUnmount, onMounted, ref} from 'vue';
-import {ElNotification} from 'element-plus';
 import {fetchWallpaper} from '@/api/WallpaperService.js';
 import {getArticlesByCategory, getArticlesDetail} from '@/api/ArticleService.js';
 import TopButton from "@/components/TopButton.vue";
@@ -49,7 +48,7 @@ const getArticleList = async () => {
   articlesLoading.value = true;
   const id = route.params.id;// 从路由参数中提取 articleId
   const res = await getArticlesByCategory(id);
-  articles.value = res.data.data;
+  articles.value = res.data;
   // console.log(articles)
   articlesLoading.value = false;
 };

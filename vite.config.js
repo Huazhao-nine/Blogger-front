@@ -18,6 +18,14 @@ export default defineConfig({
       algorithm: 'gzip', // 也可以用 'brotliCompress'
       ext: '.gz',
     }),
+    // 新增 Brotli 压缩 (需要服务器支持)
+    viteCompression({
+      verbose: true,
+      disable: false,
+      threshold: 10240,
+      algorithm: 'brotliCompress',
+      ext: '.br',
+    }),
     AutoImport({
       resolvers: [ElementPlusResolver()]
     }),
@@ -28,7 +36,7 @@ export default defineConfig({
       // 自定义 Service Worker 配置
       workbox: {
         maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
-        cacheId: 'HuaZhao-pwa-cache-' + new Date().getTime(), // 每次部署时更新缓存前缀
+        cacheId: 'HuaZhao-pwa-cache-v1.2.1',
         // 选择适合的缓存策略
         runtimeCaching: [
           {
@@ -102,6 +110,7 @@ export default defineConfig({
     proxy: {
       '/api': {
         target: 'http://localhost:8182/', //跨域地址
+        // target: 'http://192.168.0.118:8182/', //跨域地址
         // target: 'http://localhost:8088/', //跨域地址
         changeOrigin: true, //支持跨域
         rewrite: (path) => path.replace(/^\/api/, '') //重写路径,替换/api
@@ -122,9 +131,11 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: {
-          'three-lib': ['three'],
-          'markdown-lib': ['marked', 'highlight.js', 'katex'],
-          'element-plus': ['element-plus'],
+          'vue-vendor': ['vue', 'vue-router', 'pinia', 'axios'], // 核心框架
+          'element-plus': ['element-plus', '@element-plus/icons-vue'], // UI库及图标
+          'three-lib': ['three'], // 3D库
+          'markdown-lib': ['marked', 'highlight.js', 'katex'], // Markdown库
+          // lodash-es 支持 tree-shaking，通常不需要单独打包，除非到处都在用
         }
       }
     }

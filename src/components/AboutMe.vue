@@ -14,9 +14,9 @@ const getInfo = async () => {
   let res2 = await getGpuInfo()
   let res3 = await getMemoryInfo()
   let res4 = await getCpuTemp()
-  cpuInfo.value = res1.data.msg + " Temp: " + getCpuTemperatures(res4.data)
-  gpuInfo.value = res2.data.msg
-  memoryInfo.value = res3.data.msg
+  cpuInfo.value = res1.msg + " Temp: " + getCpuTemperatures(res4)
+  gpuInfo.value = res2.msg
+  memoryInfo.value = res3.msg
 }
 // 解析出 CPU 温度
 const getCpuTemperatures = (data) => {

@@ -1,6 +1,5 @@
 <script setup>
 import {onMounted, onUnmounted, ref} from 'vue';
-import {ElButton, ElForm, ElFormItem, ElInput, ElNotification, ElOption, ElSelect, ElSwitch, ElTag} from "element-plus";
 import 'highlight.js/styles/atom-one-light.css'; // 在此引入高亮样式
 import WallpaperCard from "@/components/WallpaperCard.vue";
 import {addArticle, editArticle, getArticleByID} from "@/api/ArticleService.js";
@@ -17,9 +16,9 @@ const getArticle = async () => {
   const id = route.params.id;// 从路由参数中提取 articleId
   if (id !== undefined){
     const res = await getArticleByID(id, auth.token);
-    if (res.data.code === 200) {
-      editedArticle.value = res.data.data;
-      articleData.value = res.data.data;
+    if (res.code === 200) {
+      editedArticle.value = res.data;
+      articleData.value = res.data;
       isAdd.value = false;
     }else {
       ElNotification({
@@ -84,16 +83,16 @@ const addCate = async () => {
   }
   const res = await addCategory(category);
   // console.log(res)
-  if (res.data.code === 200) {
+  if (res.code === 200) {
     ElNotification({
       title: '成功',
-      message: res.data.msg,
+      message: res.msg,
       type: 'success',
     });
   }
   else ElNotification({
     title: '错误',
-    message: res.data.msg,
+    message: res.msg,
     type: 'error',
   });
   await getAll()
@@ -102,7 +101,7 @@ const addCate = async () => {
 
 const getAll = async () => {
   const res = await getAllCategories()
-  categories.value = res.data.data
+  categories.value = res.data
   // console.log(categories.value)
 }
 
@@ -226,10 +225,10 @@ const submitArticle = async () => {
     let pwd = articleData.value.pwd === '' ? '-1' : articleData.value.pwd
     res = await editArticle(editedArticle.value, pwd);
   }
-    if (res.data.code === 200) {
+    if (res.code === 200) {
       ElNotification({
         title: '成功',
-        message: res.data.msg,
+        message: res.msg,
         type: 'success',
       });
       // 重置表单
@@ -247,7 +246,7 @@ const submitArticle = async () => {
   else {
     ElNotification({
       title: '错误',
-      message: res.data.msg,
+      message: res.msg,
       type: 'error',
     });
   }

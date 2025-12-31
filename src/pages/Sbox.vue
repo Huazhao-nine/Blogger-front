@@ -165,18 +165,18 @@ const startEvaluation = async () => {
     if (indicator === 'getSelfInverseProperty') displayIndicator = '自对合性';
     let resultText = `${displayIndicator} : `
     // 处理ANF数组（代数正规形）
-    if (indicator === 'getANF' && Array.isArray(res.data.data)) {
+    if (indicator === 'getANF' && Array.isArray(res.data)) {
       resultText = `${displayIndicator}: <br>`;  // 确保第一行有换行
       // 去除空值并格式化ANF项
-      const anfFormatted = res.data.data.filter(item => item != null) // 去除空值
+      const anfFormatted = res.data.filter(item => item != null) // 去除空值
           .map((item, index) => `ANF-${index}: ${item.trim().replace(/\s+/g, ' ')}`) // 去除多余空格
           .join("<br>"); // 使用 <br> 标签来替代换行符，每个ANF项占一行
       resultText += anfFormatted ? anfFormatted : "无有效结果";
     }
     // 处理雪崩特性（二维数组）
-    else if (indicator === 'getDSAC' && Array.isArray(res.data.data) && Array.isArray(res.data.data[0])) {
+    else if (indicator === 'getDSAC' && Array.isArray(res.data) && Array.isArray(res.data[0])) {
       // 构造HTML表格
-      const matrix = res.data.data.map((row, rowIndex) => {
+      const matrix = res.data.map((row, rowIndex) => {
         // 忽略第一行空行
         if (rowIndex === 0 && row.every(cell => cell === null || cell === '')) {
           return ''; // 返回空字符串表示跳过这一行
@@ -188,11 +188,11 @@ const startEvaluation = async () => {
         return `<tr>${rowHtml}</tr>`; // 每行用<tr>包裹
       }).filter(row => row !== '').join(''); // 过滤掉空行
 
-      resultText += `<table><thead><tr>${new Array(res.data.data[0].length).fill('<th></th>').join('')}</tr></thead><tbody>${matrix}</tbody></table>`;
+      resultText += `<table><thead><tr>${new Array(res.data[0].length).fill('<th></th>').join('')}</tr></thead><tbody>${matrix}</tbody></table>`;
     } else {
       // 默认处理为JSON格式输出
       console.log(res.data)
-      resultText += JSON.stringify(res.data.data) || "无有效结果";
+      resultText += JSON.stringify(res.data) || "无有效结果";
     }
 
     // 将处理后的结果推送到评估结果

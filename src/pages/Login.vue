@@ -67,7 +67,6 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue';
-import { ElButton, ElForm, ElFormItem, ElInput, ElNotification, ElDivider } from "element-plus";
 import WallpaperCard from "@/components/WallpaperCard.vue";
 import {onBeforeRouteUpdate, useRoute, useRouter} from "vue-router";
 import {login, QQLogin, sendValidateCode} from "@/api/UserService.js";
@@ -125,10 +124,10 @@ const sendValidate = async () => {
   }
   if (isValidateCodeDisabled.value) return;
   const res = await sendValidateCode(formData.value.email + '@qq.com');
-  if (res.data.code === 200) {
+  if (res.code === 200) {
     ElNotification({
       title: '成功',
-      message: res.data.msg,
+      message: res.msg,
       type: 'success',
     });
     isValidateCodeDisabled.value = true;
@@ -148,7 +147,7 @@ const sendValidate = async () => {
   } else {
     ElNotification({
       title: '错误',
-      message: res.data.msg,
+      message: res.msg,
       type: 'error',
     });
   }
@@ -196,19 +195,19 @@ const submitLogin = async () => {
   }
 
   const res = await login(formData.value);
-  if (res.data.code === 200) {
+  if (res.code === 200) {
     ElNotification({
       title: '成功',
-      message: res.data.msg,
+      message: res.msg,
       type: 'success',
     });
-    auth.setToken(res.data.data.token);
-    auth.setUser(res.data.data);
+    auth.setToken(res.data.token);
+    auth.setUser(res.data);
     await router.back();
   } else {
     ElNotification({
       title: '错误',
-      message: res.data.msg,
+      message: res.msg,
       type: 'error',
     });
   }
@@ -235,12 +234,18 @@ onMounted(() => {
   calculateMaxScroll();
   bindTouchEvents();
   window.addEventListener('resize', calculateMaxScroll);
+
   isLogin();
 });
 
 onUnmounted(() => {
   unbindTouchEvents();
   window.removeEventListener('resize', calculateMaxScroll);
+  // 清除倒计时定时器
+  if (timer) {
+    clearInterval(timer);
+    timer = null;
+  }
 });
 </script>
 

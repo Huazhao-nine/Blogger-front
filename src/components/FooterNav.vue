@@ -1,20 +1,24 @@
 <script setup>
-// 跳转页面
-import {useRouter} from "vue-router";
+import { useRouter } from "vue-router";
+const router = useRouter()
 
-const router1 = useRouter()
-
-const goToPage = (page) => {
-  router1.push(`/${page}`);  // 使用 router.push 进行页面跳转
-};
+// 直接用 name 跳转更稳定 (需要在 router/index.js 里定义 name)
+const navItems = [
+  { label: 'Home', name: 'Home' }, // 对应 router 里的 name: 'Home'
+  { label: 'Category', name: 'Category' },
+  { label: 'About', name: 'About' }
+]
 </script>
 
 <template>
-  <!-- 底部导航栏 -->
   <div class="footer-nav">
-    <button @click="goToPage('')">Home</button>
-    <button @click="goToPage('Category')">Category</button>
-    <button @click="goToPage('About')">About</button>
+    <button
+        v-for="item in navItems"
+        :key="item.name"
+        @click="router.push({ name: item.name })"
+    >
+      {{ item.label }}
+    </button>
   </div>
 </template>
 
@@ -24,8 +28,6 @@ const goToPage = (page) => {
   display: flex;
   justify-content: space-evenly; /* 改为均匀分布 */
   align-items: center; /* 垂直居中 */
-  position: fixed;
-  bottom: 0;
   background: #EAEAEA;
   backdrop-filter: blur(10px);
   border-top: 1px solid #EAEAEA;
@@ -33,6 +35,17 @@ const goToPage = (page) => {
   border-radius: 25px;
   margin: 0; /* 确保没有额外的外边距 */
   width: calc(100% - 20px); /* 如果需要控制内边距，确保宽度自适应 */
+  position: fixed;
+  bottom: 20px; /* 稍微离底边有点距离好看点 */
+  /* 居中方案 */
+  left: 20px;
+  right: 20px;
+
+  z-index: 999; /* ❗关键：防止被文章内容遮挡 */
+
+  /* 玻璃拟态增强 */
+  background: rgba(234, 234, 234, 0.8);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
 .footer-nav button {
   flex: 1; /* 按钮等分 */

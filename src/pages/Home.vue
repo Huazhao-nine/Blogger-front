@@ -59,7 +59,7 @@ const welcome = () => {
 const getArticleList = async () => {
   articlesLoading.value = true;
   const res = await getTheArticlesForHome(HomePage.value, HomeArticles.value);
-  articles.value = res.data.data;
+  articles.value = res.data;
   // console.log(articles.value);
   articlesLoading.value = false;
 };

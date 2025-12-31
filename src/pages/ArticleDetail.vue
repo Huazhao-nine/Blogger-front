@@ -2,9 +2,7 @@
 import { nextTick, onMounted, onUnmounted, ref, reactive } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { getArticleByID, getArticleByPwd } from '@/api/ArticleService.js';
-import { ElNotification } from 'element-plus';
 import { fetchWallpaper } from '@/api/WallpaperService.js';
-import { Clock, Close, EditPen, Postcard, User, View, Menu } from '@element-plus/icons-vue';
 import { marked } from 'marked';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
@@ -161,11 +159,11 @@ const getArticle = async () => {
   articlesLoading.value = true;
   const id = route.params.id;
   const res = await getArticleByID(id, auth.token);
-  if (res.data.code !== 200) {
-    ElNotification({ title: '错误', message: res.data.msg, type: 'error' });
+  if (res.code !== 200) {
+    ElNotification({ title: '错误', message: res.msg, type: 'error' });
     dialogVisible.value = true;
   } else {
-    article.value = res.data.data;
+    article.value = res.data;
     await getMarkdownContent();
     articlesLoading.value = false;
   }
@@ -174,13 +172,13 @@ const getArticle = async () => {
 const submitPwd = async () => {
   const id = route.params.id;
   const res = await getArticleByPwd(id, pwd.value);
-  if (res.data.code === 200) {
-    article.value = res.data.data;
+  if (res.code === 200) {
+    article.value = res.data;
     await getMarkdownContent();
     articlesLoading.value = false;
     dialogVisible.value = false;
   } else {
-    ElNotification({ title: '错误', message: res.data.msg, type: 'error' });
+    ElNotification({ title: '错误', message: res.msg, type: 'error' });
   }
 };
 
@@ -207,10 +205,10 @@ const edit = async () => {
   }
 
   const res = await isAuthor(article.value, auth.user.id);
-  if (res.data.code === 200) {
+  if (res.code === 200) {
     await router.push(`/Edit/${article.value.id}`);
   } else {
-    ElNotification({ title: '错误', message: res.data.msg, type: 'error' });
+    ElNotification({ title: '错误', message: res.msg, type: 'error' });
   }
 };
 

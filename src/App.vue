@@ -2,8 +2,8 @@
 import {computed, ref, onMounted} from 'vue' // 确保导入 computed
 import {useRoute} from 'vue-router'
 import {zhCn} from "element-plus/es/locale/index";
-import FooterNav from "@/components/footerNav.vue";
-import {ElNotification} from "element-plus";
+import FooterNav from "@/components/FooterNav.vue";
+
 
 const route = useRoute()
 const pcModel = ref(true);

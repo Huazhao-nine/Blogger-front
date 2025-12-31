@@ -1,0 +1,21 @@
+:root {
+    /* 主色调 */
+    --primary-color: #fbcf4b; /* 你常用的那个黄色 */
+    --accent-color: #4D81DA; /* 蓝色 */
+
+    /* 背景色 */
+    --bg-page: #f4f4f4;
+    --bg-card: #FFFFFE;
+
+    /* 文字颜色 */
+    --text-main: #333333;
+    --text-secondary: #666666;
+
+    /* 间距 */
+    --spacing-sm: 8px;
+    --spacing-md: 16px;
+    --spacing-lg: 24px;
+
+    /* 圆角 */
+    --radius-card: 25px;
+}

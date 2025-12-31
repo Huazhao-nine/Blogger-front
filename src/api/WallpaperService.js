@@ -1,5 +1,4 @@
 import request from "@/api/request.js";
-import {ElNotification} from "element-plus";
 
 /**
  * 获取每日壁纸
@@ -12,8 +11,8 @@ export const getWallPaper = () => {
 export const fetchWallpaper = async (wallpaperUrl) => {
     try {
         let imageUrl = await getWallPaper();
-        const wallpaperData = imageUrl.data.msg;
-        if (imageUrl.data.code === 200) {
+        const wallpaperData = imageUrl.msg;
+        if (imageUrl.code === 200) {
             const parsedData = JSON.parse(wallpaperData);
             const baseUrl = 'https://www.bing.com';
             imageUrl = baseUrl + parsedData.images[0].url;

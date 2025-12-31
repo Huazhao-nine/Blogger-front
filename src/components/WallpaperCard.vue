@@ -23,7 +23,7 @@ const wallpaperUrl = ref('');
 const fetchWallpaper = async () => {
   try {
     let imageUrl = await getWallPaper();
-    const wallpaperData = imageUrl.data.msg;
+    const wallpaperData = imageUrl.msg;
     const parsedData = JSON.parse(wallpaperData);
     const baseUrl = 'https://www.bing.com';
     imageUrl = baseUrl + parsedData.images[0].url;
