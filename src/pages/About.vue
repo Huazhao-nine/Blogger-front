@@ -152,8 +152,8 @@ const checkLoginStatus = async () => {
          message: '登录成功',
          type: 'success',
        });
-       auth.setToken(openidres.data.token);
-       auth.setUser(openidres.data);
+       auth.setToken(openidres.token);
+       auth.setUser(openidres);
        await router.push('/About');
        router.go(0);
      }
