@@ -134,10 +134,9 @@ const checkLoginStatus = async () => {
               message: QQres.msg,
               type: 'success',
             });
-            auth.setToken(QQres.data.token);
-            auth.setUser(QQres.data);
-            await router.push('/About');
-            router.go(0);
+            auth.setToken(QQres.token);
+            auth.setUser(QQres);
+            await router.replace('/About');
           } else {
             ElNotification({
               title: '错误',
@@ -155,7 +154,6 @@ const checkLoginStatus = async () => {
        auth.setToken(openidres.token);
        auth.setUser(openidres);
        await router.push('/About');
-       router.go(0);
      }
 
   }
