@@ -102,8 +102,8 @@ const checkLoginStatus = async () => {
       `need_openid=1`;
 
   const res = await axios.get(url);
-  // console.log(res.data.openid);
-  const openidRes = await getUserByopenid(res.openid);
+  console.log(res);
+  const openidRes = await getUserByopenid(res.data.openid);
     console.log(openidRes);
      if (openidres.code !== 200) {
     ElMessageBox.prompt('请输入你想要接受消息的邮箱', 'QQ绑定', {
