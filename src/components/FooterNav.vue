@@ -21,47 +21,57 @@ const navItems = [
     </button>
   </div>
 </template>
-
 <style scoped>
-/* 底部导航栏：亚克力透明效果 */
 .footer-nav {
   display: flex;
-  justify-content: space-evenly; /* 改为均匀分布 */
-  align-items: center; /* 垂直居中 */
-  background: #EAEAEA;
+  justify-content: space-evenly;
+  align-items: center;
+
+  /* 固定定位 */
+  position: fixed;
+
+  /* 底部距离：留出一点空隙，做成悬浮感，不要贴底 */
+  bottom: 20px;
+
+  /* 【核心修复】强制左右距离相等，实现绝对居中 */
+  left: 20px;  /* 左边距 20px */
+  right: 20px; /* 右边距 20px */
+  width: auto; /* 让宽度自动计算 (100% - 40px) */
+  margin: 0;   /* 清除默认边距 */
+
+  /* 样式保持不变 */
+  background: rgba(234, 234, 234, 0.8); /* 稍微调整透明度 */
   backdrop-filter: blur(10px);
   border-top: 1px solid #EAEAEA;
   padding: 10px 0;
   border-radius: 25px;
-  margin: 0; /* 确保没有额外的外边距 */
-  width: calc(100% - 20px); /* 如果需要控制内边距，确保宽度自适应 */
-  position: fixed;
-  bottom: 20px; /* 稍微离底边有点距离好看点 */
-  /* 居中方案 */
-  left: 20px;
-  right: 20px;
 
-  z-index: 999; /* ❗关键：防止被文章内容遮挡 */
+  /* 层级：确保在最上层，不会被文章遮挡 */
+  z-index: 999;
 
-  /* 玻璃拟态增强 */
-  background: rgba(234, 234, 234, 0.8);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  /* 阴影优化：增加层次感 */
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
+
 .footer-nav button {
-  flex: 1; /* 按钮等分 */
-  min-width: 80px; /* 可根据需要调整最小宽度 */
+  flex: 1;
   text-align: center;
   background: none;
   border: none;
   padding: 10px;
   font-size: 16px;
   color: #555;
-  transition: background-color 0.3s;
+  transition: all 0.3s;
+  /* 增加点击区域圆角 */
+  border-radius: 12px;
 }
+
 .footer-nav button:hover {
-  background-color: rgba(255, 255, 255, 0.1); /* 悬浮时透明背景 */
+  background-color: rgba(255, 255, 255, 0.5);
+  transform: translateY(-2px); /* 微动效 */
 }
-.footer-nav button:focus {
-  outline: none;
+
+.footer-nav button:active {
+  transform: scale(0.95);
 }
 </style>
