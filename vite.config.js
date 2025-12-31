@@ -28,7 +28,7 @@ export default defineConfig({
       // 自定义 Service Worker 配置
       workbox: {
         maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
-        cachePrefix: 'HuaZhao-pwa-cache-' + new Date().getTime(), // 每次部署时更新缓存前缀
+        cacheId: 'HuaZhao-pwa-cache-' + new Date().getTime(), // 每次部署时更新缓存前缀
         // 选择适合的缓存策略
         runtimeCaching: [
           {
@@ -70,7 +70,7 @@ export default defineConfig({
         skipWaiting: true, // 强制立即激活新版本的 SW
         clientsClaim: true, // 确保新 SW 能立即控制页面
         // 启用清理旧缓存的功能
-        cleanOutdatedCaches: true,
+        cleanupOutdatedCaches: true,
       },
       registerType: 'autoUpdate', // 自动更新 Service Worker
       injectRegister: 'auto',
