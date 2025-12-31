@@ -2,6 +2,15 @@ import {createRouter, createWebHashHistory} from 'vue-router';
 
 const router = createRouter({
     history: createWebHashHistory(import.meta.env.BASE_URL),
+    scrollBehavior(to, from, savedPosition) {
+        if (savedPosition) {
+            // 如果是浏览器的“后退”按钮，则回到之前的滚动位置
+            return savedPosition
+        } else {
+            // 否则跳转新页面时，强制滚动到顶部
+            return { top: 0, behavior: 'smooth' } // behavior: 'smooth' 提供平滑滚动效果
+        }
+    },
     routes: [
         {
             path: '/:pathMatch(.*)*',

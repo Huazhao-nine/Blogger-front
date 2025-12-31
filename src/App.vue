@@ -25,15 +25,15 @@ onMounted(() => {
 <template>
   <router-view v-slot="{ Component }">
 
-  <el-config-provider :locale="zhCn">
-    <div>
-      <!-- 使用 router-view 的 v-slot 来包裹过渡动画 -->
+    <el-config-provider :locale="zhCn">
+      <div>
+        <!-- 使用 router-view 的 v-slot 来包裹过渡动画 -->
         <transition :name="transitionName" mode="out-in">
           <component :is="Component" />
         </transition>
-      <footer-nav v-if="pcModel"></footer-nav>
-    </div>
-  </el-config-provider>
+        <footer-nav v-if="pcModel"></footer-nav>
+      </div>
+    </el-config-provider>
   </router-view>
 </template>
 

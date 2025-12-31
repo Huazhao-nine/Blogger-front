@@ -30,7 +30,6 @@
 
 <script setup>
 import {onBeforeUnmount, onMounted, ref} from 'vue';
-import {ElNotification} from 'element-plus';
 import {HomeArticles, HomePage} from '@/api/globals.js';
 import {fetchWallpaper, getWallPaper} from '@/api/WallpaperService.js';
 import {getArticleByID, getArticlesDetail, getTheArticlesForHome} from '@/api/ArticleService.js';
