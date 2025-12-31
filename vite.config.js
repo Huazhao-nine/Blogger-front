@@ -5,11 +5,19 @@ import {ElementPlusResolver} from 'unplugin-vue-components/resolvers'
 import {defineConfig} from 'vite'
 import vue from '@vitejs/plugin-vue'
 import {VitePWA} from "vite-plugin-pwa";
-
+import viteCompression from 'vite-plugin-compression';
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
     vue(),
+    // 添加压缩插件
+    viteCompression({
+      verbose: true, // 控制台输出压缩结果
+      disable: false,
+      threshold: 10240, // 体积大于 10kb 才压缩
+      algorithm: 'gzip', // 也可以用 'brotliCompress'
+      ext: '.gz',
+    }),
     AutoImport({
       resolvers: [ElementPlusResolver()]
     }),

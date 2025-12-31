@@ -1,4 +1,32 @@
 /* color palette from <https://github.com/vuejs/theme> */
+/* src/assets/base.css 或 front.css */
+
+html, body {
+  /* 禁用 iOS Safari 的弹性滚动回弹效果（可选，看个人喜好） */
+  /* overscroll-behavior: none; */
+
+  /* 优化文字渲染清晰度 */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* 禁止图片和链接被长按选中（类似App体验） */
+img, a {
+  -webkit-user-drag: none;
+  user-select: none;
+  -webkit-touch-callout: none; /* 禁用长按菜单 */
+}
+
+/* 移除移动端点击元素时的高亮背景色 */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* 针对按钮增加点击反馈（因为移除了默认高亮，需要自己加） */
+.el-button:active, .clickable-card:active {
+  opacity: 0.8;
+  transform: scale(0.98); /* 轻微缩放反馈 */
+}
 :root {
   --vt-c-white: #ffffff;
   --vt-c-white-soft: #f8f8f8;
