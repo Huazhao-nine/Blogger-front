@@ -17,8 +17,52 @@ export default defineConfig({
       resolvers: [ElementPlusResolver()]
     }),
     VitePWA({
+      // 自定义 Service Worker 配置
       workbox: {
         maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
+        cachePrefix: 'HuaZhao-pwa-cache-' + new Date().getTime(), // 每次部署时更新缓存前缀
+        // 选择适合的缓存策略
+        runtimeCaching: [
+          {
+            urlPattern: /\/assets\/.*\.(?:js|css|png|jpg|woff2|eot|ttf|svg)/,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'assets-cache',
+              expiration: {
+                maxEntries: 50,
+                maxAgeSeconds: 24 * 60 * 60, // 缓存有效期为 1 天
+              },
+            },
+          },
+          {
+            urlPattern: /.*\.(?:html|json)/,
+            handler: 'NetworkFirst', // 对于页面内容使用 NetworkFirst 策略
+            options: {
+              cacheName: 'html-cache',
+              expiration: {
+                maxEntries: 100,
+                maxAgeSeconds: 60 * 60 * 24, // 缓存有效期为 1 天
+              },
+            },
+          },
+          {
+            urlPattern: /https:\/\/www\.bing\.com\/th\?id=[^&]+/,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'wallpaper-images',
+              expiration: {
+                maxEntries: 1,  // 只保留一个壁纸
+                maxAgeSeconds: 24 * 60 * 60,  // 缓存 1 天
+              },
+            },
+          },
+
+        ],
+        // 启用 Service Worker 自清理功能
+        skipWaiting: true, // 强制立即激活新版本的 SW
+        clientsClaim: true, // 确保新 SW 能立即控制页面
+        // 启用清理旧缓存的功能
+        cleanOutdatedCaches: true,
       },
       registerType: 'autoUpdate', // 自动更新 Service Worker
       injectRegister: 'auto',
@@ -40,53 +84,7 @@ export default defineConfig({
       },
     }),
   ],
-  // 自定义 Service Worker 配置
-  workbox: {
-    maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
-    cachePrefix: 'HuaZhao-pwa-cache-' + new Date().getTime(), // 每次部署时更新缓存前缀
-    // 选择适合的缓存策略
-    runtimeCaching: [
-      {
-        urlPattern: /\/assets\/.*\.(?:js|css|png|jpg|woff2|eot|ttf|svg)/,
-        handler: 'CacheFirst',
-        options: {
-          cacheName: 'assets-cache',
-          expiration: {
-            maxEntries: 50,
-            maxAgeSeconds: 24 * 60 * 60, // 缓存有效期为 1 天
-          },
-        },
-      },
-      {
-        urlPattern: /.*\.(?:html|json)/,
-        handler: 'NetworkFirst', // 对于页面内容使用 NetworkFirst 策略
-        options: {
-          cacheName: 'html-cache',
-          expiration: {
-            maxEntries: 100,
-            maxAgeSeconds: 60 * 60 * 24, // 缓存有效期为 1 天
-          },
-        },
-      },
-      {
-        urlPattern: /https:\/\/www\.bing\.com\/th\?id=[^&]+/,
-        handler: 'CacheFirst',
-        options: {
-          cacheName: 'wallpaper-images',
-          expiration: {
-            maxEntries: 1,  // 只保留一个壁纸
-            maxAgeSeconds: 24 * 60 * 60,  // 缓存 1 天
-          },
-        },
-  },
 
-    ],
-    // 启用 Service Worker 自清理功能
-    skipWaiting: true, // 强制立即激活新版本的 SW
-    clientsClaim: true, // 确保新 SW 能立即控制页面
-    // 启用清理旧缓存的功能
-    cleanOutdatedCaches: true,
-  },
   server: {
     port: 8181,
     // port: 8189,
@@ -111,5 +109,17 @@ export default defineConfig({
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url))
     }
+  },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'three-lib': ['three'],
+          'markdown-lib': ['marked', 'highlight.js', 'katex'],
+          'element-plus': ['element-plus'],
+        }
+      }
+    }
   }
 })
+
