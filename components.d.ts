@@ -11,8 +11,6 @@ declare module 'vue' {
     Bookmark: typeof import('./src/components/Bookmark.vue')['default']
     ElConfigProvider: typeof import('element-plus/es')['ElConfigProvider']
     ElSkeleton: typeof import('element-plus/es')['ElSkeleton']
-    ElSkeletonItem: typeof import('element-plus/es')['ElSkeletonItem']
-    ElTag: typeof import('element-plus/es')['ElTag']
     FaceSlider: typeof import('./src/components/FaceSlider.vue')['default']
     FooterNav: typeof import('./src/components/footerNav.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
