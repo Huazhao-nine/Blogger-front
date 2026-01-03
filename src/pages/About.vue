@@ -134,7 +134,7 @@ const checkLoginStatus = async () => {
               message: QQRes.msg,
               type: 'success',
             });
-            auth.setToken(QQRes.token);
+            auth.setToken(QQRes.data.token);
             auth.setUser(QQRes);
             await router.replace('/About');
           } else {
@@ -151,7 +151,7 @@ const checkLoginStatus = async () => {
          message: '登录成功',
          type: 'success',
        });
-       auth.setToken(openidRes.token);
+       auth.setToken(openidRes.data.token);
        auth.setUser(openidRes);
        await router.push('/About');
      }
