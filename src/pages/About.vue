@@ -105,7 +105,7 @@ const checkLoginStatus = async () => {
   console.log(res);
   const openidRes = await getUserByopenid(res.data.openid);
     console.log(openidRes);
-     if (openidres.code !== 200) {
+     if (openidRes.code !== 200) {
     ElMessageBox.prompt('请输入你想要接受消息的邮箱', 'QQ绑定', {
       confirmButtonText: '确认',
       cancelButtonText: '取消',
@@ -128,14 +128,14 @@ const checkLoginStatus = async () => {
           });
           const QQRes = await QQLogin(QQLoginPak);
           console.log(QQRes);
-          if (QQres.code === 200) {
+          if (QQRes.code === 200) {
             ElNotification({
               title: '成功',
-              message: QQres.msg,
+              message: QQRes.msg,
               type: 'success',
             });
-            auth.setToken(QQres.token);
-            auth.setUser(QQres);
+            auth.setToken(QQRes.token);
+            auth.setUser(QQRes);
             await router.replace('/About');
           } else {
             ElNotification({
@@ -151,8 +151,8 @@ const checkLoginStatus = async () => {
          message: '登录成功',
          type: 'success',
        });
-       auth.setToken(openidres.token);
-       auth.setUser(openidres);
+       auth.setToken(openidRes.token);
+       auth.setUser(openidRes);
        await router.push('/About');
      }
 
