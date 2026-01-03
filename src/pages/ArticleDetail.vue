@@ -14,8 +14,9 @@ import { useDraggable } from '@/api/useTouchScroll.js';
 import { formatDate } from '../api/globals.js';
 import Bookmark from '@/components/Bookmark.vue';
 import { throttle } from 'lodash-es';
-import '@/assets/phycat-plusblue.css';
+import '@/assets/phycat-prussian.css';
 import { useIntersectionObserver } from '@vueuse/core';
+import {Clock, EditPen, Postcard, User, View} from "@element-plus/icons-vue";
 
 const articlesLoading = ref(false);
 const route = useRoute();
