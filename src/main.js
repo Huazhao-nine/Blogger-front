@@ -7,9 +7,9 @@ import {createPinia} from 'pinia'
 
 //注册组件
 
-
 const app = createApp(App)
 
 app.use(router);
 app.use(createPinia())
 app.mount('#app')
+

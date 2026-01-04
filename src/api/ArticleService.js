@@ -41,17 +41,24 @@ export const getArticlesByCategory = (id) => {
     return request.get(`/getArticlesByCategory/${id}`)
 }
 
-export const getArticlesDetail = async (articleId, token) => {
-    const response = await getSlugById(articleId);
-    if (response.code === 200) {
-        console.log(response)
-        const slug = response.msg;
-        await router.push(`/Article/${articleId}/${slug}`);
-    }else {
-        ElNotification({
-            title: '错误',
-            message: response.msg,
-            type: 'error',
-        });
-    }
-};
+    export const getArticlesDetail = async (articleId, token) => {
+        console.log(articleId)
+        const response = await getSlugById(articleId);
+        if (response.code === 200) {
+            console.log(response)
+            const slug = response.msg;
+            await router.push({
+                name: 'ArticleDetail',
+                params: {
+                    id: articleId,
+                    slug: slug
+                }
+            });
+        }else {
+            ElNotification({
+                title: '错误',
+                message: response.msg,
+                type: 'error',
+            });
+        }
+    };

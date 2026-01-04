@@ -7,7 +7,6 @@ import { marked } from 'marked';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
 import 'highlight.js/styles/atom-one-light.css';
-import hljs from 'highlight.js';
 import { useAuthStore } from '@/stores/auth.js';
 import { isAuthor } from '@/api/UserService.js';
 import { useDraggable } from '@/api/useTouchScroll.js';
@@ -17,6 +16,16 @@ import { throttle } from 'lodash-es';
 import '@/assets/phycat-prussian.css';
 import { useIntersectionObserver } from '@vueuse/core';
 import {Clock, EditPen, Postcard, Reading, User, View} from "@element-plus/icons-vue";
+// ✅ 救星：按需引入，体积减小 80%
+import hljs from 'highlight.js/lib/core';
+import javascript from "highlight.js/lib/languages/javascript";
+import java from "highlight.js/lib/languages/java";
+import sql from "highlight.js/lib/languages/sql";
+// ...只引入你常用的几种
+
+hljs.registerLanguage('javascript', javascript);
+hljs.registerLanguage('java', java);
+hljs.registerLanguage('sql', sql);
 
 const articlesLoading = ref(false);
 const route = useRoute();
@@ -158,8 +167,10 @@ const observeLatexElements = () => {
 
 const getArticle = async () => {
   articlesLoading.value = true;
+  console.log(route.params)
   const id = route.params.id;
   const res = await getArticleByID(id, auth.token);
+  console.log(res)
   if (res.code !== 200) {
     ElNotification({ title: '错误', message: res.msg, type: 'error' });
     dialogVisible.value = true;
@@ -672,7 +683,7 @@ onUnmounted(() => {
 
 .toc-item:hover, .toc-item.active {
   border-radius: 25px;
-  color: #2c9ab3;
+  color: #3db8d3;
   background: rgba(251, 207, 75, 0.1);
 }
 
