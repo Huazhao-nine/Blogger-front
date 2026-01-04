@@ -23,7 +23,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <router-view v-slot="{ Component }">
+  <router-view :key="route.fullPath" v-slot="{ Component }">
 
     <el-config-provider :locale="zhCn">
       <div>

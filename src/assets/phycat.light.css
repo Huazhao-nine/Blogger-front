@@ -499,13 +499,10 @@ kbd:hover {
   width: 100%;
   margin: 20px 0;
   border: 1px solid var(--element-color-shallow);
-  border-radius: 12px;
+  border-radius: 25px;
 
-  /* 🔴 修改这里：把 overflow: hidden 改为 block + auto，允许手机横向滚动 */
-  display: block;
-  overflow-x: auto;
-  white-space: nowrap; /* 保持表格不换行，确保结构清晰 */
-
+  display: table;
+  table-layout: auto; /* 列宽自动分配 */
   font-size: 14px;
   line-height: 1.6;
   /* 自定义滚动条样式，防止手机上太丑 */
@@ -843,18 +840,6 @@ pre.md-meta-block:hover {
     margin-left: 2px;
   }
 
-  /* 7. 表格手机端优化 */
-  #write table {
-    font-size: 13px;
-    margin: 15px 0;
-    /* 允许表格左右滑动 */
-    display: block;
-    overflow-x: auto;
-  }
-  #write th, #write td {
-    padding: 8px 10px;
-    white-space: nowrap; /* 保持表格不换行，滑动查看 */
-  }
 
   /* 8. 图片优化 */
   #write img {

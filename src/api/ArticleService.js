@@ -44,7 +44,7 @@ export const getArticlesByCategory = (id) => {
 export const getArticlesDetail = async (articleId, token) => {
     const response = await getSlugById(articleId);
     if (response.code === 200) {
-        // console.log("slug获取成功")
+        console.log(response)
         const slug = response.msg;
         await router.push(`/Article/${articleId}/${slug}`);
     }else {

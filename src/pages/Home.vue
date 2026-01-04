@@ -162,6 +162,8 @@ onBeforeUnmount(() => {
   background-color: #FFFFFE;
   box-shadow: 0 15px 20px rgba(0, 0, 0, 0.1);
   transition: transform 0.1s ease, box-shadow 0.1s ease;
+  z-index: 10;        /* 提升层级，确保在背景之上 */
+  cursor: pointer;
 }
 
 .article-card:hover {
