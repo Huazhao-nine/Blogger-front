@@ -38,7 +38,6 @@ html {
 #write {
   max-width: 100%;
   margin: 0 auto;
-  padding: 10px 0;
   line-height: 2.25;
   color: #333;
   letter-spacing: 0.5px;
@@ -47,6 +46,8 @@ html {
   text-align: left;
   position: relative;
   z-index: 0;
+  padding: 15px 24px !important;
+
 
   /* 强制继承全局字体 */
   font-family:"LXGW Bright Medium", sans-serif !important;
