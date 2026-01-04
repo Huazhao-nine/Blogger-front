@@ -16,7 +16,7 @@ import Bookmark from '@/components/Bookmark.vue';
 import { throttle } from 'lodash-es';
 import '@/assets/phycat-prussian.css';
 import { useIntersectionObserver } from '@vueuse/core';
-import {Clock, EditPen, Postcard, User, View} from "@element-plus/icons-vue";
+import {Clock, EditPen, Postcard, Reading, User, View} from "@element-plus/icons-vue";
 
 const articlesLoading = ref(false);
 const route = useRoute();
@@ -413,7 +413,7 @@ onUnmounted(() => {
            @mousedown="handleFloatMouseDown"
            @touchstart.passive="handleFloatTouchStart">
         <div class="toc-ball" @click="toggleToc" @touch="toggleToc">
-          <el-icon><Menu /></el-icon>
+          <el-icon><Reading /></el-icon>
         </div>
 
         <transition name="toc-slide">
@@ -612,7 +612,7 @@ onUnmounted(() => {
   width: 50px;
   height: 50px;
   border-radius: 50%;
-  background: linear-gradient(90deg, #ff8a00, #e52e71);
+  background: linear-gradient(90deg, #3db8d3, #2c9ab3);
   color: white;
   display: flex;
   align-items: center;
@@ -672,7 +672,7 @@ onUnmounted(() => {
 
 .toc-item:hover, .toc-item.active {
   border-radius: 25px;
-  color: #fbcf4b;
+  color: #2c9ab3;
   background: rgba(251, 207, 75, 0.1);
 }
 

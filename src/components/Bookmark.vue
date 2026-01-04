@@ -59,7 +59,7 @@ const generateBookmark = async () => {
   const ctx = canvas.getContext("2d");
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.resetTransform();
-  ctx.font = '25px "LXGW Bright Light", sans-serif';
+  ctx.font = '25px "LXGW Bright Medium", sans-serif';
   ctx.textAlign = "start";
   ctx.textBaseline = "top";
   // 设置 CSS 和高分辨率
@@ -87,7 +87,7 @@ const generateBookmark = async () => {
   // 绘制背景
   ctx.fillStyle = "#000"; // 黑色背景
   ctx.fillRect(0, 0, cssWidth, cssHeight);
-  ctx.font = '25px "LXGW Bright Light", sans-serif'; // 字体大小
+  ctx.font = '25px "LXGW Bright Medium", sans-serif'; // 字体大小
   ctx.fillStyle = "#FFFFFE"; // 白色文字
   ctx.textAlign = "start"; // 从左到右显示
   ctx.textBaseline = "top"; // 从顶部开始绘制
@@ -159,7 +159,7 @@ onUnmounted(() => {
 
 <style scoped>
 body {
-  font-family: "LXGW Bright Light", sans-serif;
+  font-family: "LXGW Bright Medium", sans-serif;
 }
 
 .preview-container {

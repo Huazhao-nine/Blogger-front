@@ -51,7 +51,7 @@ const welcome = () => {
     //   message: "欢迎回来！",
     //   type: 'success',
     // });
-    // console.log(auth.token)
+    // console.log(auth.user)
     ElMessage.success(auth.user.name + "，欢迎！")
   }
 }
