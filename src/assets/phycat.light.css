@@ -541,38 +541,145 @@ kbd:hover {
   color: var(--element-color-deep);
   cursor: default;
 }
-
 /* ==========================================================================
-   10. Callouts / Alerts (提示块)
+   10. Callouts / Alerts (Typora Mac OS 风格 - 最终版)
    ========================================================================== */
+
+/* 1. 容器基础样式 */
 .md-alert {
-  padding: 12px 16px;
-  margin-bottom: 16px;
-  color: #555;
-  border: none !important;
-  border-radius: 12px;
+  margin: 24px 0;
+  padding: 16px 20px;
+  border-radius: 12px; /* 圆角 */
+  border: 1px solid rgba(255, 255, 255, 0.5); /* 极细的半透明边框 */
   position: relative;
   overflow: hidden;
-  transition: transform 0.3s;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03); /* 基础柔和阴影 */
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  font-family: "LXGW Bright Medium", ui-monospace, sans-serif; /* 保持字体统一 */
 }
+
+/* 悬浮交互：上浮 + 加深阴影 */
 .md-alert:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06),
+  inset 0 0 0 1px rgba(255, 255, 255, 0.6);
 }
 
+/* 2. 标题区域 (图标+文字) */
 .md-alert-text-container {
-  font-weight: bold;
-  margin-bottom: 6px;
   display: flex;
   align-items: center;
+  font-weight: 800; /* 标题加粗 */
+  font-size: 1.05rem;
+  margin-bottom: 8px;
+  padding: 0;
+  background: transparent;
+  color: inherit;
+  letter-spacing: 0.5px;
 }
 
-/* 颜色变体 */
-.md-alert.md-alert-note { background-color: rgba(108, 92, 231, 0.1); border-left: 5px solid #6c5ce7 !important; }
-.md-alert.md-alert-tip { background-color: rgba(0, 184, 148, 0.1); border-left: 5px solid #00b894 !important; }
-.md-alert.md-alert-warning { background-color: rgba(253, 203, 110, 0.15); border-left: 5px solid #e17055 !important; }
-.md-alert.md-alert-important { background-color: rgba(255, 118, 117, 0.12); border-left: 5px solid #ff7675 !important; }
-.md-alert.md-alert-caution { background-color: rgba(214, 48, 49, 0.08); border-left: 5px solid #d63031 !important; }
+/* 3. Mac 风格图标 (白色小方块) */
+.md-alert-text-container::before {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px; /* 图标背景圆角 */
+  margin-right: 12px;
+  font-size: 18px; /* Emoji 大小 */
+  background: #fff; /* 纯白背景 */
+  box-shadow: 0 2px 6px rgba(0,0,0,0.06); /* 图标的小阴影 */
+  flex-shrink: 0;
+}
+
+/* 隐藏旧版可能存在的 SVG 图标 */
+.md-alert-text { display: none; }
+
+/* 4. 内容文字 */
+.md-alert p {
+  color: #444;
+  font-size: 0.95rem;
+  line-height: 1.7;
+  margin: 0.5em 0 0 0;
+}
+.md-alert p:first-child { margin-top: 0; }
+.md-alert p:last-child { margin-bottom: 0; }
+
+/* --- 5. 各类型配色 (微渐变背景) --- */
+/* 标题容器 */
+.md-alert-text-container {
+  display: flex;
+  align-items: center;
+  font-weight: 800;
+  font-size: 1rem;
+  margin-bottom: 8px; /* 标题和正文的间距 */
+  padding: 0;
+  background: transparent;
+  color: inherit;
+}
+
+/* 图标样式 */
+.md-alert-text-container::before {
+  /* 必须有 content 才能显示，下面的 JS 会自动匹配类型颜色 */
+  /* 这里只是通用样式 */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  margin-right: 10px;
+  font-size: 18px;
+  background: #fff;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+  flex-shrink: 0;
+
+  /* ✨ 强制指定 Emoji 字体，防止图标变成黑白或不显示 */
+  font-family: "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", sans-serif;
+}
+/* Note / Info (蓝色系 - 适合一般说明) */
+.md-alert.md-alert-note {
+  background: linear-gradient(135deg, #f0f3ff 0%, #e6e9ff 100%);
+  border-color: rgba(108, 92, 231, 0.15);
+}
+.md-alert.md-alert-note .md-alert-text-container { color: #5849be; }
+.md-alert.md-alert-note .md-alert-text-container::before { content: "📝"; color: #5849be; }
+
+/* Tip / Success (青色系 - 配合你的博客主色调) */
+.md-alert.md-alert-tip {
+  /* 使用你的 --element-color 的淡化版作为渐变 */
+  background: linear-gradient(135deg, #e6fcf5 0%, #d4f7f0 100%);
+  border-color: rgba(61, 184, 211, 0.2);
+}
+
+
+.md-alert.md-alert-tip .md-alert-text-container { color: #00997a; }
+.md-alert.md-alert-tip .md-alert-text-container::before { content: "💡"; color: #00b894; }
+
+/* Warning (橙黄色系 - 适合警告) */
+.md-alert.md-alert-warning {
+  background: linear-gradient(135deg, #fffcf0 0%, #fff7d9 100%);
+  border-color: rgba(253, 203, 110, 0.25);
+}
+.md-alert.md-alert-warning .md-alert-text-container { color: #d68910; }
+.md-alert.md-alert-warning .md-alert-text-container::before { content: "⚠️"; color: #f39c12; }
+
+/* Important (紫色系 - 适合重点) */
+.md-alert.md-alert-important {
+  background: linear-gradient(135deg, #f8f0ff 0%, #f0dfff 100%);
+  border-color: rgba(162, 155, 254, 0.25);
+}
+.md-alert.md-alert-important .md-alert-text-container { color: #6c5ce7; }
+.md-alert.md-alert-important .md-alert-text-container::before { content: "📌"; color: #6c5ce7; }
+
+/* Caution (红色系 - 适合危险/错误) */
+.md-alert.md-alert-caution {
+  background: linear-gradient(135deg, #fff0f0 0%, #ffe0e0 100%);
+  border-color: rgba(255, 118, 117, 0.25);
+}
+.md-alert.md-alert-caution .md-alert-text-container { color: #c0392b; }
+.md-alert.md-alert-caution .md-alert-text-container::before { content: "🔥"; color: #e74c3c; }
 /* --- 11. YAML 元数据块样式 --- */
 /* 如果你的解析器把 YAML 渲染成了 <pre class="md-meta-block">，这个样式会生效 */
 pre.md-meta-block {

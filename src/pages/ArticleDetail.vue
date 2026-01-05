@@ -108,6 +108,40 @@ const getMarkdownContent = async () => {
   renderer.image = ({ href, title, text }) => {
     return `<img src="${href}" alt="${text}" title="${title}" style="max-width: 100%; height: auto; display: block; margin: 0 auto;" loading="lazy" />`;
   };
+  renderer.blockquote = function (quote) {
+    // 1. 获取内容 HTML
+    let body = quote;
+    if (typeof quote !== 'string') {
+      body = this.parser.parse(quote.tokens);
+    }
+
+    // 2. 正则匹配：提取类型，例如 [!TIP]
+    const alertRegex = /^<p>\s*\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)\]/i;
+    const match = body.match(alertRegex);
+
+    if (match) {
+      // 2.1 提取类型 (如 tip)
+      const type = match[1].toLowerCase();
+
+      // 2.2 生成标题文字 (首字母大写，如 Tip)
+      const title = match[1].charAt(0).toUpperCase() + match[1].slice(1).toLowerCase();
+
+      // 2.3 删掉 [!TIP] 标记，保留剩余正文
+      const content = body.replace(/^<p>\s*\[!.*?\]\s*/i, '<p>');
+
+      // 2.4 ✨ 关键修改：生成包含“标题栏”的复杂结构
+      // 这里增加了一个 <p class="md-alert-text-container">，CSS 里的图标就是挂在它上面的
+      return `
+      <div class="md-alert md-alert-${type}">
+        <p class="md-alert-text-container">${title}</p>
+        ${content}
+      </div>
+    `;
+    }
+
+    // 普通引用块
+    return `<blockquote>${body}</blockquote>`;
+  };
   marked.use({
     extensions: [{
       name: 'highlight',
