@@ -117,6 +117,7 @@ export default defineConfig({
   // ... server 和 build 部分保持你原来的不变 ...
   server: {
     port: 8181,
+    // port: 8185,
     host: true,
     open: true,
     hot: true,
