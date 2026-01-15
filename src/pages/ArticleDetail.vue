@@ -1,5 +1,5 @@
 <script setup>
-import { nextTick, onMounted, onUnmounted, ref, reactive } from 'vue';
+import { nextTick, onMounted, onUnmounted, ref, reactive, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { getArticleByID, getArticleByPwd } from '@/api/ArticleService.js';
 import { fetchWallpaper } from '@/api/WallpaperService.js';
@@ -7,15 +7,77 @@ import { marked } from 'marked';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
 import 'highlight.js/styles/atom-one-light.css';
-import hljs from 'highlight.js';
 import { useAuthStore } from '@/stores/auth.js';
 import { isAuthor } from '@/api/UserService.js';
 import { useDraggable } from '@/api/useTouchScroll.js';
 import { formatDate } from '../api/globals.js';
 import Bookmark from '@/components/Bookmark.vue';
 import { throttle } from 'lodash-es';
-import '@/assets/phycat-plusblue.css';
+import '@/assets/phycat-prussian.css';
 import { useIntersectionObserver } from '@vueuse/core';
+import { Clock, EditPen, Postcard, Reading, User, View, Timer } from "@element-plus/icons-vue";
+import { ElNotification, ElImageViewer } from 'element-plus';
+
+// 按需引入 highlight.js
+import hljs from 'highlight.js/lib/core';
+import javascript from "highlight.js/lib/languages/javascript";
+import java from "highlight.js/lib/languages/java";
+import sql from "highlight.js/lib/languages/sql";
+import python from "highlight.js/lib/languages/python";
+import bash from "highlight.js/lib/languages/bash";
+
+hljs.registerLanguage('javascript', javascript);
+hljs.registerLanguage('java', java);
+hljs.registerLanguage('sql', sql);
+hljs.registerLanguage('python', python);
+hljs.registerLanguage('bash', bash);
+
+// ================== Marked 配置 ==================
+const renderer = new marked.Renderer();
+
+renderer.image = ({ href, title, text }) => {
+  return `<img src="${href}" alt="${text}" title="${title}" style="max-width: 100%; height: auto; display: block; margin: 0 auto;" loading="lazy" />`;
+};
+
+renderer.blockquote = function (quote) {
+  let body = quote;
+  if (typeof quote !== 'string') {
+    body = this.parser.parse(quote.tokens);
+  }
+
+  const alertRegex = /^<p>\s*\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)\]/i;
+  const match = body.match(alertRegex);
+
+  if (match) {
+    const type = match[1].toLowerCase();
+    const title = match[1].charAt(0).toUpperCase() + match[1].slice(1).toLowerCase();
+    const content = body.replace(/^<p>\s*\[!.*?\]\s*/i, '<p>');
+
+    return `
+      <div class="md-alert md-alert-${type}">
+        <p class="md-alert-text-container">${title}</p>
+        ${content}
+      </div>
+    `;
+  }
+  return `<blockquote>${body}</blockquote>`;
+};
+
+marked.use({
+  extensions: [{
+    name: 'highlight',
+    level: 'inline',
+    start(src) { return src.indexOf('=='); },
+    tokenizer(src) {
+      const match = /^==([\s\S]+?)==/.exec(src);
+      if (match) return { type: 'highlight', raw: match[0], text: match[1] };
+    },
+    renderer(token) { return `<mark>${token.text}</mark>`; }
+  }]
+});
+
+marked.setOptions({ async: false, breaks: true, gfm: true, renderer });
+// =================================================
 
 const articlesLoading = ref(false);
 const route = useRoute();
@@ -35,6 +97,10 @@ const dragPosition = reactive({ x: 20, y: 100 });
 const isDragging = ref(false);
 const startPos = reactive({ x: 0, y: 0 });
 
+const showImageViewer = ref(false);
+const imagePreviewList = ref([]);
+const imageInitialIndex = ref(0);
+
 const router = useRouter();
 const auth = useAuthStore();
 const articleListRef = ref(null);
@@ -44,6 +110,15 @@ const articleCache = new Map();
 
 let cachedHeadings = [];
 let cachedArticleContent = null;
+const textLength = ref(null)
+// 计算预估阅读时间
+const readingTime = computed(() => {
+  if (!article.value.content) return 0;
+  textLength.value = article.value.content.length;
+  const wpm = 400;
+  const time = Math.ceil(textLength.value / wpm);
+  return time < 1 ? 1 : time;
+});
 
 function batchRender(elements, renderFn, batchSize = 5) {
   const queue = [...elements];
@@ -55,15 +130,73 @@ function batchRender(elements, renderFn, batchSize = 5) {
   loop();
 }
 
-const chunkedParseMarkdown = async (markdown) => {
-  const chunkSize = isPhone.value ? 3000 : 5000;
-  let html = '';
-  for (let i = 0; i < markdown.length; i += chunkSize) {
-    const chunk = markdown.slice(i, i + chunkSize);
-    html += marked.parse(chunk);
-    await nextTick();
-  }
-  return html;
+const enhanceCodeBlocks = () => {
+  const preElements = document.querySelectorAll('.article-content pre');
+  preElements.forEach((pre) => {
+    if (pre.parentNode.classList.contains('code-block-wrapper')) return;
+
+    const wrapper = document.createElement('div');
+    wrapper.className = 'code-block-wrapper';
+
+    const header = document.createElement('div');
+    header.className = 'code-block-header';
+
+    const codeClass = pre.querySelector('code')?.className || '';
+    const lang = codeClass.match(/language-(\w+)/)?.[1] || 'TEXT';
+
+    header.innerHTML = `
+      <div class="mac-dots">
+        <span></span><span></span><span></span>
+      </div>
+      <span class="lang-label">${lang.toUpperCase()}</span>
+      <button class="copy-btn">复制</button>
+    `;
+
+    pre.parentNode.insertBefore(wrapper, pre);
+    wrapper.appendChild(header);
+    wrapper.appendChild(pre);
+
+    const btn = header.querySelector('.copy-btn');
+    btn.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(pre.innerText);
+        btn.textContent = '成功';
+        btn.style.color = '#3db8d3';
+        setTimeout(() => {
+          btn.textContent = '复制';
+          btn.style.color = '';
+        }, 2000);
+      } catch (err) {
+        console.error('复制失败', err);
+        btn.textContent = '失败';
+      }
+    });
+  });
+};
+
+const handleImagePreview = () => {
+  const imgs = document.querySelectorAll('.article-content img');
+  const srcList = [];
+  imgs.forEach((img, index) => {
+    srcList.push(img.src);
+    img.style.cursor = 'zoom-in';
+    img.onclick = () => {
+      imagePreviewList.value = srcList;
+      imageInitialIndex.value = index;
+      showImageViewer.value = true;
+    };
+  });
+};
+
+const wrapTables = () => {
+  const tables = document.querySelectorAll('.article-content table');
+  tables.forEach(table => {
+    if (table.parentNode.classList.contains('table-wrapper')) return;
+    const wrapper = document.createElement('div');
+    wrapper.className = 'table-wrapper';
+    table.parentNode.insertBefore(wrapper, table);
+    wrapper.appendChild(table);
+  });
 };
 
 const getMarkdownContent = async () => {
@@ -73,6 +206,9 @@ const getMarkdownContent = async () => {
       observeLatexElements();
       const codeBlocks = document.querySelectorAll('pre code');
       batchRender(codeBlocks, el => hljs.highlightElement(el));
+      enhanceCodeBlocks();
+      handleImagePreview();
+      wrapTables();
       generateTOC();
     }, 300);
     renderEnhancers();
@@ -80,6 +216,7 @@ const getMarkdownContent = async () => {
   }
 
   const rawContent = article.value.content;
+
   const latexMap = new Map();
   let index = 0;
   const latexProtected = rawContent
@@ -94,25 +231,8 @@ const getMarkdownContent = async () => {
         return key;
       });
 
-  const renderer = new marked.Renderer();
-  renderer.image = ({ href, title, text }) => {
-    return `<img src="${href}" alt="${text}" title="${title}" style="max-width: 100%; height: auto; display: block; margin: 0 auto;" loading="lazy" />`;
-  };
-  marked.use({
-    extensions: [{
-      name: 'highlight',
-      level: 'inline',
-      start(src) { return src.indexOf('=='); },
-      tokenizer(src) {
-        const match = /^==([\s\S]+?)==/.exec(src);
-        if (match) return { type: 'highlight', raw: match[0], text: match[1] };
-      },
-      renderer(token) { return `<mark>${token.text}</mark>`; }
-    }]
-  });
-  marked.setOptions({ async: false, breaks: true, gfm: true, renderer });
+  let html = marked.parse(latexProtected);
 
-  let html = await chunkedParseMarkdown(latexProtected);
   for (const [key, { latex, display }] of latexMap.entries()) {
     const span = `<span class="${display ? 'math' : 'inline-math'}">${latex}</span>`;
     html = html.split(key).join(span);
@@ -126,6 +246,11 @@ const getMarkdownContent = async () => {
     observeLatexElements();
     const codeBlocks = document.querySelectorAll('pre code');
     batchRender(codeBlocks, el => hljs.highlightElement(el));
+
+    enhanceCodeBlocks();
+    handleImagePreview();
+    wrapTables();
+
     generateTOC();
   });
 };
@@ -214,6 +339,7 @@ const edit = async () => {
 
 const generateTOC = () => {
   cachedArticleContent = document.querySelector('.article-content');
+  if (!cachedArticleContent) return;
   cachedHeadings = Array.from(cachedArticleContent.querySelectorAll('h2, h3, h4, h5, h6'));
 
   const toc = [];
@@ -299,7 +425,6 @@ const handleFloatMouseDown = (e) => {
 
 const handleFloatTouchStart = (e) => {
   if (e.target.closest('.toc-ball')) startDrag(e);
-  else e.stopPropagation();
 };
 
 const onDrag = (e) => {
@@ -317,6 +442,7 @@ const endDrag = () => {
 };
 
 const toggleToc = (e) => {
+  if(isDragging.value) return;
   e.stopPropagation();
   tocVisible.value = !tocVisible.value;
 };
@@ -357,7 +483,6 @@ onUnmounted(() => {
   <div v-else>
     <div class="home">
 
-      <!-- 顶部壁纸区域 -->
       <div @click="edit" class="header" :style="{ backgroundImage: `url(${wallpaperUrl})` }">
         <h2>{{ article.title }}</h2>
         <div v-if="!dialogVisible" class="article-meta">
@@ -382,6 +507,10 @@ onUnmounted(() => {
             {{ formatDate(article.publishedAt) }}
           </div>
         </div>
+        <div v-if="!dialogVisible" class="read-time-line">
+          <el-icon style="margin-right: 4px"><Timer /></el-icon>
+          本文共{{textLength}}个字符，预计阅读时间 {{ readingTime }} 分钟
+        </div>
 
         <div v-else class="dialog">
           <el-dialog v-model="dialogVisible" title="文章被上锁" width="300" :show-close="false" :modal="false"
@@ -399,20 +528,17 @@ onUnmounted(() => {
         </div>
       </div>
 
-      <!-- 阅读进度条 -->
       <div class="progress-container" v-if="!dialogVisible">
         <div class="progress-bar" :style="{ width: `${scrollProgress}%` }" />
       </div>
       <el-backtop :visibility-height="200" :right="20" :bottom="80" />
 
-
-      <!-- 悬浮目录按钮+面板 -->
       <div class="toc-float"
            :style="{ left: `${dragPosition.x}px`, top: `${dragPosition.y}px` }"
            @mousedown="handleFloatMouseDown"
            @touchstart.passive="handleFloatTouchStart">
-        <div class="toc-ball" @click="toggleToc" @touch="toggleToc">
-          <el-icon><Menu /></el-icon>
+        <div class="toc-ball" @click="toggleToc">
+          <el-icon><Reading /></el-icon>
         </div>
 
         <transition name="toc-slide">
@@ -420,7 +546,6 @@ onUnmounted(() => {
             <div class="toc-header">目录</div>
             <div class="toc-content">
               <div v-for="item in tocItems" :key="item.id">
-                <!-- 一级标题 -->
                 <div class="toc-item toc-h2"
                      :class="{ active: item.id === activeHeading }"
                      @click="() => { scrollToHeading(item.id); item.expanded = !item.expanded }">
@@ -430,7 +555,6 @@ onUnmounted(() => {
                   {{ item.text }}
                 </div>
 
-                <!-- 子标题 -->
                 <transition-group name="fade" tag="div">
                   <div v-for="child in item.children" :key="child.id"
                        v-show="item.expanded"
@@ -447,12 +571,10 @@ onUnmounted(() => {
         </transition>
       </div>
 
-      <!-- 正文内容区域 -->
       <div class="article-list" ref="articleListRef">
         <el-skeleton :rows="3" animated v-if="articlesLoading" />
         <div class="article-card" v-else>
           <div id="write" class="article-content" v-html="htmlContent" />
-          <!-- 版权声明 -->
           <div class="copyright-tip">
             © Copyright by 花朝九日
           </div>
@@ -460,6 +582,13 @@ onUnmounted(() => {
       </div>
 
     </div>
+
+    <el-image-viewer
+        v-if="showImageViewer"
+        :url-list="imagePreviewList"
+        :initial-index="imageInitialIndex"
+        @close="showImageViewer = false"
+    />
   </div>
 </template>
 
@@ -473,7 +602,8 @@ onUnmounted(() => {
 /* 顶部壁纸 */
 .header {
   background: center/cover no-repeat;
-  height: 160px;
+  height: 160px; /* 原来是 160px，因为加了一行可能稍微挤，如果文字多可以改成 180px */
+  padding: 10px 0; /* 增加一点内边距，防止内容贴边 */
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -487,9 +617,21 @@ onUnmounted(() => {
 /* 元数据 */
 .article-meta {
   display: flex;
-  justify-content: space-between;
+  justify-content: center; /* 居中对齐 */
   align-items: center;
   flex-wrap: wrap;
+  max-width: 90%; /* 防止手机上太宽 */
+}
+
+/* 单独一行的阅读时间 */
+.read-time-line {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 8px; /* 与上面隔开一点距离 */
+  font-size: 0.95rem;
+  color: #eee;
+  width: 100%;
 }
 
 .meta-item {
@@ -534,6 +676,97 @@ onUnmounted(() => {
   line-height: 1.8;
   background: #fcfcfb;
   overscroll-behavior: contain;
+  text-align: justify; /* 两端对齐 */
+  letter-spacing: 0.02em;
+}
+
+/* === 新增样式：Mac 风格代码块 === */
+:deep(.code-block-wrapper) {
+  background: #f8f8f8;
+  border-radius: 8px;
+  margin: 1.5em 0;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+  border: 1px solid #eaeaea;
+}
+
+:deep(.code-block-header) {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background: #f0f0f0;
+  border-bottom: 1px solid #ddd;
+}
+
+:deep(.mac-dots) {
+  display: flex;
+  gap: 6px;
+}
+:deep(.mac-dots span) {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+:deep(.mac-dots span:nth-child(1)) { background: #ff5f56; } /* 红 */
+:deep(.mac-dots span:nth-child(2)) { background: #ffbd2e; } /* 黄 */
+:deep(.mac-dots span:nth-child(3)) { background: #27c93f; } /* 绿 */
+
+:deep(.lang-label) {
+  font-size: 12px;
+  color: #888;
+  font-weight: bold;
+  text-transform: uppercase;
+  user-select: none;
+}
+
+:deep(.copy-btn) {
+  border: none;
+  background: white;
+  padding: 3px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
+  color: #555;
+  transition: all 0.2s;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+:deep(.copy-btn:hover) {
+  background: #3db8d3;
+  color: white;
+}
+
+:deep(.article-content pre) {
+  margin: 0 !important;
+  padding: 15px !important;
+  background: transparent !important;
+  border: none !important;
+}
+
+/* === 新增样式：表格滚动容器 === */
+:deep(.table-wrapper) {
+  overflow-x: auto;
+  margin: 1.5em 0;
+  border-radius: 8px;
+  border: 1px solid #eee;
+}
+:deep(table) {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 600px; /* 强制表格最小宽度，触发滚动 */
+}
+
+/* === 新增样式：超链接美化 === */
+:deep(.article-content a) {
+  color: #3db8d3;
+  text-decoration: none;
+  border-bottom: 1px dashed #3db8d3;
+  transition: all 0.3s;
+  padding-bottom: 1px;
+}
+:deep(.article-content a:hover) {
+  background: rgba(61, 184, 211, 0.1);
+  border-bottom-style: solid;
 }
 
 /* 标题层级优化 */
@@ -611,7 +844,7 @@ onUnmounted(() => {
   width: 50px;
   height: 50px;
   border-radius: 50%;
-  background: linear-gradient(90deg, #ff8a00, #e52e71);
+  background: linear-gradient(90deg, #3db8d3, #2c9ab3);
   color: white;
   display: flex;
   align-items: center;
@@ -671,7 +904,7 @@ onUnmounted(() => {
 
 .toc-item:hover, .toc-item.active {
   border-radius: 25px;
-  color: #fbcf4b;
+  color: #3db8d3;
   background: rgba(251, 207, 75, 0.1);
 }
 
@@ -715,4 +948,3 @@ onUnmounted(() => {
   text-align: center;
 }
 </style>
-

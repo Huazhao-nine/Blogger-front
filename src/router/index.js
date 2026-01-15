@@ -82,11 +82,6 @@ const routes = [
         meta: { title: 'Genetic Sbox' }
     },
     {
-        path: '/start',
-        component: () => import('@/pages/start.vue'),
-        meta: { title: 'Start' }
-    },
-    {
         path: '/face',
         component: () => import('@/pages/Face.vue'),
         meta: { title: 'Face' }
@@ -109,7 +104,28 @@ const router = createRouter({
         }
     },
 })
+router.onError((error) => {
+    const pattern = /Loading chunk (\d)+ failed/g;
+    const isChunkLoadFailed = error.message.match(pattern) || error.message.includes("Failed to fetch dynamically imported module");
 
+    if (isChunkLoadFailed) {
+        // 🛑 这里加个简单的防死循环机制
+        // 如果 10秒内已经刷新过了，就别再刷了，防止服务器真的挂了导致无限刷新
+        const targetPath = router.currentRoute.value.fullPath;
+        const lastReload = sessionStorage.getItem('last_reload_time');
+        const now = Date.now();
+
+        if (!lastReload || now - parseInt(lastReload) > 10000) {
+            console.log('检测到版本更新，正在强制刷新...');
+            sessionStorage.setItem('last_reload_time', now.toString());
+
+            // ✅ 直接 reload，浏览器会自动解析 Hash 路由，不会丢 # 号
+            window.location.reload();
+        } else {
+            console.error('资源加载失败，但刚刚已经刷新过了，可能是服务器真的缺文件。');
+        }
+    }
+});
 // 🚀 全局前置守卫
 router.beforeEach((to, from, next) => {
     // 1. 设置网页标题

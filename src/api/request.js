@@ -23,7 +23,7 @@ instance.interceptors.response.use(
     (response) => {
         // 直接返回 response.data
         // 这样你在业务代码里拿到的就是后端返回的 { code: 200, data: ..., msg: ... }
-        // 不需要再写 res.code 了，直接 res.code
+        // 不需要再写 res.data.code 了，直接 res.code
         return response.data
     },
     (error) => {

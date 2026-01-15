@@ -63,7 +63,7 @@ const navItems = [
   color: #555;
   transition: all 0.3s;
   /* 增加点击区域圆角 */
-  border-radius: 12px;
+  border-radius: 25px;
 }
 
 .footer-nav button:hover {
