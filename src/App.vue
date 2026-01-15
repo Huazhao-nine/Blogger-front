@@ -1,10 +1,28 @@
 <script setup>
 import { onBeforeUnmount, onMounted, ref, watch, h, computed } from 'vue';
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { zhCn } from "element-plus/es/locale/index";
 import FooterNav from "@/components/FooterNav.vue";
 import { useRegisterSW } from 'virtual:pwa-register/vue'
 import { ElNotification, ElButton } from 'element-plus'
+
+const router = useRouter()
+const route = useRoute() // 获取当前路由对象
+
+const pcModel = ref(true);
+const checkPcModel = () => {
+  if (window.innerWidth > 768) {
+    pcModel.value = false
+    if (route.path === '/') {
+      router.push('/pc')
+    }
+  } else {
+    pcModel.value = true
+    if (route.path === '/pc') {
+      router.push('/')
+    }
+  }
+}
 
 // 获取 PWA 更新状态
 const { needRefresh, updateServiceWorker } = useRegisterSW({
@@ -43,17 +61,6 @@ const showUpdateNotification = () => {
     customClass: 'pwa-updater',
   })
 }
-const route = useRoute() // 获取当前路由对象
-
-const pcModel = ref(true);
-const checkPcModel = () => {
-  // 简单的判断逻辑：如果屏幕宽，就不是移动端模式(假设 pcModel 控制底部导航显示)
-  if (window.innerWidth > 768) {
-    pcModel.value = false
-  } else {
-    pcModel.value = true
-  }
-}
 
 // 定义过渡动画名称
 const transitionName = computed(() => {
@@ -62,7 +69,6 @@ const transitionName = computed(() => {
 
 onMounted(() => {
   checkPcModel()
-  // 监听窗口变化，动态调整
   window.addEventListener('resize', checkPcModel)
 })
 </script>
@@ -79,7 +85,7 @@ onMounted(() => {
       </transition>
     </router-view>
 
-    <footer-nav></footer-nav>
+    <footer-nav v-if="pcModel"></footer-nav>
 
   </el-config-provider>
 </template>

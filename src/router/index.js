@@ -16,6 +16,12 @@ const routes = [
         meta: { title: '首页 - 花朝九日' }
     },
     {
+        path: '/pc',
+        name: 'HomePC',
+        component: () => import('@/pages/HomePC.vue'),
+        meta: { title: '首页 - 花朝九日' }
+    },
+    {
         path: '/About',
         name: 'About',
         component: () => import('@/pages/About.vue'),

@@ -59,7 +59,8 @@ const welcome = () => {
 const getArticleList = async () => {
   articlesLoading.value = true;
   const res = await getTheArticlesForHome(HomePage.value, HomeArticles.value);
-  articles.value = res.data;
+  // 后端现在返回 {data: [...], total: ...} 结构
+  articles.value = res.data.data || [];
   // console.log(articles.value);
   articlesLoading.value = false;
 };
